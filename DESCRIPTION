@@ -1,0 +1,26 @@
+Package: DynMSR
+Title: Toolkit for Working with DynMS Models in R
+Version: 0.1.0
+Authors@R: c(
+    person(given = "Evgeny", family = "Metelkin", role = c("aut", "cre"),
+           email = "evgeny.metelkin@gmail.com")
+  )
+Description: Provides tools to read, validate, normalize, and export models
+    stored in the DynMS format. DynMSR is intended as an interoperability
+    toolkit between DynMS and R modeling backends such as deSolve and
+    mrgsolve.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1)
+Imports:
+    jsonlite,
+    jsonvalidate
+Suggests:
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+URL: https://github.com/hetalang/DynMSR
+BugReports: https://github.com/hetalang/DynMSR/issues
+Config/roxygen2/version: 8.0.0

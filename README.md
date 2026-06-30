@@ -1,13 +1,15 @@
-# DynMS R
+# DynMSR
 
-Toolkit to work with DynMS in R
+Toolkit for working with DynMS models in R.
 
 [![Heta project](https://img.shields.io/badge/%CD%B1-Heta_project-blue)](https://hetalang.github.io/)
 [![GitHub issues](https://img.shields.io/github/issues/hetalang/dynmsr.svg)](https://GitHub.com/hetalang/dynmsr/issues/)
 [![GitHub license](https://img.shields.io/github/license/hetalang/dynmsr.svg)](https://github.com/hetalang/dynmsr/blob/master/LICENSE)
 [![Autotests](https://github.com/hetalang/dynmsr/workflows/Autotests/badge.svg)](https://github.com/hetalang/dynmsr/actions)
 
-**DynMS R** provides tools for reading, validating, converting, compiling, and simulating models stored in the DynMS format. It aims to make DynMS models interoperable with the R modeling ecosystem while providing a common interface for model manipulation and analysis.
+**DynMSR** provides tools for reading, validating, normalizing, converting,
+compiling, and eventually simulating models stored in the DynMS format. DynMSR
+is an interoperability toolkit between DynMS and the R modeling ecosystem.
 
 ## Planned features
 
@@ -15,7 +17,7 @@ Toolkit to work with DynMS in R
 - Convert DynMS models to **deSolve**
 - Convert DynMS models to **mrgsolve**
 - Compile generated C code for fast simulation
-- Import models from Heta via the DynMS intermediate format
+- Optional import workflows from Heta via the DynMS intermediate format
 
 ## Installation
 
@@ -31,12 +33,22 @@ devtools::install_github("hetalang/DynMSR")
 ```r
 library(DynMSR)
 
-# Load and validate DynMS models from the file
-platform <- dynms_read("model.dynms.json")
+# Read the DynMS JSON file as an R list
+raw_platform <- dynms_read("model.dynms.json")
+
+# Validate the raw platform object against the bundled DynMS schema
+dynms_validate_schema(raw_platform)
+
+# Validate model-level consistency, such as internal identifier references
+dynms_validate_semantic(raw_platform)
+
+# Normalize the raw list into DynMSR's internal representation
+platform <- dynms_normalize(raw_platform)
 dynms_model <- platform$models[[1]]
 
-# Convert the DynMS model to C code, compile and load it into DESolve model
-desolve_model <- get_desolve(dynms_model)
+# Future API target:
+# desolve_model <- dynms_export_desolve(dynms_model)
+# mrgsolve_model <- dynms_export_mrgsolve(dynms_model)
 ```
 
 ## Related projects

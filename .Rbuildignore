@@ -1,0 +1,6 @@
+^\.git$
+^\.github$
+^\.Rproj\.user$
+^AGENTS\.md$
+^README\.Rmd$
+^cran-comments\.md$
