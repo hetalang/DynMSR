@@ -1,0 +1,134 @@
+{
+  "id": "nameless",
+  "constants": [
+    {
+      "id": "k1",
+      "value": 0.001
+    }
+  ],
+  "states": [
+    {
+      "id": "c1",
+      "initial": 5,
+      "static": true
+    },
+    {
+      "id": "x1_amt_",
+      "initial": {
+        "expr": [
+          "Multiply",
+          1,
+          5
+        ],
+        "format": "math-json"
+      }
+    },
+    {
+      "id": "x2",
+      "initial": 2
+    },
+    {
+      "id": "x3_amt_",
+      "initial": {
+        "expr": [
+          "Multiply",
+          3,
+          5
+        ],
+        "format": "math-json"
+      },
+      "static": true
+    }
+  ],
+  "assignments": [
+    {
+      "id": "x3",
+      "rhs": {
+        "expr": [
+          "Divide",
+          "x3_amt_",
+          "c1"
+        ],
+        "format": "math-json"
+      }
+    },
+    {
+      "id": "x1",
+      "rhs": {
+        "expr": [
+          "Divide",
+          "x1_amt_",
+          "c1"
+        ],
+        "format": "math-json"
+      }
+    },
+    {
+      "id": "pr1",
+      "rhs": {
+        "expr": [
+          "Multiply",
+          "k1",
+          "x1"
+        ],
+        "format": "math-json"
+      }
+    }
+  ],
+  "derivatives": [
+    {
+      "state": "x1_amt_",
+      "rhs": {
+        "expr": [
+          "Negate",
+          "pr1"
+        ],
+        "format": "math-json"
+      }
+    },
+    {
+      "state": "x2",
+      "rhs": {
+        "expr": "pr1",
+        "format": "math-json"
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "sw1",
+      "trigger": {
+        "type": "time",
+        "start": 12
+      },
+      "priority": 0,
+      "actions": [
+        {
+          "rhs": {
+            "expr": [
+              "Multiply",
+              [
+                "Divide",
+                [
+                  "Add",
+                  [
+                    "Multiply",
+                    "x3",
+                    "c1"
+                  ],
+                  10
+                ],
+                "c1"
+              ],
+              "c1"
+            ],
+            "format": "math-json"
+          },
+          "state": "x3_amt_"
+        }
+      ],
+      "active": true
+    }
+  ],
+  "observables": []
+}
