@@ -51,6 +51,24 @@ dynms_model <- platform$models[[1]]
 # mrgsolve_model <- dynms_export_mrgsolve(dynms_model)
 ```
 
+## Development
+
+The bundled DynMS JSON Schema is stored in `inst/schema/dynms.schema.json`.
+Its upstream source URL is recorded in `inst/schema/dynms.schema.source.json`.
+
+To refresh the local schema copy during development:
+
+```sh
+Rscript tools/update-dynms-schema.R
+```
+
+If the upstream URL is not reachable from the current network, `source` can be
+temporarily changed to a local schema file path in
+`inst/schema/dynms.schema.source.json`.
+
+This is a manual developer step. Package installation, examples, and tests use
+the bundled local schema and do not download files from the internet.
+
 ## Related projects
 
 - [DynMS](https://hetalang.github.io/hetacompiler/dynms.html) — model representation format and specification (currently part of the **heta-compiler**)

@@ -139,6 +139,7 @@ R/
 inst/
   schema/
     dynms.schema.json
+    dynms.schema.source.json
   templates/
     desolve_model.c.mustache
   examples/
@@ -202,6 +203,24 @@ model <- jsonlite::fromJSON(path, simplifyVector = FALSE)
 Use `jsonvalidate` for JSON Schema validation.
 
 DynMSR should validate the raw DynMS JSON before attempting conversion or code generation.
+The package must use the bundled local schema at `inst/schema/dynms.schema.json`
+during normal operation.
+
+The bundled schema is a vendored copy of an upstream schema. Its source URL is
+recorded in `inst/schema/dynms.schema.source.json`. To refresh the local copy,
+developers may run:
+
+```sh
+Rscript tools/update-dynms-schema.R
+```
+
+This update script is a manual development tool. Do not run it during package
+installation, examples, tests, or CRAN checks. Do not require internet access
+for normal package use.
+
+The `source` field may be an `http(s)` URL or a local file path for development
+environments where the upstream URL is not reachable. The script must leave the
+existing local schema untouched if the download or local-file read fails.
 
 Recommended flow:
 
