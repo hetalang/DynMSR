@@ -1,108 +1,113 @@
 {
-  "id": "nameless",
-  "constants": [
+  "dynms": "0.1.0",
+  "models": [
     {
-      "id": "k1",
-      "value": 0.001
-    }
-  ],
-  "states": [
-    {
-      "id": "x1",
-      "initial": 1
-    },
-    {
-      "id": "x2",
-      "initial": 2
-    }
-  ],
-  "assignments": [
-    {
-      "id": "pr1",
-      "rhs": {
-        "expr": [
-          "Multiply",
-          "k1",
-          "x1"
-        ],
-        "format": "math-json"
-      }
-    }
-  ],
-  "derivatives": [
-    {
-      "state": "x1",
-      "rhs": {
-        "expr": [
-          "Negate",
-          "pr1"
-        ],
-        "format": "math-json"
-      }
-    },
-    {
-      "state": "x2",
-      "rhs": {
-        "expr": "pr1",
-        "format": "math-json"
-      }
-    }
-  ],
-  "events": [
-    {
-      "id": "sw1",
-      "trigger": {
-        "type": "time",
-        "start": 12,
-        "period": 24,
-        "stop": 100
-      },
-      "priority": 0,
-      "actions": [
+      "id": "nameless",
+      "constants": [
         {
+          "id": "k1",
+          "value": 0.001
+        }
+      ],
+      "states": [
+        {
+          "id": "x1",
+          "initial": 1
+        },
+        {
+          "id": "x2",
+          "initial": 2
+        }
+      ],
+      "assignments": [
+        {
+          "id": "pr1",
           "rhs": {
             "expr": [
-              "Add",
-              "x1",
-              10
+              "Multiply",
+              "k1",
+              "x1"
             ],
             "format": "math-json"
-          },
-          "state": "x1"
+          }
         }
       ],
-      "active": false
-    },
-    {
-      "id": "sw2",
-      "trigger": {
-        "type": "crossing",
-        "rhs": {
-          "expr": [
-            "Add",
-            "x1",
-            [
-              "Negate",
-              100
-            ]
-          ],
-          "format": "math-json"
-        },
-        "detection": "root",
-        "atStart": true
-      },
-      "priority": 0,
-      "actions": [
+      "derivatives": [
         {
+          "state": "x1",
           "rhs": {
-            "expr": 0,
+            "expr": [
+              "Negate",
+              "pr1"
+            ],
             "format": "math-json"
-          },
-          "state": "x1"
+          }
+        },
+        {
+          "state": "x2",
+          "rhs": {
+            "expr": "pr1",
+            "format": "math-json"
+          }
         }
       ],
-      "active": true
+      "events": [
+        {
+          "id": "sw1",
+          "trigger": {
+            "type": "time",
+            "start": 12,
+            "period": 24,
+            "stop": 100
+          },
+          "priority": 0,
+          "actions": [
+            {
+              "rhs": {
+                "expr": [
+                  "Add",
+                  "x1",
+                  10
+                ],
+                "format": "math-json"
+              },
+              "state": "x1"
+            }
+          ],
+          "active": false
+        },
+        {
+          "id": "sw2",
+          "trigger": {
+            "type": "crossing",
+            "rhs": {
+              "expr": [
+                "Add",
+                "x1",
+                [
+                  "Negate",
+                  100
+                ]
+              ],
+              "format": "math-json"
+            },
+            "detection": "root",
+            "atStart": true
+          },
+          "priority": 0,
+          "actions": [
+            {
+              "rhs": {
+                "expr": 0,
+                "format": "math-json"
+              },
+              "state": "x1"
+            }
+          ],
+          "active": true
+        }
+      ],
+      "observables": []
     }
-  ],
-  "observables": []
+  ]
 }

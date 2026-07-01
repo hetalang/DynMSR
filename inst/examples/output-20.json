@@ -1,129 +1,134 @@
 {
-  "id": "nameless",
-  "constants": [
+  "dynms": "0.1.0",
+  "models": [
     {
-      "id": "k1",
-      "value": 0.001
-    },
-    {
-      "id": "dose1",
-      "value": 15
-    },
-    {
-      "id": "start1",
-      "value": 12
-    }
-  ],
-  "states": [
-    {
-      "id": "c1",
-      "initial": 5,
-      "static": true
-    },
-    {
-      "id": "x1_amt_",
-      "initial": {
-        "expr": [
-          "Multiply",
-          1,
-          5
-        ],
-        "format": "math-json"
-      }
-    },
-    {
-      "id": "x2",
-      "initial": 2
-    }
-  ],
-  "assignments": [
-    {
-      "id": "x1",
-      "rhs": {
-        "expr": [
-          "Divide",
-          "x1_amt_",
-          "c1"
-        ],
-        "format": "math-json"
-      }
-    },
-    {
-      "id": "pr1",
-      "rhs": {
-        "expr": [
-          "Multiply",
-          "k1",
-          "x1"
-        ],
-        "format": "math-json"
-      }
-    }
-  ],
-  "derivatives": [
-    {
-      "state": "x1_amt_",
-      "rhs": {
-        "expr": [
-          "Negate",
-          "pr1"
-        ],
-        "format": "math-json"
-      }
-    },
-    {
-      "state": "x2",
-      "rhs": {
-        "expr": "pr1",
-        "format": "math-json"
-      }
-    }
-  ],
-  "events": [
-    {
-      "id": "sw1",
-      "trigger": {
-        "type": "time",
-        "start": {
-          "expr": "start1",
-          "format": "math-json"
-        }
-      },
-      "priority": 0,
-      "actions": [
+      "id": "nameless",
+      "constants": [
         {
-          "rhs": {
+          "id": "k1",
+          "value": 0.001
+        },
+        {
+          "id": "dose1",
+          "value": 15
+        },
+        {
+          "id": "start1",
+          "value": 12
+        }
+      ],
+      "states": [
+        {
+          "id": "c1",
+          "initial": 5,
+          "static": true
+        },
+        {
+          "id": "x1_amt_",
+          "initial": {
             "expr": [
               "Multiply",
-              [
-                "Divide",
-                [
-                  "Add",
-                  [
-                    "Multiply",
-                    "x1",
-                    "c1"
-                  ],
-                  "dose1"
-                ],
-                "c1"
-              ],
+              1,
+              5
+            ],
+            "format": "math-json"
+          }
+        },
+        {
+          "id": "x2",
+          "initial": 2
+        }
+      ],
+      "assignments": [
+        {
+          "id": "x1",
+          "rhs": {
+            "expr": [
+              "Divide",
+              "x1_amt_",
               "c1"
             ],
             "format": "math-json"
-          },
-          "state": "x1_amt_"
+          }
         },
         {
+          "id": "pr1",
           "rhs": {
-            "expr": 0,
+            "expr": [
+              "Multiply",
+              "k1",
+              "x1"
+            ],
             "format": "math-json"
-          },
-          "state": "x2"
+          }
         }
       ],
-      "active": true
+      "derivatives": [
+        {
+          "state": "x1_amt_",
+          "rhs": {
+            "expr": [
+              "Negate",
+              "pr1"
+            ],
+            "format": "math-json"
+          }
+        },
+        {
+          "state": "x2",
+          "rhs": {
+            "expr": "pr1",
+            "format": "math-json"
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "sw1",
+          "trigger": {
+            "type": "time",
+            "start": {
+              "expr": "start1",
+              "format": "math-json"
+            }
+          },
+          "priority": 0,
+          "actions": [
+            {
+              "rhs": {
+                "expr": [
+                  "Multiply",
+                  [
+                    "Divide",
+                    [
+                      "Add",
+                      [
+                        "Multiply",
+                        "x1",
+                        "c1"
+                      ],
+                      "dose1"
+                    ],
+                    "c1"
+                  ],
+                  "c1"
+                ],
+                "format": "math-json"
+              },
+              "state": "x1_amt_"
+            },
+            {
+              "rhs": {
+                "expr": 0,
+                "format": "math-json"
+              },
+              "state": "x2"
+            }
+          ],
+          "active": true
+        }
+      ],
+      "observables": []
     }
-  ],
-  "observables": []
+  ]
 }

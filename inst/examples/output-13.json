@@ -1,60 +1,65 @@
 {
-  "id": "nameless",
-  "constants": [
+  "dynms": "0.1.0",
+  "models": [
     {
-      "id": "k1",
-      "value": 0.001
-    }
-  ],
-  "states": [
-    {
-      "id": "x1",
-      "initial": 1
-    },
-    {
-      "id": "x2",
-      "initial": 2
-    }
-  ],
-  "assignments": [
-    {
-      "id": "pr1",
-      "rhs": {
-        "expr": [
-          "Multiply",
-          "k1",
-          "x1"
-        ],
-        "format": "math-json"
-      }
-    }
-  ],
-  "derivatives": [
-    {
-      "state": "x1",
-      "rhs": {
-        "expr": [
-          "Negate",
-          "pr1"
-        ],
-        "format": "math-json"
-      }
-    },
-    {
-      "state": "x2",
-      "rhs": {
-        "expr": "pr1",
-        "format": "math-json"
-      }
-    }
-  ],
-  "events": [],
-  "observables": [
-    {
-      "symbol": "x1"
-    },
-    {
-      "symbol": "pr1"
+      "id": "nameless",
+      "constants": [
+        {
+          "id": "k1",
+          "value": 0.001
+        }
+      ],
+      "states": [
+        {
+          "id": "x1",
+          "initial": 1
+        },
+        {
+          "id": "x2",
+          "initial": 2
+        }
+      ],
+      "assignments": [
+        {
+          "id": "pr1",
+          "rhs": {
+            "expr": [
+              "Multiply",
+              "k1",
+              "x1"
+            ],
+            "format": "math-json"
+          }
+        }
+      ],
+      "derivatives": [
+        {
+          "state": "x1",
+          "rhs": {
+            "expr": [
+              "Negate",
+              "pr1"
+            ],
+            "format": "math-json"
+          }
+        },
+        {
+          "state": "x2",
+          "rhs": {
+            "expr": "pr1",
+            "format": "math-json"
+          }
+        }
+      ],
+      "events": [],
+      "observables": [
+        {
+          "symbol": "x1"
+        },
+        {
+          "symbol": "pr1"
+        }
+      ]
     }
   ]
 }

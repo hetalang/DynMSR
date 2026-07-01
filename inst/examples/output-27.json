@@ -1,74 +1,79 @@
 {
-  "id": "nameless",
-  "constants": [
+  "dynms": "0.1.0",
+  "models": [
     {
-      "id": "k1",
-      "value": 0.001
-    }
-  ],
-  "states": [
-    {
-      "id": "x1",
-      "initial": 1
-    },
-    {
-      "id": "x2",
-      "initial": 2
-    }
-  ],
-  "assignments": [
-    {
-      "id": "pr1",
-      "rhs": {
-        "expr": [
-          "Multiply",
-          "k1",
-          "x1"
-        ],
-        "format": "math-json"
-      }
-    }
-  ],
-  "derivatives": [
-    {
-      "state": "x1",
-      "rhs": {
-        "expr": [
-          "Negate",
-          "pr1"
-        ],
-        "format": "math-json"
-      }
-    },
-    {
-      "state": "x2",
-      "rhs": {
-        "expr": "pr1",
-        "format": "math-json"
-      }
-    }
-  ],
-  "events": [
-    {
-      "id": "ss1",
-      "trigger": {
-        "type": "conditional",
-        "rhs": {
-          "expr": [
-            "Greater",
-            "x1",
-            10
-          ],
-          "format": "math-json"
+      "id": "nameless",
+      "constants": [
+        {
+          "id": "k1",
+          "value": 0.001
+        }
+      ],
+      "states": [
+        {
+          "id": "x1",
+          "initial": 1
         },
-        "detection": "step",
-        "atStart": true
-      },
-      "priority": 0,
-      "actions": [],
-      "active": true,
-      "stopSimulation": true
+        {
+          "id": "x2",
+          "initial": 2
+        }
+      ],
+      "assignments": [
+        {
+          "id": "pr1",
+          "rhs": {
+            "expr": [
+              "Multiply",
+              "k1",
+              "x1"
+            ],
+            "format": "math-json"
+          }
+        }
+      ],
+      "derivatives": [
+        {
+          "state": "x1",
+          "rhs": {
+            "expr": [
+              "Negate",
+              "pr1"
+            ],
+            "format": "math-json"
+          }
+        },
+        {
+          "state": "x2",
+          "rhs": {
+            "expr": "pr1",
+            "format": "math-json"
+          }
+        }
+      ],
+      "events": [
+        {
+          "id": "ss1",
+          "trigger": {
+            "type": "conditional",
+            "rhs": {
+              "expr": [
+                "Greater",
+                "x1",
+                10
+              ],
+              "format": "math-json"
+            },
+            "detection": "step",
+            "atStart": true
+          },
+          "priority": 0,
+          "actions": [],
+          "active": true,
+          "stopSimulation": true
+        }
+      ],
+      "observables": []
     }
-  ],
-  "observables": []
+  ]
 }

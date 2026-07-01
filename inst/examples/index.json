@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "0.1.0",
+  "locationBase": "examples",
+  "contentType": "platform",
+  "examples": [
+    {
+      "id": "output-01",
+      "file": "output-01.json"
+    },
+    {
+      "id": "output-02",
+      "file": "output-02.json"
+    },
+    {
+      "id": "output-03",
+      "file": "output-03.json"
+    },
+    {
+      "id": "output-04",
+      "file": "output-04.json"
+    },
+    {
+      "id": "output-05",
+      "file": "output-05.json"
+    },
+    {
+      "id": "output-06",
+      "file": "output-06.json"
+    },
+    {
+      "id": "output-07",
+      "file": "output-07.json"
+    },
+    {
+      "id": "output-08",
+      "file": "output-08.json"
+    },
+    {
+      "id": "output-09",
+      "file": "output-09.json"
+    },
+    {
+      "id": "output-10",
+      "file": "output-10.json"
+    },
+    {
+      "id": "output-11",
+      "file": "output-11.json"
+    },
+    {
+      "id": "output-12",
+      "file": "output-12.json"
+    },
+    {
+      "id": "output-13",
+      "file": "output-13.json"
+    },
+    {
+      "id": "output-14",
+      "file": "output-14.json"
+    },
+    {
+      "id": "output-15",
+      "file": "output-15.json"
+    },
+    {
+      "id": "output-16",
+      "file": "output-16.json"
+    },
+    {
+      "id": "output-17",
+      "file": "output-17.json"
+    },
+    {
+      "id": "output-18",
+      "file": "output-18.json"
+    },
+    {
+      "id": "output-19",
+      "file": "output-19.json"
+    },
+    {
+      "id": "output-20",
+      "file": "output-20.json"
+    },
+    {
+      "id": "output-21",
+      "file": "output-21.json"
+    },
+    {
+      "id": "output-22",
+      "file": "output-22.json"
+    },
+    {
+      "id": "output-23",
+      "file": "output-23.json"
+    },
+    {
+      "id": "output-24",
+      "file": "output-24.json"
+    },
+    {
+      "id": "output-25",
+      "file": "output-25.json"
+    },
+    {
+      "id": "output-26",
+      "file": "output-26.json"
+    },
+    {
+      "id": "output-27",
+      "file": "output-27.json"
+    },
+    {
+      "id": "output-28",
+      "file": "output-28.json"
+    }
+  ]
+}

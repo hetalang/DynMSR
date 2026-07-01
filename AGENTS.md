@@ -142,6 +142,7 @@ inst/
   templates/
     desolve_model.c.mustache
   examples/
+    index.json
     *.json
 
 tests/
@@ -159,8 +160,10 @@ This structure may change, but keep the separation between reading, validation, 
 The structure must follow the traditional CRAN R package layout.
 
 Do not assume a specific example filename in `inst/examples`. User-provided
-example files may change. Unit tests should use test fixtures or temporary JSON
-files instead of depending on a particular file in `inst/examples`.
+example files may change. Example files that should be used by tests or
+documentation must be listed in `inst/examples/index.json`; do not scan the
+folder at test time. Unit tests may also use inline temporary JSON fixtures for
+schema-level platform documents.
 
 ## R dependencies
 
@@ -554,13 +557,15 @@ When modifying the project:
 
 * Keep changes small and testable.
 * Prefer adding tests with each new feature.
-* Keep tests independent from mutable files in `inst/examples`; use testthat
-  helpers or temporary files for stable fixtures.
+* Keep tests independent from directory scans in `inst/examples`; use
+  `inst/examples/index.json` for example discovery or inline temporary files
+  for stable fixtures.
 * Do not introduce Node.js unless explicitly requested.
 * Do not make Heta a required dependency.
 * Do not assume DynMS always comes from Heta.
-* Do not modify `inst/schema/dynms.schema.json` or `inst/examples` unless the
-  user explicitly asks for changes there.
+* Do not modify `inst/schema/dynms.schema.json` or example JSON files in
+  `inst/examples` unless the user explicitly asks for changes there. Updating
+  `inst/examples/index.json` is appropriate when the example list changes.
 * Do not hard-code paths outside the package or temporary directories.
 * Do not generate files in the user working directory unless explicitly requested by the function contract.
 * Keep generated files reproducible.

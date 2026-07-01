@@ -16,7 +16,8 @@ dynms_schema_path <- function() {
 #'
 #' Validates a DynMS document against a JSON Schema. The document can be passed
 #' as a file path or as the raw R list returned by [dynms_read()]. By default,
-#' the schema bundled with DynMSR is used.
+#' the schema bundled with DynMSR is used. Validation uses the `ajv` engine
+#' because the bundled schema uses modern JSON Schema features.
 #'
 #' @param x Path to a DynMS JSON file, or the raw R list returned by
 #'   [dynms_read()].
@@ -40,7 +41,8 @@ dynms_validate_schema <- function(x, schema = NULL, error = FALSE, verbose = FAL
     json = json,
     schema = schema,
     error = error,
-    verbose = verbose
+    verbose = verbose,
+    engine = "ajv"
   )
 }
 
