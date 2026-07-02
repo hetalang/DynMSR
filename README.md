@@ -59,6 +59,12 @@ Run the local test suite with:
 Rscript -e "pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
 ```
 
+Regenerate roxygen2 documentation, including `NAMESPACE` and `man/*.Rd`, with:
+
+```sh
+Rscript -e "roxygen2::roxygenise()"
+```
+
 The bundled DynMS JSON Schema is stored in `inst/schema/dynms.schema.json`.
 Its upstream source URL is recorded in `inst/schema/dynms.schema.source.json`.
 

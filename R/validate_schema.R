@@ -21,16 +21,14 @@ dynms_schema_path <- function() {
 #'
 #' @param x Path to a DynMS JSON file, or the raw R list returned by
 #'   [dynms_read()].
-#' @param schema Optional path to a JSON Schema file. When `NULL`, the bundled
-#'   schema is used.
 #' @param error Whether validation errors should be raised as R errors.
 #' @param verbose Whether to return verbose validation output from
 #'   `jsonvalidate`.
 #'
 #' @return `TRUE` or `FALSE`, unless verbose validation is requested.
 #' @export
-dynms_validate_schema <- function(x, schema = NULL, error = FALSE, verbose = FALSE) {
-  schema <- schema %||% dynms_schema_path()
+dynms_validate_schema <- function(x, error = FALSE, verbose = FALSE) {
+  schema <- dynms_schema_path()
 
   if (!is.character(schema) || length(schema) != 1L || !file.exists(schema)) {
     stop("`schema` must be a path to an existing JSON Schema file.", call. = FALSE)
@@ -46,6 +44,8 @@ dynms_validate_schema <- function(x, schema = NULL, error = FALSE, verbose = FAL
   )
 }
 
+# XXX: We convert the input back to JSON here, mybe this is not the best approach. 
+# We can validate just from file or file content inside dynms_read() function.
 dynms_json_input <- function(x) {
   if (is.character(x) && length(x) == 1L && file.exists(x)) {
     return(x)

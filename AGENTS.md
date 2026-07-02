@@ -125,8 +125,8 @@ class-based dispatch.
 
 ```text
 R/
-  read_dynms.R
-  validate_dynms.R
+  read.R
+  validate_schema.R
   validate_semantic.R
   normalize_dynms.R
   export_desolve.R
@@ -148,9 +148,9 @@ inst/
 
 tests/
   testthat/
-    test-read-dynms.R
-    test-validate-dynms.R
-    test-normalize-dynms.R
+    test-read.R
+    test-validate-schema.R
+    test-normalize.R
     test-generate-desolve-c.R
     test-export-desolve.R
     test-generate-mrgsolve-c.R
