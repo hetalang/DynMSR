@@ -4,19 +4,17 @@
 \alias{dynms_validate_schema}
 \title{Validate a DynMS document against the JSON Schema}
 \usage{
-dynms_validate_schema(x, error = FALSE, verbose = FALSE)
+dynms_validate_schema(x, error = FALSE)
 }
 \arguments{
 \item{x}{Path to a DynMS JSON file, or the raw R list returned by
 \code{\link[=dynms_read]{dynms_read()}}.}
 
-\item{error}{Whether validation errors should be raised as R errors.}
-
-\item{verbose}{Whether to return verbose validation output from
-\code{jsonvalidate}.}
+\item{error}{Whether schema validation errors should be raised as one R
+error after all available issues are collected.}
 }
 \value{
-\code{TRUE} or \code{FALSE}, unless verbose validation is requested.
+A list with \code{valid}, \code{errors}, and \code{warnings} fields.
 }
 \description{
 Validates a DynMS document against a JSON Schema. The document can be passed

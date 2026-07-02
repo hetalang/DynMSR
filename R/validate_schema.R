@@ -21,13 +21,12 @@ dynms_schema_path <- function() {
 #'
 #' @param x Path to a DynMS JSON file, or the raw R list returned by
 #'   [dynms_read()].
-#' @param error Whether validation errors should be raised as R errors.
-#' @param verbose Whether to return verbose validation output from
-#'   `jsonvalidate`.
+#' @param error Whether schema validation errors should be raised as one R
+#'   error after all available issues are collected.
 #'
-#' @return `TRUE` or `FALSE`, unless verbose validation is requested.
+#' @return A list with `valid`, `errors`, and `warnings` fields.
 #' @export
-dynms_validate_schema <- function(x, error = FALSE, verbose = FALSE) {
+dynms_validate_schema <- function(x, error = FALSE) {
   schema <- dynms_schema_path()
 
   if (!is.character(schema) || length(schema) != 1L || !file.exists(schema)) {
@@ -35,13 +34,27 @@ dynms_validate_schema <- function(x, error = FALSE, verbose = FALSE) {
   }
 
   json <- dynms_json_input(x)
-  jsonvalidate::json_validate(
+  validation <- jsonvalidate::json_validate(
     json = json,
     schema = schema,
-    error = error,
-    verbose = verbose,
+    error = FALSE,
+    verbose = TRUE,
+    greedy = TRUE,
     engine = "ajv"
   )
+
+  errors <- schema_validation_errors(attr(validation, "errors"))
+  result <- list(
+    valid = isTRUE(unname(validation)),
+    errors = errors,
+    warnings = list()
+  )
+
+  if (!result$valid && isTRUE(error)) {
+    stop(format_schema_errors(errors), call. = FALSE)
+  }
+
+  result
 }
 
 # XXX: We convert the input back to JSON here, mybe this is not the best approach. 
@@ -56,4 +69,44 @@ dynms_json_input <- function(x) {
   }
 
   stop("`x` must be a DynMS file path or an R list.", call. = FALSE)
+}
+
+schema_validation_errors <- function(errors) {
+  if (is.null(errors) || nrow(errors) == 0L) {
+    return(list())
+  }
+
+  lapply(seq_len(nrow(errors)), function(i) {
+    row <- errors[i, , drop = FALSE]
+    path <- row[["instancePath"]]
+
+    if (is.null(path) || is.na(path) || !nzchar(path)) {
+      path <- "$"
+    } else {
+      path <- paste0("$", path)
+    }
+
+    list(
+      path = path,
+      code = row[["keyword"]],
+      message = row[["message"]],
+      schema_path = row[["schemaPath"]]
+    )
+  })
+}
+
+format_schema_errors <- function(errors) {
+  lines <- vapply(
+    errors,
+    function(issue) {
+      paste0(issue$path, " [", issue$code, "]: ", issue$message)
+    },
+    character(1)
+  )
+
+  paste(
+    "DynMS schema validation failed:",
+    paste(lines, collapse = "\n"),
+    sep = "\n"
+  )
 }
