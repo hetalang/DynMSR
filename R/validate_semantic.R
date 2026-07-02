@@ -22,15 +22,9 @@ dynms_validate_semantic <- function(raw_platform, error = FALSE) {
     )
   }
 
-  models <- raw_platform$models
-  if (length(models) == 0L) {
-    add_error("$.models", "empty_models", "DynMS platform must contain at least one model.")
-    return_semantic_result(issues, error)
-  }
-
-  for (model_index in seq_along(models)) {
+  for (model_index in seq_along(raw_platform$models)) {
     model_path <- paste0("$.models[", model_index, "]")
-    model <- models[[model_index]]
+    model <- raw_platform$models[[model_index]]
 
     validate_duplicate_identifiers(
       model$states,

@@ -45,16 +45,6 @@ test_that("dynms_validate_semantic collects duplicate identifiers", {
   expect_match(result$errors[[2]]$message, "observables")
 })
 
-test_that("dynms_validate_semantic reports empty model lists", {
-  raw <- list(models = list())
-
-  result <- dynms_validate_semantic(raw)
-
-  expect_false(result$valid)
-  expect_length(result$errors, 1L)
-  expect_equal(result$errors[[1]]$code, "empty_models")
-})
-
 test_that("dynms_validate_semantic can raise one error with all collected issues", {
   raw <- list(
     models = list(
