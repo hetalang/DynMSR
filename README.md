@@ -53,6 +53,12 @@ dynms_model <- platform$models[[1]]
 
 ## Development
 
+Run the local test suite with:
+
+```sh
+Rscript -e "pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
+```
+
 The bundled DynMS JSON Schema is stored in `inst/schema/dynms.schema.json`.
 Its upstream source URL is recorded in `inst/schema/dynms.schema.source.json`.
 

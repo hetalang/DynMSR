@@ -4,6 +4,68 @@ args <- commandArgs(trailingOnly = TRUE)
 dry_run <- "--dry-run" %in% args
 
 config_path <- file.path("inst", "schema", "dynms.schema.source.json")
+json_schema_meta_url <- "https://json-schema.org/draft/2020-12/schema"
+
+download_file <- function(url, dest) {
+  tryCatch(
+    {
+      utils::download.file(
+        url,
+        dest,
+        mode = "wb",
+        quiet = TRUE,
+        method = if (capabilities("libcurl")) "libcurl" else "auto"
+      )
+      NULL
+    },
+    error = function(e) conditionMessage(e),
+    warning = function(w) conditionMessage(w)
+  )
+}
+
+validate_json_schema <- function(schema_path) {
+  message("Validating DynMS schema with AJV.")
+
+  schema <- jsonlite::fromJSON(schema_path, simplifyVector = FALSE)
+  if (!identical(schema[["$schema"]], json_schema_meta_url)) {
+    stop(
+      paste(
+        "DynMS schema must declare JSON Schema draft 2020-12.",
+        "",
+        "Expected `$schema`:",
+        json_schema_meta_url,
+        "",
+        "The existing local schema was not modified.",
+        sep = "\n"
+      ),
+      call. = FALSE
+    )
+  }
+
+  tryCatch(
+    {
+      jsonvalidate::json_validator(
+        schema = schema_path,
+        engine = "ajv"
+      )
+      invisible(TRUE)
+    },
+    error = function(e) {
+      stop(
+        paste(
+          "DynMS schema could not be compiled by AJV as JSON Schema draft 2020-12.",
+          "",
+          "Reason:",
+          conditionMessage(e),
+          "",
+          "The existing local schema was not modified.",
+          sep = "\n"
+        ),
+        call. = FALSE
+      )
+    }
+  )
+}
 
 if (!file.exists(config_path)) {
   stop("Schema source config was not found: ", config_path, call. = FALSE)
@@ -33,20 +95,7 @@ is_url <- grepl("^https?://", config$source)
 
 if (is_url) {
   message("Downloading DynMS schema from: ", config$source)
-  download_error <- tryCatch(
-    {
-      utils::download.file(
-        config$source,
-        tmp,
-        mode = "wb",
-        quiet = TRUE,
-        method = if (capabilities("libcurl")) "libcurl" else "auto"
-      )
-      NULL
-    },
-    error = function(e) conditionMessage(e),
-    warning = function(w) conditionMessage(w)
-  )
+  download_error <- download_file(config$source, tmp)
 
   if (!is.null(download_error)) {
     stop(
@@ -89,6 +138,8 @@ schema <- tryCatch(
 if (!is.list(schema) || is.null(schema[["$schema"]]) || is.null(schema[["$id"]])) {
   stop("Downloaded file does not look like a JSON Schema document.", call. = FALSE)
 }
+
+validate_json_schema(tmp)
 
 if (isTRUE(dry_run)) {
   message("Dry run complete; target was not modified: ", config$target)
