@@ -74,17 +74,7 @@ normalize_outputs <- function(x) {
     item
   })
 
-  ids <- vapply(items, `[[`, character(1), "id")
-  duplicated_ids <- unique(ids[duplicated(ids)])
-  if (length(duplicated_ids) > 0L) {
-    stop(
-      "Duplicate identifiers in `outputs`: ",
-      paste(duplicated_ids, collapse = ", "),
-      call. = FALSE
-    )
-  }
-
-  names(items) <- ids
+  names(items) <- vapply(items, `[[`, character(1), "id")
   items
 }
 
@@ -112,16 +102,6 @@ normalize_named_collection <- function(x, field) {
     item
   })
 
-  ids <- vapply(items, `[[`, character(1), "id")
-  duplicated_ids <- unique(ids[duplicated(ids)])
-  if (length(duplicated_ids) > 0L) {
-    stop(
-      "Duplicate identifiers in `", field, "`: ",
-      paste(duplicated_ids, collapse = ", "),
-      call. = FALSE
-    )
-  }
-
-  names(items) <- ids
+  names(items) <- vapply(items, `[[`, character(1), "id")
   items
 }

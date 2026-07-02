@@ -21,7 +21,7 @@ test_that("dynms_normalize returns a stable platform representation", {
   expect_named(platform$models[[1]]$outputs, "A")
 })
 
-test_that("dynms_normalize reports duplicate identifiers", {
+test_that("dynms_normalize leaves semantic duplicate checks to semantic validation", {
   raw <- list(
     models = list(
       list(
@@ -31,5 +31,7 @@ test_that("dynms_normalize reports duplicate identifiers", {
     )
   )
 
-  expect_error(dynms_normalize(raw), "Duplicate identifiers")
+  platform <- dynms_normalize(raw)
+
+  expect_named(platform$models[[1]]$states, c("A", "A"))
 })
