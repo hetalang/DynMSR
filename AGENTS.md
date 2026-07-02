@@ -1,132 +1,75 @@
 # Instructions for AI agents
 
-## Project overview
+## Project identity
 
-This repository contains **DynMSR**, an R toolkit for working with models stored in the **DynMS** format.
+**DynMSR** is an R toolkit for working with models stored in the **DynMS**
+format. DynMS is the canonical, language-independent intermediate
+representation for Systems Biology and Systems Pharmacology models.
 
-DynMS is intended to be a language-independent model representation format for Systems Biology and Systems Pharmacology. DynMSR is the R implementation/toolkit that reads, validates, converts, compiles, and eventually simulates DynMS models using R modeling backends.
+DynMSR must be positioned as an interoperability toolkit between DynMS and the
+R modeling ecosystem. Do not describe or design it as only:
 
-The package should not be treated as a Heta-only package. Heta is one possible frontend that can generate DynMS, but DynMSR must work with DynMS files independently of Heta.
+* a Heta importer;
+* a deSolve wrapper;
+* a simulator.
 
-Conceptual pipeline:
+Heta is one optional frontend that can produce DynMS. DynMSR must work with
+DynMS JSON files independently of Heta.
+
+Target direction:
 
 ```text
-Heta or other frontend
-        |
-        v
-    DynMS JSON
-        |
-        v
-      DynMSR
-        |
-        +--> deSolve
-        +--> mrgsolve
-        +--> future R backends
+Heta or other frontend -> DynMS JSON -> DynMSR -> deSolve / mrgsolve / future R backends
 ```
 
-## Naming and positioning
-
-* Specification / format: **DynMS**
-* R package: **DynMSR**
-* Repository name: `DynMSR`
-* Project description: **Toolkit for working with DynMS models in R**
-
-Avoid positioning DynMSR as:
-
-* a Heta importer only;
-* a deSolve wrapper only;
-* a simulator only.
-
-DynMSR should be positioned as an interoperability toolkit between DynMS and the R modeling ecosystem.
-
-## Main goals
-
-DynMSR should provide tools to:
-
-1. Read DynMS JSON files.
-2. Validate raw DynMS documents against a JSON Schema.
-3. Validate semantic consistency of raw DynMS documents.
-4. Normalize DynMS content into internal R list structures.
-5. Export DynMS models to R modeling backends.
-6. Generate C code for compiled backends where needed.
-7. Compile generated code using R tooling.
-8. Load compiled models into R.
-9. Later, run simulations through a unified R interface.
-
-## Initial scope
-
-The first practical target is:
+Initial backend priorities:
 
 ```text
 DynMS JSON -> deSolve C code -> compiled shared library -> deSolve model
-```
-
-The second target is:
-
-```text
 DynMS JSON -> mrgsolve C code -> compiled shared library -> mrgsolve model
 ```
 
-Heta support must remain optional.
+## Architecture
 
-## Recommended architecture
-
-Use a staged architecture instead of direct JSON-to-C generation.
+Keep the implementation staged. Do not collapse reading, validation,
+normalization, code generation, compilation, and simulation into one converter.
 
 Preferred pipeline:
 
 ```text
 dynms_read()
-    |
-    v
-dynms_validate_schema()
-    |
-    v
-dynms_validate_semantic()
-    |
-    v
-dynms_normalize()
-    |
-    v
-backend-specific exporter
-    |
-    +--> dynms_export_desolve()
-    +--> dynms_export_mrgsolve()
+  -> dynms_validate_schema()
+  -> dynms_validate_semantic()
+  -> dynms_normalize()
+  -> dynms_export_desolve() / dynms_export_mrgsolve()
 ```
 
-Recommended internal stages:
+Important function boundaries:
 
-1. Raw JSON parsing.
-2. JSON Schema validation.
-3. Semantic validation.
-4. Conversion to internal R list representation.
-5. Backend-specific code generation.
-6. Compilation/loading if applicable.
+* `dynms_read(path)` is a small reader only. It uses
+  `jsonlite::fromJSON(path, simplifyVector = FALSE)` and returns the raw R
+  list. It must not validate or normalize.
+* `dynms_validate_schema(raw_platform)` validates raw DynMS JSON against the
+  bundled schema. It may accept a file path or a raw list returned by
+  `dynms_read()`. It validates DynMS documents, not the schema itself.
+* `dynms_validate_semantic(raw_platform)` is a public placeholder for future
+  model-level checks. Do not add behavior until semantic rules are deliberately
+  designed.
+* `dynms_normalize(raw_platform)` returns a plain R list. Do not add S3 classes
+  such as `dynms_platform` until there is a concrete dispatch need.
 
-Do not put all logic into one large converter function.
+Core parsing and generation should be R-native. Generate backend code from
+prepared R data structures. Do not write a C program that reads JSON and emits
+C.
 
-`dynms_read()` must remain a small reader: it reads a JSON file with
-`jsonlite::fromJSON(..., simplifyVector = FALSE)` and returns the raw R list.
-It should not validate or normalize.
+## Package layout
 
-`dynms_validate_schema(raw_platform)` validates a raw DynMS document against the bundled
-JSON Schema. It may accept either a file path or the raw R list returned by
-`dynms_read()`. It does not validate the schema itself.
-
-`dynms_validate_semantic(raw_platform)` is currently a placeholder for future
-model-level integrity checks. Keep it in the public API, but do not add behavior
-until semantic rules are intentionally implemented.
-
-`dynms_normalize(raw_platform)` returns a plain R list. Do not add an S3 class
-such as `dynms_platform` until there is a concrete need for S3 methods or
-class-based dispatch.
-
-## Suggested file structure
+Follow a traditional CRAN R package layout and keep concerns separated:
 
 ```text
 R/
-  read.R
-  validate_schema.R
+  read_dynms.R
+  validate_dynms.R
   validate_semantic.R
   normalize_dynms.R
   export_desolve.R
@@ -141,274 +84,104 @@ inst/
     dynms.schema.json
     dynms.schema.source.json
   templates/
-    desolve_model.c.mustache
   examples/
     index.json
     *.json
 
 tests/
   testthat/
-    test-read.R
-    test-validate-schema.R
-    test-normalize.R
-    test-generate-desolve-c.R
-    test-export-desolve.R
-    test-generate-mrgsolve-c.R
-    test-export-mrgsolve.R
 ```
 
-This structure may change, but keep the separation between reading, validation, normalization, export, compilation, and simulation.
-The structure must follow the traditional CRAN R package layout.
+The exact files may change, but keep reading, validation, normalization,
+backend export, compilation, and simulation separate.
 
-Do not assume a specific example filename in `inst/examples`. User-provided
-example files may change. Example files that should be used by tests or
-documentation must be listed in `inst/examples/index.json`; do not scan the
-folder at test time. Unit tests may also use inline temporary JSON fixtures for
-schema-level platform documents.
+Do not assume a specific example filename in `inst/examples`. Examples used by
+tests or documentation must be listed in `inst/examples/index.json`. Do not
+scan the examples directory at test time. Unit tests may use inline temporary
+fixtures or explicit fixture files for error cases.
 
-## R dependencies
+## Dependencies
 
-Prefer stable CRAN packages.
+Prefer stable CRAN packages and avoid unnecessary dependencies.
 
 Recommended packages:
 
-* `jsonlite` for reading and writing JSON.
+* `jsonlite` for JSON reading/writing.
 * `jsonvalidate` for JSON Schema validation.
-* `whisker` for Mustache-style templates.
+* `whisker` for Mustache templates.
 * `deSolve` for the first simulation backend.
 * `mrgsolve` for the second backend.
 * `testthat` for tests.
 * `withr` for temporary files and controlled environments.
-* `fs` may be used for filesystem utilities if useful.
-* `processx` may be used if robust external process execution becomes necessary.
+* `fs` or `processx` only when they remove real complexity.
 
-Avoid unnecessary dependencies.
+Do not require Node.js, npm, or `heta-compiler` for the core package.
 
-Do not require Node.js, npm, or heta-compiler for the core package.
+## JSON and schema handling
 
-## JSON handling
-
-Use `jsonlite::fromJSON(..., simplifyVector = FALSE)` when reading DynMS files.
-
-Reason: DynMS is closer to an AST/configuration tree than to tabular data. Automatic conversion of arrays to data frames may cause unexpected behavior.
-
-Example:
+Always parse DynMS JSON with:
 
 ```r
-model <- jsonlite::fromJSON(path, simplifyVector = FALSE)
+jsonlite::fromJSON(path, simplifyVector = FALSE)
 ```
 
-## JSON Schema validation
+DynMS documents are tree-like model descriptions, not tables; automatic data
+frame simplification can corrupt structure.
 
-Use `jsonvalidate` for JSON Schema validation.
+Use the bundled local schema at `inst/schema/dynms.schema.json` for normal
+operation. The source of that vendored schema is recorded in
+`inst/schema/dynms.schema.source.json`.
 
-DynMSR should validate the raw DynMS JSON before attempting conversion or code generation.
-The package must use the bundled local schema at `inst/schema/dynms.schema.json`
-during normal operation.
-
-The bundled schema is a vendored copy of an upstream schema. Its source URL is
-recorded in `inst/schema/dynms.schema.source.json`. To refresh the local copy,
-developers may run:
+Developers may refresh the local schema manually with:
 
 ```sh
 Rscript tools/update-dynms-schema.R
 ```
 
-This update script is a manual development tool. Do not run it during package
-installation, examples, tests, or CRAN checks. Do not require internet access
-for normal package use.
+The update script is a development tool only. Do not run it during package
+installation, examples, tests, or CRAN checks. Normal package use must not
+require internet access. If downloading or reading a local schema source fails,
+the existing bundled schema must remain unchanged.
 
-The `source` field may be an `http(s)` URL or a local file path for development
-environments where the upstream URL is not reachable. The script must leave the
-existing local schema untouched if the download or local-file read fails.
+JSON Schema validation should cover structural rules such as required fields,
+types, enums, patterns, and object/array shape. R semantic validation should
+cover model-level rules such as duplicate identifiers, missing references,
+unsupported expressions, and backend limitations.
 
-Recommended flow:
+## Backend generation
 
-```text
-DynMS JSON file
-    |
-    v
-dynms_read()
-    |
-    v
-raw R list
-    |
-    v
-dynms_validate_schema(raw_platform)
-    |
-    v
-dynms_validate_semantic(raw_platform)
-    |
-    v
-dynms_normalize(raw_platform)
-```
+Keep backend assumptions out of the core DynMS parser.
 
-JSON Schema should check structural rules:
+For generated code:
 
-* required fields;
-* types;
-* enums;
-* patterns;
-* array/object structure.
+* Prepare template data in R.
+* Keep templates logic-light.
+* Prefer `whisker` for Mustache-style templates.
+* Make generated files reproducible.
+* Use temporary directories unless a public function explicitly promises an
+  output path.
 
-R semantic validation should check model-level rules:
+For deSolve, target compiled C compatible with `R CMD SHLIB`, `dyn.load()`, and
+deSolve's compiled model interface.
 
-* duplicate identifiers;
-* missing state references;
-* invalid parameter references;
-* unsupported expressions;
-* backend-specific limitations.
-
-## Code generation strategy
-
-The generator should be written in R.
-
-Do not write a C program that reads JSON and generates C code.
-
-Preferred approach:
-
-```text
-DynMS JSON -> R list/object -> prepared template data -> C code text
-```
-
-The generated C code is backend-specific output.
-
-Most generation logic should live in R, while the C template should stay as simple as possible.
-
-## Template engine
-
-Prefer `whisker` for templates.
-
-Reason:
-
-* available on CRAN;
-* simple;
-* stable;
-* suitable for code generation;
-* encourages logic-less templates.
-
-Template data should be prepared in R before rendering.
-
-Avoid putting complex logic into templates.
-
-Possible example:
-
-```mustache
-{{#parameters}}
-double {{name}} = {{value}};
-{{/parameters}}
-
-{{#equations}}
-ydot[{{index}}] = {{rhs}};
-{{/equations}}
-```
-
-## deSolve backend
-
-The first backend should generate C code compatible with compiled `deSolve` models.
-
-Target pipeline:
-
-```text
-DynMS model
-    |
-    v
-generated C source
-    |
-    v
-R CMD SHLIB or equivalent compilation
-    |
-    v
-dyn.load()
-    |
-    v
-deSolve simulation object/interface
-```
-
-The public API may start with:
-
-```r
-raw_platform <- dynms_read("model.dynms.json")
-dynms_validate_schema(raw_platform)
-dynms_validate_semantic(raw_platform)
-platform <- dynms_normalize(raw_platform)
-model <- platform$models[[1]]
-```
-
-Later, backend-specific APIs should use explicit names such as:
-
-```r
-desolve_model <- dynms_export_desolve(model)
-```
-
-Function names are still experimental. Prefer explicit names for public API.
-
-## mrgsolve backend
-
-The second backend should export DynMS models to `mrgsolve`.
-
-Target pipeline:
-
-```text
-DynMS model -> mrgsolve model source -> mrgsolve compilation/loading
-```
-
-Keep mrgsolve-specific assumptions out of the core DynMS parser.
-
-## Heta integration
-
-Heta support is optional and should not be required for normal DynMSR usage.
-
-Future Heta pipeline:
-
-```text
-Heta source -> heta-compiler -> DynMS JSON -> DynMSR
-```
-
-If Heta integration is added, it should:
-
-* detect whether `heta` is available;
-* check for `heta` version compatibility;
-* fail gracefully if not installed;
-* not run during CRAN checks unless explicitly enabled;
-* not require Node.js for core package installation.
+For mrgsolve, generate mrgsolve model source and keep compilation/loading logic
+backend-specific.
 
 ## CRAN compatibility
 
-Keep CRAN compatibility in mind from the beginning.
+Preserve CRAN compatibility from the beginning:
 
-Important rules:
-
-* Do not require internet access during installation, examples, or tests.
-* Do not require heta-compiler to be installed for package checks.
-* Do not require Node.js for package checks.
-* Avoid writing outside temporary directories.
-* Use `tempdir()` or `withr::local_tempdir()` for generated files.
-* Guard optional examples with availability checks.
+* No internet access during installation, examples, tests, or checks.
+* No required Node.js, npm, Heta, or external compiler frontend.
+* Write generated files only under temporary directories unless explicitly
+  requested by the function contract.
+* Guard optional backend tests and examples with availability checks such as
+  `testthat::skip_if_not_installed("deSolve")`.
 * Keep examples small and fast.
-* Include at least one small DynMS example file in `inst/examples`.
 
-Optional features should be skipped safely in tests when required external tools are unavailable.
+## Public API
 
-Example:
-
-```r
-testthat::skip_if_not_installed("deSolve")
-```
-
-or for external executables:
-
-```r
-if (!heta_available()) {
-  testthat::skip("heta-compiler is not available")
-}
-```
-
-## Public API principles
-
-Prefer clear names over short names.
-
-Recommended naming style:
+Prefer explicit names:
 
 ```r
 dynms_read()
@@ -421,147 +194,65 @@ dynms_compile()
 dynms_simulate()
 ```
 
-Avoid ambiguous names like:
+Avoid ambiguous public names such as `import()`, `convert()`, `compile()`, or
+`run()`. Use internal helpers for backend-specific implementation details.
 
-```r
-import()
-convert()
-compile()
-run()
-```
+## Testing
 
-unless they are internal helpers.
-
-Use internal helper functions for backend-specific work.
-
-## Implementation sequence (preliminary)
-
-### Phase 1 — Minimal DynMS reader
-
-* Create package skeleton.
-* Add `dynms_read()`.
-* Read JSON using `jsonlite`.
-* Return a raw R list.
-* Do not validate or normalize in `dynms_read()`.
-* Add minimal tests.
-
-### Phase 2 — Validation
-
-* Add DynMS JSON Schema file.
-* Add `dynms_validate_schema(raw_platform)`.
-* Use `jsonvalidate`.
-* Add tests for valid and invalid DynMS files.
-
-### Phase 2b — Semantic validation placeholder
-
-* Add `dynms_validate_semantic(raw_platform)`.
-* Keep it as a documented no-op placeholder until semantic rules are designed.
-
-### Phase 3 — Normalization
-
-* Add `dynms_normalize()`.
-* Convert raw DynMS list into a stable internal plain-list representation.
-* Resolve model list access.
-* Normalize identifiers, states, parameters, equations, outputs.
-* Do not add S3 classes until there is a concrete use for class-based behavior.
-
-### Phase 4 — deSolve C generation
-
-* Add a simple C template.
-* Add `dynms_export_desolve()`.
-* Generate C code from a minimal ODE model.
-* Test generated text against expected output.
-* Do not compile in the first test if avoidable.
-
-### Phase 5 — Compilation
-
-* Add code compilation via R-compatible tools.
-* Compile generated C into a shared library.
-* Load the library.
-* Add tests guarded by platform/compiler availability.
-
-### Phase 6 — Heta integration
-
-* Add optional detection of heta-compiler.
-* Add a helper for converting Heta to DynMS if useful.
-* Keep this optional and separate from the core package.
-
-### Phase 7 — deSolve simulation wrapper
-
-* Add a small wrapper around `deSolve`.
-* Run a simple simulation.
-* Compare output with expected values for a trivial model.
-
-### Phase 8 — mrgsolve export
-
-* Add `dynms_export_mrgsolve()`.
-* Generate mrgsolve model code.
-* Add tests guarded by `mrgsolve` availability.
-
-
-## Testing strategy
-
-Test layers independently.
-
-Recommended tests:
+Test layers independently:
 
 1. JSON reading.
 2. Schema validation.
-3. Normalization.
-4. Semantic validation.
-5. C code generation.
+3. Semantic validation.
+4. Normalization.
+5. Code generation.
 6. Compilation.
 7. deSolve simulation.
 8. mrgsolve export.
 
-Generated code tests should not rely only on snapshot text. Where possible, test behavior using small models.
+Prefer small models such as one-compartment decay, two-state conversion,
+parameterized models, and models with outputs/observables.
 
-Use very small models:
+Generated code tests should not rely only on snapshots. Where feasible, test
+behavior with small models. Optional backend or compiler tests must skip safely
+when required tools are unavailable.
 
-* one-compartment decay;
-* two-state conversion;
-* model with parameters;
-* model with outputs/observables.
+Run local tests with:
+
+```sh
+Rscript -e "pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
+```
 
 ## Documentation
 
-All documentation, comments, and code comments must be written in English.
+All documentation, comments, and code comments must be in English.
 
-Use `roxygen2` for public function documentation and `NAMESPACE` generation.
-Documentation should live in `#'` blocks next to the functions in `R/*.R`.
+Use `roxygen2` for public function documentation and for generating
+`NAMESPACE` and `man/*.Rd`. Documentation should live in `#'` blocks next to
+functions in `R/*.R`.
+
 Do not edit generated `man/*.Rd` files or `NAMESPACE` by hand unless explicitly
-fixing roxygen output; regenerate them with `roxygen2::roxygenise()`.
+fixing generated output. Regenerate with:
 
-README should remain concise and user-oriented.
+```sh
+Rscript -e "roxygen2::roxygenise()"
+```
 
-## Related projects
+Keep the README concise and user-oriented.
 
-* DynMS specification:
-  https://hetalang.github.io/hetacompiler/dynms.html
+## Heta integration
 
-* heta-compiler:
-  https://github.com/hetalang/heta-compiler
+Heta support is optional. If added, it must:
 
-* HetaImporter.jl:
-  https://github.com/hetalang/HetaImporter.jl
-
-## Design principles
-
-* DynMS is the canonical intermediate representation.
-* DynMSR should work without Heta.
-* Heta is an optional frontend, not a required dependency.
-* Keep the core package small.
-* Prefer R-native implementation for parsing and generation.
-* Generate backend code rather than embedding backend logic everywhere.
-* Separate format validation from semantic validation.
-* Separate model representation from backend export.
-* Avoid premature large framework design.
+* detect whether Heta tooling is available;
+* check version compatibility where relevant;
+* fail gracefully when not installed;
+* stay separate from core DynMS parsing;
+* not run during CRAN checks unless explicitly enabled.
 
 ## Non-goals for the initial version
 
-Do not implement everything at once.
-
-Initial version should not try to be:
+Do not try to build everything at once. The initial version should not become:
 
 * a full modeling platform;
 * a replacement for Heta;
@@ -570,23 +261,26 @@ Initial version should not try to be:
 * a GUI application;
 * an AI agent framework.
 
-## Notes for agents
+## Agent rules
 
 When modifying the project:
 
 * Keep changes small and testable.
-* Prefer adding tests with each new feature.
-* Keep tests independent from directory scans in `inst/examples`; use
-  `inst/examples/index.json` for example discovery or inline temporary files
-  for stable fixtures.
-* Do not introduce Node.js unless explicitly requested.
-* Do not make Heta a required dependency.
+* Add or update focused tests with behavior changes.
+* Preserve the staged architecture and CRAN constraints above.
+* Do not make Heta or Node.js required.
 * Do not assume DynMS always comes from Heta.
-* Do not modify `inst/schema/dynms.schema.json` or example JSON files in
-  `inst/examples` unless the user explicitly asks for changes there. Updating
-  `inst/examples/index.json` is appropriate when the example list changes.
 * Do not hard-code paths outside the package or temporary directories.
-* Do not generate files in the user working directory unless explicitly requested by the function contract.
-* Keep generated files reproducible.
 * Use clear error messages.
-* Preserve CRAN compatibility where possible.
+* Do not modify `inst/schema/dynms.schema.json` or example JSON files in
+  `inst/examples` unless explicitly asked. Updating `inst/examples/index.json`
+  is appropriate when the listed examples change.
+
+## Related projects
+
+* DynMS specification:
+  https://hetalang.github.io/hetacompiler/dynms.html
+* heta-compiler:
+  https://github.com/hetalang/heta-compiler
+* HetaImporter.jl:
+  https://github.com/hetalang/HetaImporter.jl
