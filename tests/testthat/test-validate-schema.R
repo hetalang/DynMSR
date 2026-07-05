@@ -1,17 +1,3 @@
-test_that("dynms_validate_schema validates a DynMS file", {
-  index <- jsonlite::fromJSON(
-    system.file("examples", "index.json", package = "DynMSR"),
-    simplifyVector = FALSE
-  )
-  path <- system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR")
-
-  result <- dynms_validate_schema(path)
-
-  expect_true(result$valid)
-  expect_equal(result$errors, list())
-  expect_equal(result$warnings, list())
-})
-
 test_that("dynms_validate_schema validates all indexed examples", {
   index <- jsonlite::fromJSON(
     system.file("examples", "index.json", package = "DynMSR"),
@@ -44,7 +30,7 @@ test_that("dynms_validate_schema reports messages for all indexed invalid exampl
   )
 
   paths <- vapply(
-    index$validationErrorsExamples,
+    index$schemaErrorsExamples,
     function(example) {
       system.file(index$locationBase, example$file, package = "DynMSR")
     },

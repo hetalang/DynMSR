@@ -1,0 +1,28 @@
+{
+  "dynms": "0.1.0",
+  "models": [
+    {
+      "id": "model",
+      "constants": [
+        {
+          "id": "k",
+          "value": 0.1
+        },
+        {
+          "id": "k",
+          "value": 0.2
+        }
+      ],
+      "states": [
+        {
+          "id": "A",
+          "initial": 1
+        }
+      ],
+      "assignments": [],
+      "derivatives": [],
+      "events": [],
+      "observables": []
+    }
+  ]
+}

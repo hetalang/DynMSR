@@ -1,0 +1,41 @@
+{
+  "dynms": "0.1.0",
+  "models": [
+    {
+      "id": "model",
+      "constants": [
+        {
+          "id": "k",
+          "value": 0.1
+        }
+      ],
+      "states": [
+        {
+          "id": "A",
+          "initial": 1
+        }
+      ],
+      "assignments": [],
+      "derivatives": [],
+      "events": [
+        {
+          "id": "dose",
+          "trigger": {
+            "type": "time",
+            "start": 0
+          },
+          "actions": []
+        },
+        {
+          "id": "dose",
+          "trigger": {
+            "type": "time",
+            "start": 1
+          },
+          "actions": []
+        }
+      ],
+      "observables": []
+    }
+  ]
+}

@@ -116,10 +116,32 @@
       "file": "output-28.json"
     }
   ],
-  "validationErrorsExamples": [
+  "schemaErrorsExamples": [
     {
       "id": "validation-errors-01",
       "file": "validation-errors-01.json"
+    }
+  ],
+  "semanticErrorsExamples": [
+    {
+      "id": "semantic-errors-01",
+      "file": "semantic-errors-01.json"
+    },
+    {
+      "id": "semantic-errors-02",
+      "file": "semantic-errors-02.json"
+    },
+    {
+      "id": "semantic-errors-03",
+      "file": "semantic-errors-03.json"
+    },
+    {
+      "id": "semantic-errors-04",
+      "file": "semantic-errors-04.json"
+    },
+    {
+      "id": "semantic-errors-05",
+      "file": "semantic-errors-05.json"
     }
   ]
 }

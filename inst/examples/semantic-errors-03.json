@@ -1,0 +1,39 @@
+{
+  "dynms": "0.1.0",
+  "models": [
+    {
+      "id": "model",
+      "constants": [
+        {
+          "id": "k",
+          "value": 0.1
+        }
+      ],
+      "states": [
+        {
+          "id": "A",
+          "initial": 1
+        }
+      ],
+      "assignments": [
+        {
+          "id": "calc",
+          "rhs": {
+            "expr": "k * A",
+            "format": "heta"
+          }
+        },
+        {
+          "id": "calc",
+          "rhs": {
+            "expr": "k",
+            "format": "heta"
+          }
+        }
+      ],
+      "derivatives": [],
+      "events": [],
+      "observables": []
+    }
+  ]
+}
