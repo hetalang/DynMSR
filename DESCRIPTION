@@ -16,7 +16,8 @@ Depends:
     R (>= 4.1)
 Imports:
     jsonlite,
-    jsonvalidate
+    jsonvalidate,
+    whisker
 Suggests:
     testthat (>= 3.0.0),
     withr
