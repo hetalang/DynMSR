@@ -68,10 +68,10 @@ Follow a traditional CRAN R package layout and keep concerns separated:
 
 ```text
 R/
-  read_dynms.R
-  validate_dynms.R
+  read.R
+  validate_schema.R
   validate_semantic.R
-  normalize_dynms.R
+  normalize.R
   export_desolve.R
   export_mrgsolve.R
   generate_c_desolve.R
@@ -211,7 +211,7 @@ Test layers independently:
 8. mrgsolve export.
 
 Prefer small models such as one-compartment decay, two-state conversion,
-parameterized models, and models with outputs/observables.
+parameterized models, and models with observables.
 
 Generated code tests should not rely only on snapshots. Where feasible, test
 behavior with small models. Optional backend or compiler tests must skip safely
