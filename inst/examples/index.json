@@ -115,5 +115,11 @@
       "id": "output-28",
       "file": "output-28.json"
     }
+  ],
+  "validationErrorsExamples": [
+    {
+      "id": "validation-errors-01",
+      "file": "validation-errors-01.json"
+    }
   ]
 }

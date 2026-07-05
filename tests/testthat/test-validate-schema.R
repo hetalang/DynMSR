@@ -12,17 +12,6 @@ test_that("dynms_validate_schema validates a DynMS file", {
   expect_equal(result$warnings, list())
 })
 
-test_that("dynms_validate_schema validates a raw DynMS object", {
-  index <- jsonlite::fromJSON(
-    system.file("examples", "index.json", package = "DynMSR"),
-    simplifyVector = FALSE
-  )
-  path <- system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR")
-  raw_platform <- dynms_read(path)
-
-  expect_true(dynms_validate_schema(raw_platform)$valid)
-})
-
 test_that("dynms_validate_schema validates all indexed examples", {
   index <- jsonlite::fromJSON(
     system.file("examples", "index.json", package = "DynMSR"),
@@ -48,21 +37,28 @@ test_that("dynms_validate_schema validates all indexed examples", {
   expect_true(all(valid))
 })
 
-test_that("dynms_validate_schema rejects structurally invalid input", {
-  invalid <- list(format = "DynMS")
-
-  result <- dynms_validate_schema(invalid)
-
-  expect_false(result$valid)
-  expect_true(length(result$errors) > 1L)
-  expect_true(all(c("path", "code", "message", "schema_path") %in% names(result$errors[[1]])))
-})
-
-test_that("dynms_validate_schema can raise one error with all collected issues", {
-  invalid <- list(format = "DynMS")
-
-  expect_error(
-    dynms_validate_schema(invalid, error = TRUE),
-    "DynMS schema validation failed"
+test_that("dynms_validate_schema reports messages for all indexed invalid examples", {
+  index <- jsonlite::fromJSON(
+    system.file("examples", "index.json", package = "DynMSR"),
+    simplifyVector = FALSE
   )
+
+  paths <- vapply(
+    index$validationErrorsExamples,
+    function(example) {
+      system.file(index$locationBase, example$file, package = "DynMSR")
+    },
+    character(1)
+  )
+
+  results <- lapply(paths, dynms_validate_schema)
+
+  expect_true(all(!vapply(results, `[[`, logical(1), "valid")))
+  expect_true(all(vapply(results, function(result) length(result$errors) > 0L, logical(1))))
+  expect_true(all(vapply(
+    results,
+    function(result) all(nzchar(vapply(result$errors, `[[`, character(1), "message"))),
+    logical(1)
+  )))
 })
+

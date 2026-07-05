@@ -26,5 +26,8 @@ dynms_read <- function(path) {
     stop("DynMS file does not exist: ", path, call. = FALSE)
   }
 
-  jsonlite::fromJSON(path, simplifyVector = FALSE)
+  output <- jsonlite::fromJSON(path, simplifyVector = FALSE)
+
+
+  return(output)
 }

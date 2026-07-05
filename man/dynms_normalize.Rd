@@ -14,5 +14,5 @@ An R list with normalized DynMS platform content.
 }
 \description{
 Converts raw DynMS content into a stable internal representation used by
-backend exporters.
+backend exporters while preserving the DynMS document structure.
 }

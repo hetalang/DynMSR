@@ -1,0 +1,14 @@
+{
+  "dynms": "0.2.0",
+  "models": [
+    {
+      "id": "1bad",
+      "constants": {},
+      "states": [],
+      "assignments": [],
+      "derivatives": [],
+      "events": [],
+      "observables": []
+    }
+  ]
+}
