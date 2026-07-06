@@ -1,16 +1,9 @@
-#' Get the bundled DynMS JSON Schema path
-#'
-#' @return Path to the DynMS JSON Schema installed with DynMSR.
-#' @export
-dynms_schema_path <- function() {
-  path <- system.file("schema", "dynms.schema.json", package = "DynMSR")
-
-  if (!nzchar(path)) {
-    stop("DynMS schema file was not found in the installed package.", call. = FALSE)
-  }
-
-  path
-}
+.dynms_schema_path <- system.file(
+  "schema",
+  "dynms.schema.json",
+  package = "DynMSR",
+  mustWork = TRUE
+)
 
 #' Validate a DynMS document against the JSON Schema
 #'
@@ -27,16 +20,10 @@ dynms_schema_path <- function() {
 #' @return A list with `valid`, `errors`, and `warnings` fields.
 #' @export
 dynms_validate_schema <- function(x, error = FALSE) {
-  schema <- dynms_schema_path()
-
-  if (!is.character(schema) || length(schema) != 1L || !file.exists(schema)) {
-    stop("`schema` must be a path to an existing JSON Schema file.", call. = FALSE)
-  }
-
   json <- dynms_json_input(x)
   validation <- jsonvalidate::json_validate(
     json = json,
-    schema = schema,
+    schema = .dynms_schema_path,
     error = FALSE,
     verbose = TRUE,
     greedy = TRUE,

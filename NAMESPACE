@@ -2,7 +2,6 @@
 
 export(dynms_normalize)
 export(dynms_read)
-export(dynms_schema_path)
 export(dynms_validate_schema)
 export(dynms_validate_semantic)
 export(dynms_write_mrgsolve)

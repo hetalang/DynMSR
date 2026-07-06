@@ -1,27 +1,30 @@
+.dynms_mrgsolve_template_path <- system.file(
+  "templates",
+  "mrgsolve-model.cpp.mustache",
+  package = "DynMSR",
+  mustWork = TRUE
+)
+
 #' Write an mrgsolve model file
 #'
-#' Generates mrgsolve C++ model source from a normalized DynMS platform.
+#' Generates mrgsolve C++ model source from a normalized DynMS model.
 #'
 #' @param filepath Path where the generated model source should be written.
-#' @param platform A DynMS platform list, preferably returned by
-#'   [dynms_normalize()].
+#' @param model A normalized DynMS model list, such as one element of
+#'   `dynms_normalize(raw)$models`.
 #'
 #' @return `filepath`, invisibly.
 #' @export
-dynms_write_mrgsolve <- function(filepath, platform) {
+dynms_write_mrgsolve <- function(filepath, model) {
   if (!is.character(filepath) || length(filepath) != 1L || is.na(filepath)) {
     stop("`filepath` must be a single output file path.", call. = FALSE)
   }
-  if (!is.list(platform)) {
-    stop("`platform` must be a DynMS platform represented as an R list.", call. = FALSE)
-  }
-  if (length(platform$models %||% list()) != 1L) {
-    stop("`platform` must contain exactly one model for mrgsolve export.", call. = FALSE)
+  if (!is.list(model)) {
+    stop("`model` must be a normalized DynMS model represented as an R list.", call. = FALSE)
   }
 
-  model <- platform$models[[1]]
   data <- prepare_mrgsolve_template_data(model)
-  template <- readLines(dynms_mrgsolve_template_path(), warn = FALSE)
+  template <- readLines(.dynms_mrgsolve_template_path, warn = FALSE)
   code <- whisker::whisker.render(paste(template, collapse = "\n"), data)
 
   output_dir <- dirname(filepath)
@@ -30,25 +33,6 @@ dynms_write_mrgsolve <- function(filepath, platform) {
   }
   writeLines(code, filepath, useBytes = TRUE)
   invisible(filepath)
-}
-
-dynms_mrgsolve_template_path <- function() {
-  path <- system.file(
-    "templates",
-    "mrgsolve-model.cpp.mustache",
-    package = "DynMSR",
-    mustWork = FALSE
-  )
-  if (nzchar(path)) {
-    return(path)
-  }
-
-  local_path <- file.path("inst", "templates", "mrgsolve-model.cpp.mustache")
-  if (file.exists(local_path)) {
-    return(local_path)
-  }
-
-  stop("Cannot find bundled mrgsolve template.", call. = FALSE)
 }
 
 prepare_mrgsolve_template_data <- function(model) {

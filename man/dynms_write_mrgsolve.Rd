@@ -4,17 +4,17 @@
 \alias{dynms_write_mrgsolve}
 \title{Write an mrgsolve model file}
 \usage{
-dynms_write_mrgsolve(filepath, platform)
+dynms_write_mrgsolve(filepath, model)
 }
 \arguments{
 \item{filepath}{Path where the generated model source should be written.}
 
-\item{platform}{A DynMS platform list, preferably returned by
-\code{\link[=dynms_normalize]{dynms_normalize()}}.}
+\item{model}{A normalized DynMS model list, such as one element of
+\code{dynms_normalize(raw)$models}.}
 }
 \value{
 \code{filepath}, invisibly.
 }
 \description{
-Generates mrgsolve C++ model source from a normalized DynMS platform.
+Generates mrgsolve C++ model source from a normalized DynMS model.
 }
