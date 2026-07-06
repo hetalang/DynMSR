@@ -36,6 +36,8 @@ dynms_write_mrgsolve <- function(filepath, model) {
 }
 
 prepare_mrgsolve_template_data <- function(model) {
+  data <- model
+
   constants <- unname(model$constants)
   states <- unname(model$states)
   assignments <- unname(model$assignments)
@@ -43,9 +45,13 @@ prepare_mrgsolve_template_data <- function(model) {
   events <- unname(model$events)
   observables <- unname(model$observables)
 
-  dynamic_states <- Filter(function(x) !isTRUE(x$static), states)
-  static_states <- Filter(function(x) isTRUE(x$static), states)
-  dynamic_index <- stats::setNames(seq_along(dynamic_states), vapply(dynamic_states, `[[`, character(1), "id"))
+  dynamic_state_ids <- vapply(
+    Filter(function(x) !isTRUE(x$static), states),
+    `[[`,
+    character(1),
+    "id"
+  )
+  dynamic_index <- stats::setNames(seq_along(dynamic_state_ids), dynamic_state_ids)
 
   time_event_ids <- vapply(
     Filter(function(x) identical(x$trigger$type, "time"), events),
@@ -55,144 +61,98 @@ prepare_mrgsolve_template_data <- function(model) {
   )
   time_event_index <- stats::setNames(seq_along(time_event_ids), time_event_ids)
 
-  captured_observables <- prepare_mrgsolve_observables(observables, dynamic_index)
-
-  list(
-    id = model$id,
-    constants = lapply(constants, prepare_mrgsolve_constant),
-    dynamic_states = lapply(dynamic_states, prepare_mrgsolve_dynamic_state),
-    dynamic_expression_initials = Filter(
-      function(x) !is.null(x),
-      lapply(dynamic_states, prepare_mrgsolve_dynamic_expression_initial)
-    ),
-    static_states = lapply(static_states, prepare_mrgsolve_static_state),
-    assignments = lapply(assignments, prepare_mrgsolve_assignment),
-    derivatives = lapply(derivatives, prepare_mrgsolve_derivative),
-    events = lapply(
-      seq_along(events),
-      function(i) prepare_mrgsolve_event(events[[i]], dynamic_index, time_event_index, i)
-    ),
-    time_events = lapply(
-      Filter(function(x) identical(x$trigger$type, "time"), events),
-      prepare_mrgsolve_time_event,
-      time_event_index = time_event_index
-    ),
-    non_time_events = lapply(
-      Filter(function(x) !identical(x$trigger$type, "time"), events),
-      prepare_mrgsolve_non_time_event
-    ),
-    captured_observables = captured_observables,
-    has_captured_observables = length(captured_observables) > 0L,
-    has_events = length(events) > 0L
+  data$constants <- lapply(constants, prepare_mrgsolve_constant)
+  data$states <- lapply(states, prepare_mrgsolve_state)
+  data$assignments <- lapply(assignments, prepare_mrgsolve_assignment)
+  data$derivatives <- lapply(derivatives, prepare_mrgsolve_derivative)
+  data$events <- lapply(
+    seq_along(events),
+    function(i) prepare_mrgsolve_event(events[[i]], dynamic_index, time_event_index, i)
   )
+  data$observables <- lapply(observables, prepare_mrgsolve_observable, dynamic_index = dynamic_index)
+  data$has_events <- length(events) > 0L
+  data$has_captured_observables <- any(vapply(data$observables, `[[`, logical(1), "captured"))
+
+  data
 }
 
 prepare_mrgsolve_constant <- function(constant) {
-  list(
-    id = constant$id,
-    value = dynms_value_to_mrgsolve(constant$value),
-    title = constant$title %||% "-"
-  )
+  constant$value_expr <- dynms_value_to_mrgsolve(constant$value)
+  constant$title <- constant$title %||% "-"
+  constant
 }
 
-prepare_mrgsolve_dynamic_state <- function(state) {
-  list(
-    id = state$id,
-    initial_value = if (is.numeric(state$initial)) dynms_number_to_c(state$initial) else "0.0",
-    title = state$title %||% "-"
-  )
-}
+prepare_mrgsolve_state <- function(state) {
+  static <- isTRUE(state$static)
+  numeric_initial <- is.numeric(state$initial)
 
-prepare_mrgsolve_dynamic_expression_initial <- function(state) {
-  if (is.numeric(state$initial)) {
-    return(NULL)
-  }
+  state$static <- static
+  state$dynamic <- !static
+  state$initial_value <- if (numeric_initial) dynms_number_to_c(state$initial) else "0.0"
+  state$initial_expr <- dynms_value_to_mrgsolve(state$initial)
+  state$has_expression_initial <- !static && !numeric_initial
+  state$title <- state$title %||% "-"
 
-  list(id = state$id, initial_expr = dynms_value_to_mrgsolve(state$initial))
-}
-
-prepare_mrgsolve_static_state <- function(state) {
-  list(
-    id = state$id,
-    title = state$title %||% "-",
-    initial_expr = dynms_value_to_mrgsolve(state$initial)
-  )
+  state
 }
 
 prepare_mrgsolve_assignment <- function(assignment) {
-  list(
-    id = assignment$id,
-    rhs_expr = dynms_expression_to_mrgsolve(assignment$rhs),
-    title = assignment$title %||% "-"
-  )
+  assignment$rhs_expr <- dynms_expression_to_mrgsolve(assignment$rhs)
+  assignment$title <- assignment$title %||% "-"
+  assignment
 }
 
 prepare_mrgsolve_derivative <- function(derivative) {
-  list(
-    state = derivative$state,
-    rhs_expr = dynms_expression_to_mrgsolve(derivative$rhs)
-  )
-}
-
-prepare_mrgsolve_time_event <- function(event, time_event_index) {
-  list(
-    id = event$id,
-    start_expr = dynms_value_to_mrgsolve(event$trigger$start),
-    time_index = unname(time_event_index[[event$id]])
-  )
-}
-
-prepare_mrgsolve_non_time_event <- function(event) {
-  list(
-    id = event$id,
-    initial_pull = if (isTRUE(event$trigger$atStart)) "false" else "true",
-    trigger_expr = dynms_expression_to_mrgsolve(event$trigger$rhs),
-    trigger_suffix = if (identical(event$trigger$type, "crossing")) " >= 0.0" else ""
-  )
+  derivative$rhs_expr <- dynms_expression_to_mrgsolve(derivative$rhs)
+  derivative
 }
 
 prepare_mrgsolve_event <- function(event, dynamic_index, time_event_index, event_number) {
   is_time <- identical(event$trigger$type, "time")
   trigger <- event$trigger
 
-  list(
-    id = event$id,
-    title = event$title %||% "-",
-    active_value = if (isFALSE(event$active)) "0" else "1",
-    is_time = is_time,
-    is_non_time = !is_time,
-    time_index = if (is_time) unname(time_event_index[[event$id]]) else "",
-    actions = lapply(
-      seq_along(event$actions),
-      function(i) prepare_mrgsolve_event_action(event$actions[[i]], dynamic_index, event_number, i)
-    ),
-    has_period = is_time && !is.null(trigger$period),
-    period_expr = if (!is.null(trigger$period)) dynms_value_to_mrgsolve(trigger$period) else "",
-    has_stop = is_time && !is.null(trigger$stop),
-    stop_expr = if (!is.null(trigger$stop)) dynms_value_to_mrgsolve(trigger$stop) else ""
+  event$title <- event$title %||% "-"
+  event$active_value <- if (isFALSE(event$active)) "0" else "1"
+  event$is_time <- is_time
+  event$is_non_time <- !is_time
+  event$time_index <- if (is_time) unname(time_event_index[[event$id]]) else ""
+  event$actions <- lapply(
+    seq_along(event$actions),
+    function(i) prepare_mrgsolve_event_action(event$actions[[i]], dynamic_index, event_number, i)
   )
+
+  event$trigger <- trigger
+  if (is_time) {
+    event$trigger$start_expr <- dynms_value_to_mrgsolve(trigger$start)
+    event$trigger$has_period <- !is.null(trigger$period)
+    event$trigger$period_expr <- if (!is.null(trigger$period)) dynms_value_to_mrgsolve(trigger$period) else ""
+    event$trigger$has_stop <- !is.null(trigger$stop)
+    event$trigger$stop_expr <- if (!is.null(trigger$stop)) dynms_value_to_mrgsolve(trigger$stop) else ""
+  } else {
+    event$trigger$initial_pull <- if (isTRUE(trigger$atStart)) "false" else "true"
+    event$trigger$trigger_expr <- dynms_expression_to_mrgsolve(trigger$rhs)
+    event$trigger$trigger_suffix <- if (identical(trigger$type, "crossing")) " >= 0.0" else ""
+  }
+
+  event
 }
 
 prepare_mrgsolve_event_action <- function(action, dynamic_index, event_number, action_number) {
   dynamic <- action$state %in% names(dynamic_index)
 
-  list(
-    state = action$state,
-    rhs_expr = dynms_expression_to_mrgsolve(action$rhs),
-    dynamic = dynamic,
-    static = !dynamic,
-    cmt = if (dynamic) unname(dynamic_index[[action$state]]) else "",
-    event_var = paste0("evt_", event_number, "_", action_number, "_")
-  )
+  action$rhs_expr <- dynms_expression_to_mrgsolve(action$rhs)
+  action$dynamic <- dynamic
+  action$static <- !dynamic
+  action$cmt <- if (dynamic) unname(dynamic_index[[action$state]]) else ""
+  action$event_var <- paste0("evt_", event_number, "_", action_number, "_")
+
+  action
 }
 
-prepare_mrgsolve_observables <- function(observables, dynamic_index) {
-  lapply(
-    Filter(function(x) !(x$symbol %in% names(dynamic_index)), observables),
-    function(observable) {
-      list(symbol = observable$symbol, title = observable$title %||% "-")
-    }
-  )
+prepare_mrgsolve_observable <- function(observable, dynamic_index) {
+  observable$captured <- !(observable$symbol %in% names(dynamic_index))
+  observable$title <- observable$title %||% "-"
+  observable
 }
 
 dynms_value_to_mrgsolve <- function(value) {

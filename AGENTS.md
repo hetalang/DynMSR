@@ -41,7 +41,7 @@ dynms_read()
   -> dynms_validate_schema()
   -> dynms_validate_semantic()
   -> dynms_normalize()
-  -> dynms_export_desolve() / dynms_export_mrgsolve()
+  -> dynms_write_mrgsolve(filepath, model)
 ```
 
 Important function boundaries:
@@ -57,6 +57,8 @@ Important function boundaries:
   designed.
 * `dynms_normalize(raw_platform)` returns a plain R list. Do not add S3 classes
   such as `dynms_platform` until there is a concrete dispatch need.
+* `dynms_write_mrgsolve(filepath, model)` writes mrgsolve source for one
+  normalized model, not a whole platform. Callers choose `platform$models[[i]]`.
 
 Core parsing and generation should be R-native. Generate backend code from
 prepared R data structures. Do not write a C program that reads JSON and emits
@@ -155,6 +157,11 @@ Keep backend assumptions out of the core DynMS parser.
 For generated code:
 
 * Prepare template data in R.
+* Template data should preserve the normalized model shape. Add backend helper
+  fields to existing objects instead of creating parallel collections such as
+  `dynamic_states`, `static_states`, or `time_events`.
+* Convert MathJSON expressions to backend expressions in R before rendering.
+  Do not implement expression conversion in Mustache templates.
 * Keep templates logic-light.
 * Prefer `whisker` for Mustache-style templates.
 * Make generated files reproducible.
@@ -165,7 +172,9 @@ For deSolve, target compiled C compatible with `R CMD SHLIB`, `dyn.load()`, and
 deSolve's compiled model interface.
 
 For mrgsolve, generate mrgsolve model source and keep compilation/loading logic
-backend-specific.
+backend-specific. Use package-internal template path constants initialized with
+`system.file(..., mustWork = TRUE)`; do not expose path helper functions unless
+there is a real public API need.
 
 ## CRAN compatibility
 
@@ -189,7 +198,7 @@ dynms_validate_schema()
 dynms_validate_semantic()
 dynms_normalize()
 dynms_export_desolve()
-dynms_export_mrgsolve()
+dynms_write_mrgsolve()
 dynms_compile()
 dynms_simulate()
 ```

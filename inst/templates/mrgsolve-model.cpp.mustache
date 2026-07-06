@@ -9,7 +9,7 @@ $SET end=120, delta=0.1, hmax=0.01, hmin=0.0, rtol=1e-3, atol=1e-6
 $PARAM @annotated
 // constants
 {{#constants}}
-{{&id}} : {{&value}} : {{&title}}
+{{&id}} : {{&value_expr}} : {{&title}}
 {{/constants}}
 // events active
 {{#events}}
@@ -18,40 +18,54 @@ $PARAM @annotated
 
 $INIT @annotated
 // dynamic states
-{{#dynamic_states}}
+{{#states}}
+{{#dynamic}}
 {{&id}} : {{&initial_value}} : {{&title}}
-{{/dynamic_states}}
+{{/dynamic}}
+{{/states}}
 
 $PREAMBLE
 // static states
-{{#static_states}}
+{{#states}}
+{{#static}}
 double {{&id}} = 0.0; // {{&title}}
-{{/static_states}}
+{{/static}}
+{{/states}}
 // triggers
-{{#non_time_events}}
+{{#events}}
+{{#is_non_time}}
 bool {{&id}}__pull__ = false;
 int {{&id}}__charge__ = 0;
-{{/non_time_events}}
+{{/is_non_time}}
+{{/events}}
 
 $MAIN
 // dynamic states initializations
-{{#dynamic_expression_initials}}
+{{#states}}
+{{#has_expression_initial}}
 {{&id}}_0 = {{&initial_expr}};
-{{/dynamic_expression_initials}}
+{{/has_expression_initial}}
+{{/states}}
 if (NEWIND <= 1) {
 // static states initializations
-{{#static_states}}
+{{#states}}
+{{#static}}
 {{&id}} = {{&initial_expr}};
-{{/static_states}}
+{{/static}}
+{{/states}}
 // triggers
-{{#non_time_events}}
-{{&id}}__pull__ = {{&initial_pull}};
+{{#events}}
+{{#is_non_time}}
+{{&id}}__pull__ = {{&trigger.initial_pull}};
 {{&id}}__charge__ = 0;
-{{/non_time_events}}
+{{/is_non_time}}
+{{/events}}
 // time events
-{{#time_events}}
-self.mevent({{&start_expr}}, {{&time_index}});
-{{/time_events}}
+{{#events}}
+{{#is_time}}
+self.mevent({{&trigger.start_expr}}, {{&time_index}});
+{{/is_time}}
+{{/events}}
  } // end NEWIND initialization
 
 $ODE
@@ -60,8 +74,9 @@ $ODE
 double {{&id}} = {{&rhs_expr}}; // {{&title}}
 {{/assignments}}
 // triggers
-{{#non_time_events}}
-bool {{&id}}__trigger__ = ({{&trigger_expr}}){{&trigger_suffix}};
+{{#events}}
+{{#is_non_time}}
+bool {{&id}}__trigger__ = ({{&trigger.trigger_expr}}){{&trigger.trigger_suffix}};
 if ({{&id}}__trigger__ && !{{&id}}__pull__ && {{&id}}__active__) {
   {{&id}}__pull__ = true;
   {{&id}}__charge__++;
@@ -69,7 +84,8 @@ if ({{&id}}__trigger__ && !{{&id}}__pull__ && {{&id}}__active__) {
 if (!{{&id}}__trigger__) {
   {{&id}}__pull__ = false;
  } // end trigger reset
-{{/non_time_events}}
+{{/is_non_time}}
+{{/events}}
 // derivatives
 {{#derivatives}}
 dxdt_{{&state}} = {{&rhs_expr}};
@@ -77,9 +93,11 @@ dxdt_{{&state}} = {{&rhs_expr}};
 
 {{#has_captured_observables}}
 $CAPTURE @annotated
-{{#captured_observables}}
+{{#observables}}
+{{#captured}}
 {{&symbol}} : {{&title}}
-{{/captured_observables}}
+{{/captured}}
+{{/observables}}
 {{/has_captured_observables}}
 
 {{#has_events}}
@@ -100,17 +118,17 @@ if ({{&id}}__active__ && EVID=={{&time_index}}) {
   {{&state}} = {{&rhs_expr}};
 {{/static}}
 {{/actions}}
-{{#has_period}}
+{{#trigger.has_period}}
   // next event
-{{#has_stop}}
-  if (TIME < {{&stop_expr}}) {
-    self.mevent(TIME + {{&period_expr}}, {{&time_index}});
+{{#trigger.has_stop}}
+  if (TIME < {{&trigger.stop_expr}}) {
+    self.mevent(TIME + {{&trigger.period_expr}}, {{&time_index}});
   }
-{{/has_stop}}
-{{^has_stop}}
-  self.mevent(TIME + {{&period_expr}}, {{&time_index}});
-{{/has_stop}}
-{{/has_period}}
+{{/trigger.has_stop}}
+{{^trigger.has_stop}}
+  self.mevent(TIME + {{&trigger.period_expr}}, {{&time_index}});
+{{/trigger.has_stop}}
+{{/trigger.has_period}}
  } // end time event
 {{/is_time}}
 {{#is_non_time}}
