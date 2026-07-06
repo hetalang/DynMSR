@@ -154,3 +154,25 @@ prepare_mrgsolve_observable <- function(observable, dynamic_index) {
   observable$title <- observable$title %||% "-"
   observable
 }
+
+# mrgsolve specific helpers for converting DynMS objects to mrgsolve code
+
+dynms_value_to_mrgsolve <- function(value) {
+  if (is.numeric(value)) {
+    return(dynms_number_to_c(value))
+  }
+
+  dynms_expression_to_mrgsolve(value)
+}
+
+dynms_initial_value_to_mrgsolve <- function(value) {
+  if (is.numeric(value)) {
+    return(dynms_value_to_mrgsolve(value))
+  }
+
+  "0.0"
+}
+
+dynms_expression_to_mrgsolve <- function(expression) {
+  dynms_mathjson_to_c(expression$expr)
+}
