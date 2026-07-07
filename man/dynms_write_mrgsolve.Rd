@@ -4,13 +4,13 @@
 \alias{dynms_write_mrgsolve}
 \title{Write an mrgsolve model file}
 \usage{
-dynms_write_mrgsolve(filepath, model)
+dynms_write_mrgsolve(model, filepath)
 }
 \arguments{
-\item{filepath}{Path where the generated model source should be written.}
-
 \item{model}{A normalized DynMS model list, such as one element of
 \code{dynms_normalize(raw)$models}.}
+
+\item{filepath}{Path where the generated model source should be written.}
 }
 \value{
 \code{filepath}, invisibly.

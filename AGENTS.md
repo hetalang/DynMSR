@@ -41,7 +41,7 @@ dynms_read()
   -> dynms_validate_schema()
   -> dynms_validate_semantic()
   -> dynms_normalize()
-  -> dynms_write_mrgsolve(filepath, model)
+  -> dynms_write_mrgsolve(model, filepath)
 ```
 
 Important function boundaries:
@@ -57,7 +57,7 @@ Important function boundaries:
   designed.
 * `dynms_normalize(raw_platform)` returns a plain R list. Do not add S3 classes
   such as `dynms_platform` until there is a concrete dispatch need.
-* `dynms_write_mrgsolve(filepath, model)` writes mrgsolve source for one
+* `dynms_write_mrgsolve(model, filepath)` writes mrgsolve source for one
   normalized model, not a whole platform. Callers choose `platform$models[[i]]`.
 
 Core parsing and generation should be R-native. Generate backend code from

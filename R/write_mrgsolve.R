@@ -1,6 +1,6 @@
 .dynms_mrgsolve_template_path <- system.file(
   "templates",
-  "mrgsolve-model.cpp.mustache",
+  "mrgsolve-model.mod.mustache",
   package = "DynMSR",
   mustWork = TRUE
 )
@@ -15,7 +15,7 @@
 #'
 #' @return `filepath`, invisibly.
 #' @export
-dynms_write_mrgsolve <- function(filepath, model) {
+dynms_write_mrgsolve <- function(model, filepath) {
   if (!is.character(filepath) || length(filepath) != 1L || is.na(filepath)) {
     stop("`filepath` must be a single output file path.", call. = FALSE)
   }
