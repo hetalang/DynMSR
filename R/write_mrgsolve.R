@@ -9,13 +9,14 @@
 #'
 #' Generates mrgsolve C++ model source from a normalized DynMS model.
 #'
-#' @param filepath Path where the generated model source should be written.
 #' @param model A normalized DynMS model list, such as one element of
 #'   `dynms_normalize(raw)$models`.
+#' @param filepath Path where the generated model source should be written. If
+#'   omitted, a temporary `.mod` file is created.
 #'
-#' @return `filepath`, invisibly.
+#' @return The path to the generated model file.
 #' @export
-dynms_write_mrgsolve <- function(model, filepath) {
+dynms_write_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod")) {
   if (!is.character(filepath) || length(filepath) != 1L || is.na(filepath)) {
     stop("`filepath` must be a single output file path.", call. = FALSE)
   }
@@ -32,7 +33,7 @@ dynms_write_mrgsolve <- function(model, filepath) {
     dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
   }
   writeLines(code, filepath, useBytes = TRUE)
-  invisible(filepath)
+  filepath
 }
 
 prepare_mrgsolve_template_data <- function(model) {

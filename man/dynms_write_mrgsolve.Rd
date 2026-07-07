@@ -4,16 +4,17 @@
 \alias{dynms_write_mrgsolve}
 \title{Write an mrgsolve model file}
 \usage{
-dynms_write_mrgsolve(model, filepath)
+dynms_write_mrgsolve(model, filepath = tempfile(fileext = ".mod"))
 }
 \arguments{
 \item{model}{A normalized DynMS model list, such as one element of
 \code{dynms_normalize(raw)$models}.}
 
-\item{filepath}{Path where the generated model source should be written.}
+\item{filepath}{Path where the generated model source should be written. If
+omitted, a temporary \code{.mod} file is created.}
 }
 \value{
-\code{filepath}, invisibly.
+The path to the generated model file.
 }
 \description{
 Generates mrgsolve C++ model source from a normalized DynMS model.
