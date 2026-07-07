@@ -32,3 +32,18 @@ test_that("dynms_write_mrgsolve creates a temporary file when filepath is omitte
   expect_match(basename(path), "\\.mod$")
   expect_gt(file.info(path)$size, 0)
 })
+
+test_that("dynms_to_mrgsolve compiles a model when mrgsolve is available", {
+  testthat::skip_if_not_installed("mrgsolve")
+
+  index <- jsonlite::fromJSON(
+    system.file("examples", "index.json", package = "DynMSR"),
+    simplifyVector = FALSE
+  )
+  raw <- dynms_read(system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR"))
+  model <- dynms_normalize(raw)$models[[1]]
+
+  compiled <- dynms_to_mrgsolve(model, quiet = TRUE)
+
+  expect_s4_class(compiled, "mrgmod")
+})
