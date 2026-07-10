@@ -17,3 +17,8 @@ backend-specific operations.
 Reads a DynMS JSON file, validates it against the bundled schema, runs
 backend-independent semantic validation, and returns a platform list.
 }
+\details{
+Schema and semantic validation are both attempted before loading fails.
+Validation messages are reported with \code{\link[=message]{message()}}, followed by one final
+error when any validation issue is found.
+}

@@ -42,3 +42,41 @@ test_that("dynms_load reads, validates, and returns a platform", {
   expect_type(platform$models, "list")
   expect_gt(length(platform$models), 0L)
 })
+
+test_that("dynms_load reports schema and semantic validation messages before failing", {
+  path <- tempfile(fileext = ".json")
+  on.exit(unlink(path), add = TRUE)
+  jsonlite::write_json(
+    list(
+      models = list(
+        list(
+          id = "model",
+          constants = list(),
+          states = list(
+            list(id = "A", initial = 1),
+            list(id = "A", initial = 2)
+          ),
+          assignments = list(),
+          derivatives = list(),
+          events = list(),
+          observables = list()
+        )
+      )
+    ),
+    path,
+    auto_unbox = TRUE
+  )
+
+  messages <- character()
+  withCallingHandlers(
+    expect_error(dynms_load(path), "DynMS load failed: validation found"),
+    message = function(message) {
+      messages <<- c(messages, conditionMessage(message))
+      invokeRestart("muffleMessage")
+    }
+  )
+
+  expect_true(any(grepl("DynMS schema validation failed", messages, fixed = TRUE)))
+  expect_true(any(grepl("DynMS semantic validation failed", messages, fixed = TRUE)))
+  expect_true(any(grepl("Duplicate identifier in `states`: A", messages, fixed = TRUE)))
+})
