@@ -16,6 +16,22 @@ new_model <- function(raw_model) {
   structure(raw_model, class = c("model", "list"))
 }
 
+#' Get one model from a platform
+#'
+#' Selects one model from a DynMS platform by numeric index or by name.
+#'
+#' @param platform A platform object returned by [dynms_load()] or
+#'   [heta_load()].
+#' @param model A single model index or model name.
+#'
+#' @return A model list.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' platform <- heta_load("_drafts/0-hello-world")
+#' model <- get_model(platform, 2)
+#' }
 get_model <- function(platform, model) {
   if (!inherits(platform, "platform")) {
     stop("`platform` must be a DynMS platform object.", call. = FALSE)

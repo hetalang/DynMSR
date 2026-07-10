@@ -1,3 +1,29 @@
+#' Load a Heta project as a DynMS platform
+#'
+#' Builds a Heta project with the DynMS export enabled, reads the generated
+#' DynMS JSON file, and returns a DynMS platform object.
+#'
+#' @param dir Heta project working directory.
+#' @param source Path to the main source file, passed to [heta_build()].
+#' @param type Source file type, passed to [heta_build()].
+#' @param debug If `TRUE`, passed to [heta_build()].
+#' @param units_check If `TRUE`, passed to [heta_build()].
+#' @param meta_dir Meta directory path, passed to [heta_build()].
+#' @param log_mode Log file saving mode, passed to [heta_build()].
+#' @param log_path Log file path, passed to [heta_build()].
+#' @param declaration Declaration file path without extension, passed to
+#'   [heta_build()].
+#' @param log_level Log level, passed to [heta_build()].
+#' @param skip_updates If `TRUE`, passed to [heta_build()].
+#'
+#' @return A platform list. Use [get_model()] or ordinary list access such as
+#'   `platform$models[[1]]` to select one model.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' platform <- heta_load("_drafts/0-hello-world")
+#' }
 heta_load <- function(dir = ".",
                       source = NULL,
                       type = NULL,

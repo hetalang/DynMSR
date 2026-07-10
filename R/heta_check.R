@@ -1,3 +1,13 @@
+#' Check Heta compiler availability
+#'
+#' Checks whether the `heta` command is available and can report its version
+#' with `heta --version`.
+#'
+#' @return A list with `available`, `command`, `version`, and `output` fields.
+#' @export
+#'
+#' @examples
+#' heta_check()
 heta_check <- function() {
   output <- tryCatch(
     suppressWarnings(system2("heta", "--version", stdout = TRUE, stderr = TRUE)),

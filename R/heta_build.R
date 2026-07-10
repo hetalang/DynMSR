@@ -1,3 +1,32 @@
+#' Build a Heta project
+#'
+#' Runs `heta build` for a Heta project directory. The arguments map directly
+#' to Heta compiler CLI options, for example `units_check = TRUE` adds
+#' `--units-check`.
+#'
+#' @param dir Project working directory passed as the final CLI argument.
+#' @param source Path to the main source file, passed as `--source`.
+#' @param type Source file type, passed as `--type`.
+#' @param debug If `TRUE`, add `--debug`.
+#' @param units_check If `TRUE`, add `--units-check`.
+#' @param dist_dir Export directory path, passed as `--dist-dir`.
+#' @param meta_dir Meta directory path, passed as `--meta-dir`.
+#' @param log_mode Log file saving mode, passed as `--log-mode`.
+#' @param log_path Log file path, passed as `--log-path`.
+#' @param declaration Declaration file path without extension, passed as
+#'   `--declaration`.
+#' @param log_level Log level, passed as `--log-level`.
+#' @param skip_updates If `TRUE`, add `--skip-updates`.
+#' @param export Export format specification, passed as `--export`.
+#'
+#' @return Invisibly returns a list with the command, arguments, exit status,
+#'   and captured output.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' heta_build("_drafts/0-hello-world", export = "DynMS")
+#' }
 heta_build <- function(dir = ".",
                        source = NULL,
                        type = NULL,
