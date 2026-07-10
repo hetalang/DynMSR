@@ -7,22 +7,19 @@
 
 #' Write an mrgsolve model file
 #'
-#' Generates mrgsolve C++ model source from a normalized DynMS model.
+#' Generates mrgsolve source from one DynMS model.
 #'
-#' @param model A normalized DynMS model list, such as one element of
-#'   `dynms_normalize(raw)$models`.
+#' @param model A model list, such as one element of `platform$models`.
 #' @param filepath Path where the generated model source should be written. If
 #'   omitted, a temporary `.mod` file is created.
 #'
 #' @return The path to the generated model file.
 #' @export
-dynms_write_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod")) {
+write_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod")) {
   if (!is.character(filepath) || length(filepath) != 1L || is.na(filepath)) {
     stop("`filepath` must be a single output file path.", call. = FALSE)
   }
-  if (!is.list(model)) {
-    stop("`model` must be a normalized DynMS model represented as an R list.", call. = FALSE)
-  }
+  check_mrgsolve_model(model, "write_mrgsolve")
 
   data <- prepare_mrgsolve_template_data(model)
   template <- readLines(.dynms_mrgsolve_template_path, warn = FALSE)
@@ -42,15 +39,16 @@ dynms_write_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod")) {
 #' The `mrgsolve` package is optional and is required only when this function is
 #' called.
 #'
-#' @param model A normalized DynMS model list, such as one element of
-#'   `dynms_normalize(raw)$models`.
+#' @param model A model list, such as one element of `platform$models`.
 #' @param filepath Path where the intermediate mrgsolve model source should be
 #'   written. If omitted, a temporary `.mod` file is created.
 #' @param ... Additional arguments passed to [mrgsolve::mread()].
 #'
 #' @return A compiled mrgsolve model object.
 #' @export
-dynms_to_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod"), ...) {
+build_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod"), ...) {
+  check_mrgsolve_model(model, "build_mrgsolve")
+
   if (!requireNamespace("mrgsolve", quietly = TRUE)) {
     stop(
       paste(
@@ -62,13 +60,31 @@ dynms_to_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod"), ...)
     )
   }
 
-  path <- dynms_write_mrgsolve(model, filepath)
+  path <- write_mrgsolve(model, filepath)
   mrgsolve::mread(
     model = tools::file_path_sans_ext(basename(path)),
     project = dirname(path),
     file = basename(path),
     ...
   )
+}
+
+check_mrgsolve_model <- function(model, caller) {
+  if (!is.list(model)) {
+    stop("`model` must be a DynMS model represented as an R list.", call. = FALSE)
+  }
+  if (is.list(model$models)) {
+    stop(
+      paste(
+        "`", caller, "()` expects one model, not a platform.",
+        "Select a model first, for example `platform$models[[1]]`.",
+        sep = "\n"
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(model)
 }
 
 prepare_mrgsolve_template_data <- function(model) {

@@ -32,3 +32,13 @@ test_that("dynms_read reports malformed JSON", {
 
   expect_error(dynms_read(path))
 })
+
+test_that("dynms_load reads, validates, and returns a platform", {
+  path <- system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR")
+
+  platform <- dynms_load(path)
+
+  expect_type(platform, "list")
+  expect_type(platform$models, "list")
+  expect_gt(length(platform$models), 0L)
+})

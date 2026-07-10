@@ -33,22 +33,14 @@ devtools::install_github("hetalang/DynMSR")
 ```r
 library(DynMSR)
 
-# Read the DynMS JSON file as an R list
-raw_platform <- dynms_read("model.dynms.json")
+# Load the DynMS JSON file as a platform
+platform <- dynms_load("x.json")
 
-# Validate the raw platform object against the bundled DynMS schema
-dynms_validate_schema(raw_platform)
+# Select the first model in the platform
+model <- platform$models[[1]]
 
-# Validate model-level consistency, such as internal identifier references
-dynms_validate_semantic(raw_platform)
-
-# Normalize the raw list into DynMSR's internal representation
-platform <- dynms_normalize(raw_platform)
-dynms_model <- platform$models[[1]]
-
-# Future API target:
-# desolve_model <- dynms_export_desolve(dynms_model)
-# mrgsolve_model <- dynms_export_mrgsolve(dynms_model)
+# Build a compiled mrgsolve model object
+mrgsolve_model <- build_mrgsolve(model)
 ```
 
 ## Development

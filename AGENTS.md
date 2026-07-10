@@ -32,33 +32,55 @@ DynMS JSON -> mrgsolve C code -> compiled shared library -> mrgsolve model
 ## Architecture
 
 Keep the implementation staged. Do not collapse reading, validation,
-normalization, code generation, compilation, and simulation into one converter.
+platform construction, backend preparation, code generation, compilation, and
+simulation into one converter.
 
-Preferred pipeline:
+Preferred low-level pipeline:
 
 ```text
 dynms_read()
   -> dynms_validate_schema()
   -> dynms_validate_semantic()
-  -> dynms_normalize()
-  -> dynms_write_mrgsolve(model, filepath)
+  -> new_platform()
+```
+
+Preferred user-facing pipeline:
+
+```text
+dynms_load(path)
+  -> platform
+  -> platform$models[[i]]
+  -> model
+  -> write_mrgsolve(model, filepath) / build_mrgsolve(model)
 ```
 
 Important function boundaries:
 
 * `dynms_read(path)` is a small reader only. It uses
   `jsonlite::fromJSON(path, simplifyVector = FALSE)` and returns the raw R
-  list. It must not validate or normalize.
+  list. It must not validate, construct, or prepare backend data.
+* `dynms_load(path)` is the normal user-facing loader for DynMS JSON files. It
+  may read, validate, and construct a platform object, and it returns a
+  `platform` list.
 * `dynms_validate_schema(raw_platform)` validates raw DynMS JSON against the
   bundled schema. It may accept a file path or a raw list returned by
   `dynms_read()`. It validates DynMS documents, not the schema itself.
 * `dynms_validate_semantic(raw_platform)` is a public placeholder for future
   model-level checks. Do not add behavior until semantic rules are deliberately
   designed.
-* `dynms_normalize(raw_platform)` returns a plain R list. Do not add S3 classes
-  such as `dynms_platform` until there is a concrete dispatch need.
-* `dynms_write_mrgsolve(model, filepath)` writes mrgsolve source for one
-  normalized model, not a whole platform. Callers choose `platform$models[[i]]`.
+* `new_platform(raw_platform)` is an internal constructor placeholder for a
+  platform object. For now it may return the input unchanged. Keep it so the
+  loader has a clear place for future platform/model construction logic, but do
+  not use it for backend-specific preparation.
+* `write_mrgsolve(model, filepath)` writes mrgsolve source for one model, not a
+  whole platform. Callers choose `platform$models[[i]]`.
+* `build_mrgsolve(model, ...)` writes temporary mrgsolve source, compiles it,
+  loads it, and returns a compiled mrgsolve model object.
+
+Treat `platform` and `model` as the primary working objects. DynMS is the input
+format, not the object prefix that must appear in every public function name.
+After a platform has been loaded, backend functions should normally operate on
+one `model`.
 
 Core parsing and generation should be R-native. Generate backend code from
 prepared R data structures. Do not write a C program that reads JSON and emits
@@ -73,9 +95,9 @@ R/
   read.R
   validate_schema.R
   validate_semantic.R
-  normalize.R
-  export_desolve.R
-  export_mrgsolve.R
+  platform.R
+  write_desolve.R
+  write_mrgsolve.R
   generate_c_desolve.R
   compile.R
   simulate.R
@@ -94,8 +116,9 @@ tests/
   testthat/
 ```
 
-The exact files may change, but keep reading, validation, normalization,
-backend export, compilation, and simulation separate.
+The exact files may change, but keep reading, validation, platform
+construction, backend preparation, code generation, compilation, and simulation
+separate.
 
 Do not assume a specific example filename in `inst/examples`. Examples used by
 tests or documentation must be listed in `inst/examples/index.json`. Do not
@@ -154,11 +177,19 @@ unsupported expressions, and backend limitations.
 
 Keep backend assumptions out of the core DynMS parser.
 
+Backend functions operate on one model, not on a whole platform.
+Do not make backend functions guess which model to use from a multi-model
+platform. If a platform is accidentally passed where a model is expected, fail
+with a clear message that tells the user to select a model first, for example
+`platform$models[[1]]` or `platform$models[["model_id"]]`.
+
 For generated code:
 
 * Prepare template data in R.
-* Template data should preserve the normalized model shape. Add backend helper
-  fields to existing objects instead of creating parallel collections such as
+* Backend-specific preparation belongs inside backend writers/builders, not in
+  a general normalization layer.
+* Template data should preserve the model shape. Add backend helper fields to
+  existing objects instead of creating parallel collections such as
   `dynamic_states`, `static_states`, or `time_events`.
 * Convert MathJSON expressions to backend expressions in R before rendering.
   Do not implement expression conversion in Mustache templates.
@@ -190,21 +221,60 @@ Preserve CRAN compatibility from the beginning:
 
 ## Public API
 
-Prefer explicit names:
+Use names that reflect the layer where the function belongs.
+
+Use the `dynms_` prefix for functions whose main job is reading or processing
+the DynMS format itself:
 
 ```r
 dynms_read()
+dynms_load()
 dynms_validate_schema()
 dynms_validate_semantic()
-dynms_normalize()
-dynms_export_desolve()
-dynms_write_mrgsolve()
-dynms_compile()
-dynms_simulate()
 ```
 
-Avoid ambiguous public names such as `import()`, `convert()`, `compile()`, or
-`run()`. Use internal helpers for backend-specific implementation details.
+Keep `new_platform()` internal unless there is a concrete reason to expose a
+platform constructor.
+
+Use optional frontend-specific names only for frontend-specific workflows:
+
+```r
+heta_load()
+```
+
+Use backend-specific names for operations that start from a single `model`:
+
+```r
+write_mrgsolve()
+build_mrgsolve()
+write_desolve()
+build_desolve()
+```
+
+`write_*()` functions write backend source files. `build_*()` functions may
+generate temporary source, compile or load backend code, and return a usable
+backend object.
+
+Do not add extractor functions such as `dynms_models()`, `dynms_model()`, or
+`dynms_model_names()` unless there is a concrete need. The recommended model
+selection API is ordinary R list access:
+
+```r
+platform <- dynms_load("model.dynms.json")
+model <- platform$models[[1]]
+```
+
+Avoid ambiguous public names such as `import()`, `convert()`, `compile()`,
+`simulate()`, `models()`, or `run()`. Use internal helpers for backend-specific
+implementation details.
+
+Do not introduce S3 classes just to support naming. Plain lists are preferred
+until methods such as `print()`, `summary()`, validation dispatch, or backend
+dispatch provide a concrete reason for classes.
+
+Do not add a public general `dynms_normalize()` function unless a real
+backend-independent normal form is deliberately designed and documented.
+Backend-specific preparation should remain backend-specific.
 
 ## Testing
 
@@ -213,7 +283,7 @@ Test layers independently:
 1. JSON reading.
 2. Schema validation.
 3. Semantic validation.
-4. Normalization.
+4. Platform construction.
 5. Code generation.
 6. Compilation.
 7. deSolve simulation.
