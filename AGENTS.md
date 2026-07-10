@@ -68,10 +68,10 @@ Important function boundaries:
 * `dynms_validate_semantic(raw_platform)` is a public placeholder for future
   model-level checks. Do not add behavior until semantic rules are deliberately
   designed.
-* `new_platform(raw_platform)` is an internal constructor placeholder for a
-  platform object. For now it may return the input unchanged. Keep it so the
-  loader has a clear place for future platform/model construction logic, but do
-  not use it for backend-specific preparation.
+* `new_platform(raw_platform)` is an internal constructor for a platform
+  object. It attaches the S3 class `platform` to the top-level list and the S3
+  class `model` to each element of `platform$models`. Do not use it for
+  backend-specific preparation.
 * `write_mrgsolve(model, filepath)` writes mrgsolve source for one model, not a
   whole platform. Callers choose `platform$models[[i]]`.
 * `build_mrgsolve(model, ...)` writes temporary mrgsolve source, compiles it,
@@ -268,9 +268,9 @@ Avoid ambiguous public names such as `import()`, `convert()`, `compile()`,
 `simulate()`, `models()`, or `run()`. Use internal helpers for backend-specific
 implementation details.
 
-Do not introduce S3 classes just to support naming. Plain lists are preferred
-until methods such as `print()`, `summary()`, validation dispatch, or backend
-dispatch provide a concrete reason for classes.
+Use the S3 classes `platform` and `model` only as light object markers for now.
+Do not add S3 methods such as `print()`, `summary()`, validation dispatch, or
+backend dispatch until there is a concrete reason for them.
 
 Do not add a public general `dynms_normalize()` function unless a real
 backend-independent normal form is deliberately designed and documented.
