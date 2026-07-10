@@ -15,3 +15,32 @@ new_model <- function(raw_model) {
 
   structure(raw_model, class = c("model", "list"))
 }
+
+get_model <- function(platform, model) {
+  if (!inherits(platform, "platform")) {
+    stop("`platform` must be a DynMS platform object.", call. = FALSE)
+  }
+  if (missing(model)) {
+    stop("`model` must be a model index or name.", call. = FALSE)
+  }
+  if (!is.numeric(model) && !is.character(model)) {
+    stop("`model` must be a model index or name.", call. = FALSE)
+  }
+  if (length(model) != 1L || is.na(model)) {
+    stop("`model` must be a single model index or name.", call. = FALSE)
+  }
+
+  if (is.numeric(model)) {
+    if (model < 1L || model > length(platform$models) || model != as.integer(model)) {
+      stop("Model index is out of range.", call. = FALSE)
+    }
+
+    return(platform$models[[as.integer(model)]])
+  }
+
+  if (!model %in% names(platform$models)) {
+    stop("Model was not found: ", model, call. = FALSE)
+  }
+
+  platform$models[[model]]
+}
