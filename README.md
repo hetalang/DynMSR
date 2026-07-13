@@ -3,9 +3,9 @@
 Toolkit for working with DynMS models in R.
 
 [![Heta project](https://img.shields.io/badge/%CD%B1-Heta_project-blue)](https://hetalang.github.io/)
-[![GitHub issues](https://img.shields.io/github/issues/hetalang/dynmsr.svg)](https://GitHub.com/hetalang/dynmsr/issues/)
-[![GitHub license](https://img.shields.io/github/license/hetalang/dynmsr.svg)](https://github.com/hetalang/dynmsr/blob/master/LICENSE)
-[![Autotests](https://github.com/hetalang/dynmsr/workflows/Autotests/badge.svg)](https://github.com/hetalang/dynmsr/actions)
+[![GitHub issues](https://img.shields.io/badge/issues-GitHub-blue.svg)](https://github.com/hetalang/DynMSR/issues/)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/hetalang/DynMSR/blob/master/LICENSE.md)
+[![Autotests](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml/badge.svg)](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml)
 
 **DynMSR** provides tools for reading, validating, normalizing, converting,
 compiling, and eventually simulating models stored in the DynMS format. DynMSR
