@@ -50,3 +50,5 @@ rsconnect/
 
 # Specific to the Project
 _drafts
+.positai
+.claude
