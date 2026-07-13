@@ -1,9 +1,11 @@
-.dynms_mrgsolve_template_path <- system.file(
-  "templates",
-  "mrgsolve-model.mod.mustache",
-  package = "DynMSR",
-  mustWork = TRUE
-)
+.dynms_mrgsolve_template_path <- function() {
+  system.file(
+    "templates",
+    "mrgsolve-model.mod.mustache",
+    package = "DynMSR",
+    mustWork = TRUE
+  )
+}
 
 #' Write an mrgsolve model file
 #'
@@ -22,7 +24,7 @@ write_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod")) {
   check_mrgsolve_model(model, "write_mrgsolve")
 
   data <- prepare_mrgsolve_template_data(model)
-  template <- readLines(.dynms_mrgsolve_template_path, warn = FALSE)
+  template <- readLines(.dynms_mrgsolve_template_path(), warn = FALSE)
   code <- whisker::whisker.render(paste(template, collapse = "\n"), data)
 
   output_dir <- dirname(filepath)

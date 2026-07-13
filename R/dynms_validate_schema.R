@@ -1,9 +1,11 @@
-.dynms_schema_path <- system.file(
-  "schema",
-  "dynms.schema.json",
-  package = "DynMSR",
-  mustWork = TRUE
-)
+.dynms_schema_path <- function() {
+  system.file(
+    "schema",
+    "dynms.schema.json",
+    package = "DynMSR",
+    mustWork = TRUE
+  )
+}
 
 #' Validate a DynMS document against the JSON Schema
 #'
@@ -23,7 +25,7 @@ dynms_validate_schema <- function(x, error = FALSE) {
   json <- dynms_json_input(x)
   validation <- jsonvalidate::json_validate(
     json = json,
-    schema = .dynms_schema_path,
+    schema = .dynms_schema_path(),
     error = FALSE,
     verbose = TRUE,
     greedy = TRUE,
