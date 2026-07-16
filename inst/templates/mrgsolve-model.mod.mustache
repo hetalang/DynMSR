@@ -9,20 +9,20 @@ $SET end=120, delta=0.1, hmax=0.01, hmin=0.0, rtol=1e-3, atol=1e-6
 $PARAM @annotated
 // constants
 {{#constants}}
-{{&id}} : {{&value_expr}} : {{&title}}
+{{&id}} : {{&value_expr_}} : {{&title}}
 {{/constants}}
 // events active
 {{#timeEvents}}
-{{&id}}__active__ : {{&active_value}} : -
+{{&id}}__active__ : {{&active_value_}} : -
 {{/timeEvents}}
 {{#events}}
-{{&id}}__active__ : {{&active_value}} : -
+{{&id}}__active__ : {{&active_value_}} : -
 {{/events}}
 
 $INIT @annotated
 // dynamic states
 {{#dynamic}}
-{{&id}} : {{&initial_value}} : {{&title}}
+{{&id}} : {{&initial_value_}} : {{&title}}
 {{/dynamic}}
 
 $PREAMBLE
@@ -39,34 +39,34 @@ int {{&id}}__charge__ = 0;
 $MAIN
 // dynamic states initializations
 {{#dynamic}}
-{{#has_expression_initial}}
-{{&id}}_0 = {{&initial_expr}};
-{{/has_expression_initial}}
+{{#has_expression_initial_}}
+{{&id}}_0 = {{&initial_expr_}};
+{{/has_expression_initial_}}
 {{/dynamic}}
 if (NEWIND <= 1) {
 // static states initializations
 {{#static}}
-{{&id}} = {{&initial_expr}};
+{{&id}} = {{&initial_expr_}};
 {{/static}}
 // triggers
 {{#events}}
-{{&id}}__pull__ = {{&trigger.initial_pull}};
+{{&id}}__pull__ = {{&trigger.initial_pull_}};
 {{&id}}__charge__ = 0;
 {{/events}}
 // time events
 {{#timeEvents}}
-self.mevent({{&trigger.start_expr}}, {{&time_index}});
+self.mevent({{&trigger.start_expr_}}, {{&time_index_}});
 {{/timeEvents}}
  } // end NEWIND initialization
 
 $ODE
 // assignments
 {{#assignments}}
-double {{&id}} = {{&rhs_expr}}; // {{&title}}
+double {{&id}} = {{&rhs_expr_}}; // {{&title}}
 {{/assignments}}
 // triggers
 {{#events}}
-bool {{&id}}__trigger__ = ({{&trigger.trigger_expr}}){{&trigger.trigger_suffix}};
+bool {{&id}}__trigger__ = ({{&trigger.trigger_expr_}}){{&trigger.trigger_suffix_}};
 if ({{&id}}__trigger__ && !{{&id}}__pull__ && {{&id}}__active__) {
   {{&id}}__pull__ = true;
   {{&id}}__charge__++;
@@ -77,46 +77,46 @@ if (!{{&id}}__trigger__) {
 {{/events}}
 // derivatives
 {{#dynamic}}
-dxdt_{{&id}} = {{&derivative_expr}};
+dxdt_{{&id}} = {{&derivative_expr_}};
 {{/dynamic}}
 
-{{#has_captured_observables}}
+{{#has_captured_observables_}}
 $CAPTURE @annotated
 {{#observables}}
-{{#captured}}
+{{#captured_}}
 {{&symbol}} : {{&title}}
-{{/captured}}
+{{/captured_}}
 {{/observables}}
-{{/has_captured_observables}}
+{{/has_captured_observables_}}
 
-{{#has_events}}
+{{#has_events_}}
 $TABLE
 {{#timeEvents}}
 // {{&id}} // {{&title}}
-if ({{&id}}__active__ && EVID=={{&time_index}}) {
+if ({{&id}}__active__ && EVID=={{&time_index_}}) {
 {{#actions}}
-{{#dynamic}}
-  mrg::evdata {{&event_var}}(TIME, 8);
-  {{&event_var}}.amt = {{&rhs_expr}};
-  {{&event_var}}.cmt = {{&cmt}};
-  {{&event_var}}.now = true;
-  self.mevector.push_back({{&event_var}});
-{{/dynamic}}
-{{#static}}
-  {{&state}} = {{&rhs_expr}};
-{{/static}}
+{{#dynamic_}}
+  mrg::evdata {{&event_var_}}(TIME, 8);
+  {{&event_var_}}.amt = {{&rhs_expr_}};
+  {{&event_var_}}.cmt = {{&cmt_}};
+  {{&event_var_}}.now = true;
+  self.mevector.push_back({{&event_var_}});
+{{/dynamic_}}
+{{#static_}}
+  {{&state}} = {{&rhs_expr_}};
+{{/static_}}
 {{/actions}}
-{{#trigger.has_period}}
+{{#trigger.has_period_}}
   // next event
-{{#trigger.has_stop}}
-  if (TIME < {{&trigger.stop_expr}}) {
-    self.mevent(TIME + {{&trigger.period_expr}}, {{&time_index}});
+{{#trigger.has_stop_}}
+  if (TIME < {{&trigger.stop_expr_}}) {
+    self.mevent(TIME + {{&trigger.period_expr_}}, {{&time_index_}});
   }
-{{/trigger.has_stop}}
-{{^trigger.has_stop}}
-  self.mevent(TIME + {{&trigger.period_expr}}, {{&time_index}});
-{{/trigger.has_stop}}
-{{/trigger.has_period}}
+{{/trigger.has_stop_}}
+{{^trigger.has_stop_}}
+  self.mevent(TIME + {{&trigger.period_expr_}}, {{&time_index_}});
+{{/trigger.has_stop_}}
+{{/trigger.has_period_}}
  } // end time event
 
 {{/timeEvents}}
@@ -124,19 +124,19 @@ if ({{&id}}__active__ && EVID=={{&time_index}}) {
 // {{&id}} // {{&title}}
 for (int {{&id}}__i__ = 0; {{&id}}__i__ < {{&id}}__charge__; {{&id}}__i__++) {
 {{#actions}}
-{{#dynamic}}
-  mrg::evdata {{&event_var}}(TIME, 8);
-  {{&event_var}}.amt = {{&rhs_expr}};
-  {{&event_var}}.cmt = {{&cmt}};
-  {{&event_var}}.now = true;
-  self.mevector.push_back({{&event_var}});
-{{/dynamic}}
-{{#static}}
-  {{&state}} = {{&rhs_expr}};
-{{/static}}
+{{#dynamic_}}
+  mrg::evdata {{&event_var_}}(TIME, 8);
+  {{&event_var_}}.amt = {{&rhs_expr_}};
+  {{&event_var_}}.cmt = {{&cmt_}};
+  {{&event_var_}}.now = true;
+  self.mevector.push_back({{&event_var_}});
+{{/dynamic_}}
+{{#static_}}
+  {{&state}} = {{&rhs_expr_}};
+{{/static_}}
 {{/actions}}
  } // end event loop
 {{&id}}__charge__ = 0;
 
 {{/events}}
-{{/has_events}}
+{{/has_events_}}
