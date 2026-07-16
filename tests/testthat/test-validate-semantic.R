@@ -53,10 +53,13 @@ test_that("dynms_validate_semantic rejects duplicate state ids across dynamic an
       list(
         id = "model",
         constants = list(),
-        dynamic = list(list(id = "A", initial = 1)),
+        dynamic = list(list(
+          id = "A",
+          initial = 1,
+          derivative = list(expr = 0, format = "math-json")
+        )),
         static = list(list(id = "A", initial = 2)),
         assignments = list(),
-        derivatives = list(),
         events = list(),
         observables = list()
       )

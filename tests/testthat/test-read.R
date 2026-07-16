@@ -53,12 +53,19 @@ test_that("dynms_load reports schema and semantic validation messages before fai
           id = "model",
           constants = list(),
           dynamic = list(
-            list(id = "A", initial = 1),
-            list(id = "A", initial = 2)
+            list(
+              id = "A",
+              initial = 1,
+              derivative = list(expr = 0, format = "math-json")
+            ),
+            list(
+              id = "A",
+              initial = 2,
+              derivative = list(expr = 0, format = "math-json")
+            )
           ),
           static = list(),
           assignments = list(),
-          derivatives = list(),
           events = list(),
           observables = list()
         )

@@ -32,6 +32,13 @@
               ]
             ],
             "format": "math-json"
+          },
+          "derivative": {
+            "expr": [
+              "Negate",
+              "pr1"
+            ],
+            "format": "math-json"
           }
         },
         {
@@ -46,6 +53,10 @@
                 2
               ]
             ],
+            "format": "math-json"
+          },
+          "derivative": {
+            "expr": "pr1",
             "format": "math-json"
           }
         }
@@ -106,25 +117,6 @@
                 ]
               ]
             ],
-            "format": "math-json"
-          }
-        }
-      ],
-      "derivatives": [
-        {
-          "state": "x1_amt_",
-          "rhs": {
-            "expr": [
-              "Negate",
-              "pr1"
-            ],
-            "format": "math-json"
-          }
-        },
-        {
-          "state": "x2_amt_",
-          "rhs": {
-            "expr": "pr1",
             "format": "math-json"
           }
         }

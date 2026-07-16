@@ -81,9 +81,9 @@ if (!{{&id}}__trigger__) {
 {{/is_non_time}}
 {{/events}}
 // derivatives
-{{#derivatives}}
-dxdt_{{&state}} = {{&rhs_expr}};
-{{/derivatives}}
+{{#dynamic}}
+dxdt_{{&id}} = {{&derivative_expr}};
+{{/dynamic}}
 
 {{#has_captured_observables}}
 $CAPTURE @annotated

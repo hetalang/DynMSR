@@ -60,7 +60,6 @@ prepare_mrgsolve_template_data <- function(model) {
   dynamic <- unname(model$dynamic)
   static <- unname(model$static)
   assignments <- unname(model$assignments)
-  derivatives <- unname(model$derivatives)
   events <- unname(model$events)
   observables <- unname(model$observables)
 
@@ -79,7 +78,6 @@ prepare_mrgsolve_template_data <- function(model) {
   data$dynamic <- lapply(dynamic, prepare_mrgsolve_dynamic_state)
   data$static <- lapply(static, prepare_mrgsolve_static_state)
   data$assignments <- lapply(assignments, prepare_mrgsolve_assignment)
-  data$derivatives <- lapply(derivatives, prepare_mrgsolve_derivative)
   data$events <- lapply(
     seq_along(events),
     function(i) prepare_mrgsolve_event(events[[i]], dynamic_index, time_event_index, i)
@@ -103,6 +101,7 @@ prepare_mrgsolve_dynamic_state <- function(state) {
   state$initial_value <- dynms_initial_value_to_mrgsolve(state$initial)
   state$initial_expr <- dynms_value_to_mrgsolve(state$initial)
   state$has_expression_initial <- !numeric_initial
+  state$derivative_expr <- dynms_expression_to_mrgsolve(state$derivative)
   state$title <- state$title %||% "-"
 
   state
@@ -119,11 +118,6 @@ prepare_mrgsolve_assignment <- function(assignment) {
   assignment$rhs_expr <- dynms_expression_to_mrgsolve(assignment$rhs)
   assignment$title <- assignment$title %||% "-"
   assignment
-}
-
-prepare_mrgsolve_derivative <- function(derivative) {
-  derivative$rhs_expr <- dynms_expression_to_mrgsolve(derivative$rhs)
-  derivative
 }
 
 prepare_mrgsolve_event <- function(event, dynamic_index, time_event_index, event_number) {

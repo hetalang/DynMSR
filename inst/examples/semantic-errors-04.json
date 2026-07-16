@@ -12,12 +12,15 @@
       "dynamic": [
         {
           "id": "A",
-          "initial": 1
+          "initial": 1,
+          "derivative": {
+            "expr": 0,
+            "format": "math-json"
+          }
         }
       ],
       "static": [],
       "assignments": [],
-      "derivatives": [],
       "events": [
         {
           "id": "dose",

@@ -62,7 +62,7 @@
     "model": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "constants", "dynamic", "static", "assignments", "derivatives", "events", "observables"],
+      "required": ["id", "constants", "dynamic", "static", "assignments", "events", "observables"],
       "properties": {
         "id": {
           "$ref": "#/$defs/identifier"
@@ -95,12 +95,6 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/assignment"
-          }
-        },
-        "derivatives": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/derivative"
           }
         },
         "events": {
@@ -139,13 +133,16 @@
     "dynamicState": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "initial"],
+      "required": ["id", "initial", "derivative"],
       "properties": {
         "id": {
           "$ref": "#/$defs/identifier"
         },
         "initial": {
           "$ref": "#/$defs/value"
+        },
+        "derivative": {
+          "$ref": "#/$defs/expression"
         },
         "title": {
           "type": "string"
@@ -190,23 +187,6 @@
         },
         "notes": {
           "type": "string"
-        }
-      }
-    },
-    "derivative": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["state", "rhs"],
-      "properties": {
-        "state": {
-          "$ref": "#/$defs/identifier"
-        },
-        "rhs": {
-          "$ref": "#/$defs/expression"
-        },
-        "algebraic": {
-          "type": "boolean",
-          "default": false
         }
       }
     },
