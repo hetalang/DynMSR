@@ -89,11 +89,10 @@
           }
         }
       ],
-      "events": [
+      "timeEvents": [
         {
           "id": "sw1",
           "trigger": {
-            "type": "time",
             "start": 12
           },
           "priority": 0,
@@ -125,6 +124,7 @@
           "active": true
         }
       ],
+      "events": [],
       "observables": []
     }
   ]

@@ -62,7 +62,7 @@
     "model": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "constants", "dynamic", "static", "assignments", "events", "observables"],
+      "required": ["id", "constants", "dynamic", "static", "assignments", "timeEvents", "events", "observables"],
       "properties": {
         "id": {
           "$ref": "#/$defs/identifier"
@@ -95,6 +95,12 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/assignment"
+          }
+        },
+        "timeEvents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/timeEvent"
           }
         },
         "events": {
@@ -190,7 +196,7 @@
         }
       }
     },
-    "event": {
+    "timeEvent": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "trigger", "actions"],
@@ -199,7 +205,7 @@
           "$ref": "#/$defs/identifier"
         },
         "trigger": {
-          "$ref": "#/$defs/eventTrigger"
+          "$ref": "#/$defs/timeTrigger"
         },
         "priority": {
           "type": "integer",
@@ -227,11 +233,45 @@
         }
       }
     },
-    "eventTrigger": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/timeTrigger"
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "trigger", "actions"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
         },
+        "trigger": {
+          "$ref": "#/$defs/nonTimeEventTrigger"
+        },
+        "priority": {
+          "type": "integer",
+          "default": 0
+        },
+        "active": {
+          "type": "boolean",
+          "default": true
+        },
+        "stopSimulation": {
+          "type": "boolean",
+          "default": false
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventAction"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "nonTimeEventTrigger": {
+      "oneOf": [
         {
           "$ref": "#/$defs/crossingTrigger"
         },
@@ -243,11 +283,8 @@
     "timeTrigger": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "start"],
+      "required": ["start"],
       "properties": {
-        "type": {
-          "const": "time"
-        },
         "start": {
           "$ref": "#/$defs/value",
           "description": "Required first activation time."

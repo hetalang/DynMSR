@@ -75,11 +75,10 @@
           }
         }
       ],
-      "events": [
+      "timeEvents": [
         {
           "id": "sw1",
           "trigger": {
-            "type": "time",
             "start": {
               "expr": "start1",
               "format": "math-json"
@@ -121,6 +120,7 @@
           "active": true
         }
       ],
+      "events": [],
       "observables": []
     }
   ]

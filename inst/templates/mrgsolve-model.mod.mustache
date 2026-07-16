@@ -12,6 +12,9 @@ $PARAM @annotated
 {{&id}} : {{&value_expr}} : {{&title}}
 {{/constants}}
 // events active
+{{#timeEvents}}
+{{&id}}__active__ : {{&active_value}} : -
+{{/timeEvents}}
 {{#events}}
 {{&id}}__active__ : {{&active_value}} : -
 {{/events}}
@@ -29,10 +32,8 @@ double {{&id}} = 0.0; // {{&title}}
 {{/static}}
 // triggers
 {{#events}}
-{{#is_non_time}}
 bool {{&id}}__pull__ = false;
 int {{&id}}__charge__ = 0;
-{{/is_non_time}}
 {{/events}}
 
 $MAIN
@@ -49,17 +50,13 @@ if (NEWIND <= 1) {
 {{/static}}
 // triggers
 {{#events}}
-{{#is_non_time}}
 {{&id}}__pull__ = {{&trigger.initial_pull}};
 {{&id}}__charge__ = 0;
-{{/is_non_time}}
 {{/events}}
 // time events
-{{#events}}
-{{#is_time}}
+{{#timeEvents}}
 self.mevent({{&trigger.start_expr}}, {{&time_index}});
-{{/is_time}}
-{{/events}}
+{{/timeEvents}}
  } // end NEWIND initialization
 
 $ODE
@@ -69,7 +66,6 @@ double {{&id}} = {{&rhs_expr}}; // {{&title}}
 {{/assignments}}
 // triggers
 {{#events}}
-{{#is_non_time}}
 bool {{&id}}__trigger__ = ({{&trigger.trigger_expr}}){{&trigger.trigger_suffix}};
 if ({{&id}}__trigger__ && !{{&id}}__pull__ && {{&id}}__active__) {
   {{&id}}__pull__ = true;
@@ -78,7 +74,6 @@ if ({{&id}}__trigger__ && !{{&id}}__pull__ && {{&id}}__active__) {
 if (!{{&id}}__trigger__) {
   {{&id}}__pull__ = false;
  } // end trigger reset
-{{/is_non_time}}
 {{/events}}
 // derivatives
 {{#dynamic}}
@@ -96,9 +91,8 @@ $CAPTURE @annotated
 
 {{#has_events}}
 $TABLE
-{{#events}}
+{{#timeEvents}}
 // {{&id}} // {{&title}}
-{{#is_time}}
 if ({{&id}}__active__ && EVID=={{&time_index}}) {
 {{#actions}}
 {{#dynamic}}
@@ -124,8 +118,10 @@ if ({{&id}}__active__ && EVID=={{&time_index}}) {
 {{/trigger.has_stop}}
 {{/trigger.has_period}}
  } // end time event
-{{/is_time}}
-{{#is_non_time}}
+
+{{/timeEvents}}
+{{#events}}
+// {{&id}} // {{&title}}
 for (int {{&id}}__i__ = 0; {{&id}}__i__ < {{&id}}__charge__; {{&id}}__i__++) {
 {{#actions}}
 {{#dynamic}}
@@ -141,7 +137,6 @@ for (int {{&id}}__i__ = 0; {{&id}}__i__ < {{&id}}__charge__; {{&id}}__i__++) {
 {{/actions}}
  } // end event loop
 {{&id}}__charge__ = 0;
-{{/is_non_time}}
 
 {{/events}}
 {{/has_events}}

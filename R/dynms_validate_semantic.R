@@ -61,10 +61,23 @@ dynms_validate_semantic <- function(raw_platform, error = FALSE) {
       add_error
     )
     validate_duplicate_identifiers(
+      model$timeEvents,
+      paste0(model_path, ".timeEvents"),
+      "timeEvents",
+      "id",
+      add_error
+    )
+    validate_duplicate_identifiers(
       model$events,
       paste0(model_path, ".events"),
       "events",
       "id",
+      add_error
+    )
+    validate_duplicate_event_identifiers(
+      model$timeEvents,
+      model$events,
+      model_path,
       add_error
     )
     validate_duplicate_identifiers(
@@ -122,6 +135,22 @@ validate_duplicate_state_identifiers <- function(dynamic, static, model_path, ad
       model_path,
       "duplicate_identifier",
       paste0("Duplicate state identifier across `dynamic` and `static`: ", id)
+    )
+  }
+
+  invisible(TRUE)
+}
+
+validate_duplicate_event_identifiers <- function(time_events, events, model_path, add_error) {
+  time_event_ids <- collect_identifiers(time_events, "id")
+  event_ids <- collect_identifiers(events, "id")
+  duplicated_ids <- intersect(time_event_ids, event_ids)
+
+  for (id in duplicated_ids) {
+    add_error(
+      model_path,
+      "duplicate_identifier",
+      paste0("Duplicate event identifier across `timeEvents` and `events`: ", id)
     )
   }
 

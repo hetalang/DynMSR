@@ -60,6 +60,7 @@ test_that("dynms_validate_semantic rejects duplicate state ids across dynamic an
         )),
         static = list(list(id = "A", initial = 2)),
         assignments = list(),
+        timeEvents = list(),
         events = list(),
         observables = list()
       )
@@ -72,6 +73,45 @@ test_that("dynms_validate_semantic rejects duplicate state ids across dynamic an
   expect_false(result$valid)
   expect_true(any(grepl(
     "Duplicate state identifier across `dynamic` and `static`: A",
+    messages,
+    fixed = TRUE
+  )))
+})
+
+test_that("dynms_validate_semantic rejects duplicate event ids across timeEvents and events", {
+  raw <- list(
+    dynms = "0.2.0",
+    models = list(
+      list(
+        id = "model",
+        constants = list(),
+        dynamic = list(),
+        static = list(),
+        assignments = list(),
+        timeEvents = list(list(
+          id = "sw",
+          trigger = list(start = 0),
+          actions = list()
+        )),
+        events = list(list(
+          id = "sw",
+          trigger = list(
+            type = "conditional",
+            rhs = list(expr = 1, format = "math-json")
+          ),
+          actions = list()
+        )),
+        observables = list()
+      )
+    )
+  )
+
+  result <- dynms_validate_semantic(raw)
+  messages <- vapply(result$errors, `[[`, character(1), "message")
+
+  expect_false(result$valid)
+  expect_true(any(grepl(
+    "Duplicate event identifier across `timeEvents` and `events`: sw",
     messages,
     fixed = TRUE
   )))

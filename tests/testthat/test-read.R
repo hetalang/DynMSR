@@ -66,6 +66,7 @@ test_that("dynms_load reports schema and semantic validation messages before fai
           ),
           static = list(),
           assignments = list(),
+          timeEvents = list(),
           events = list(),
           observables = list()
         )
