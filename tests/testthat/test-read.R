@@ -52,10 +52,11 @@ test_that("dynms_load reports schema and semantic validation messages before fai
         list(
           id = "model",
           constants = list(),
-          states = list(
+          dynamic = list(
             list(id = "A", initial = 1),
             list(id = "A", initial = 2)
           ),
+          static = list(),
           assignments = list(),
           derivatives = list(),
           events = list(),
@@ -78,5 +79,5 @@ test_that("dynms_load reports schema and semantic validation messages before fai
 
   expect_true(any(grepl("DynMS schema validation failed", messages, fixed = TRUE)))
   expect_true(any(grepl("DynMS semantic validation failed", messages, fixed = TRUE)))
-  expect_true(any(grepl("Duplicate identifier in `states`: A", messages, fixed = TRUE)))
+  expect_true(any(grepl("Duplicate identifier in `dynamic`: A", messages, fixed = TRUE)))
 })

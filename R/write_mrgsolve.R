@@ -57,18 +57,14 @@ prepare_mrgsolve_template_data <- function(model) {
   data <- model
 
   constants <- unname(model$constants)
-  states <- unname(model$states)
+  dynamic <- unname(model$dynamic)
+  static <- unname(model$static)
   assignments <- unname(model$assignments)
   derivatives <- unname(model$derivatives)
   events <- unname(model$events)
   observables <- unname(model$observables)
 
-  dynamic_state_ids <- vapply(
-    Filter(function(x) !isTRUE(x$static), states),
-    `[[`,
-    character(1),
-    "id"
-  )
+  dynamic_state_ids <- vapply(dynamic, `[[`, character(1), "id")
   dynamic_index <- stats::setNames(seq_along(dynamic_state_ids), dynamic_state_ids)
 
   time_event_ids <- vapply(
@@ -80,7 +76,8 @@ prepare_mrgsolve_template_data <- function(model) {
   time_event_index <- stats::setNames(seq_along(time_event_ids), time_event_ids)
 
   data$constants <- lapply(constants, prepare_mrgsolve_constant)
-  data$states <- lapply(states, prepare_mrgsolve_state)
+  data$dynamic <- lapply(dynamic, prepare_mrgsolve_dynamic_state)
+  data$static <- lapply(static, prepare_mrgsolve_static_state)
   data$assignments <- lapply(assignments, prepare_mrgsolve_assignment)
   data$derivatives <- lapply(derivatives, prepare_mrgsolve_derivative)
   data$events <- lapply(
@@ -100,15 +97,19 @@ prepare_mrgsolve_constant <- function(constant) {
   constant
 }
 
-prepare_mrgsolve_state <- function(state) {
-  static <- isTRUE(state$static)
+prepare_mrgsolve_dynamic_state <- function(state) {
   numeric_initial <- is.numeric(state$initial)
 
-  state$static <- static
-  state$dynamic <- !static
   state$initial_value <- dynms_initial_value_to_mrgsolve(state$initial)
   state$initial_expr <- dynms_value_to_mrgsolve(state$initial)
-  state$has_expression_initial <- !static && !numeric_initial
+  state$has_expression_initial <- !numeric_initial
+  state$title <- state$title %||% "-"
+
+  state
+}
+
+prepare_mrgsolve_static_state <- function(state) {
+  state$initial_expr <- dynms_value_to_mrgsolve(state$initial)
   state$title <- state$title %||% "-"
 
   state

@@ -1,14 +1,14 @@
 {
-  "dynms": "0.1.0",
+  "dynms": "0.2.0",
   "models": [
     {
       "id": "nameless",
       "constants": [],
-      "states": [
+      "dynamic": [],
+      "static": [
         {
           "id": "x1",
-          "initial": 1,
-          "static": true
+          "initial": 1
         }
       ],
       "assignments": [

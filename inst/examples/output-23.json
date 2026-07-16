@@ -1,5 +1,5 @@
 {
-  "dynms": "0.1.0",
+  "dynms": "0.2.0",
   "models": [
     {
       "id": "nameless",
@@ -9,12 +9,7 @@
           "value": 0.001
         }
       ],
-      "states": [
-        {
-          "id": "c1",
-          "initial": 5,
-          "static": true
-        },
+      "dynamic": [
         {
           "id": "x1_amt_",
           "initial": {
@@ -29,6 +24,12 @@
         {
           "id": "x2",
           "initial": 2
+        }
+      ],
+      "static": [
+        {
+          "id": "c1",
+          "initial": 5
         },
         {
           "id": "x3_amt_",
@@ -39,8 +40,7 @@
               5
             ],
             "format": "math-json"
-          },
-          "static": true
+          }
         }
       ],
       "assignments": [

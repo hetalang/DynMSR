@@ -1,6 +1,6 @@
 test_that("new_platform adds S3 classes to platform and models", {
   raw <- list(
-    dynms = "0.1.0",
+    dynms = "0.2.0",
     models = list(
       list(id = "model_1"),
       list(id = "model_2")

@@ -45,3 +45,31 @@ test_that("dynms_validate_semantic reports messages for all indexed semantic err
     logical(1)
   )))
 })
+
+test_that("dynms_validate_semantic rejects duplicate state ids across dynamic and static", {
+  raw <- list(
+    dynms = "0.2.0",
+    models = list(
+      list(
+        id = "model",
+        constants = list(),
+        dynamic = list(list(id = "A", initial = 1)),
+        static = list(list(id = "A", initial = 2)),
+        assignments = list(),
+        derivatives = list(),
+        events = list(),
+        observables = list()
+      )
+    )
+  )
+
+  result <- dynms_validate_semantic(raw)
+  messages <- vapply(result$errors, `[[`, character(1), "message")
+
+  expect_false(result$valid)
+  expect_true(any(grepl(
+    "Duplicate state identifier across `dynamic` and `static`: A",
+    messages,
+    fixed = TRUE
+  )))
+})

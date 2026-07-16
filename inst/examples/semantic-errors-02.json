@@ -1,5 +1,5 @@
 {
-  "dynms": "0.1.0",
+  "dynms": "0.2.0",
   "models": [
     {
       "id": "model",
@@ -13,12 +13,13 @@
           "value": 0.2
         }
       ],
-      "states": [
+      "dynamic": [
         {
           "id": "A",
           "initial": 1
         }
       ],
+      "static": [],
       "assignments": [],
       "derivatives": [],
       "events": [],

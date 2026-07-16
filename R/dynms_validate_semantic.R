@@ -27,10 +27,23 @@ dynms_validate_semantic <- function(raw_platform, error = FALSE) {
     model <- raw_platform$models[[model_index]]
 
     validate_duplicate_identifiers(
-      model$states,
-      paste0(model_path, ".states"),
-      "states",
+      model$dynamic,
+      paste0(model_path, ".dynamic"),
+      "dynamic",
       "id",
+      add_error
+    )
+    validate_duplicate_identifiers(
+      model$static,
+      paste0(model_path, ".static"),
+      "static",
+      "id",
+      add_error
+    )
+    validate_duplicate_state_identifiers(
+      model$dynamic,
+      model$static,
+      model_path,
       add_error
     )
     validate_duplicate_identifiers(
@@ -97,6 +110,30 @@ validate_duplicate_identifiers <- function(x, path, field, id_field, add_error) 
   }
 
   invisible(TRUE)
+}
+
+validate_duplicate_state_identifiers <- function(dynamic, static, model_path, add_error) {
+  dynamic_ids <- collect_identifiers(dynamic, "id")
+  static_ids <- collect_identifiers(static, "id")
+  duplicated_ids <- intersect(dynamic_ids, static_ids)
+
+  for (id in duplicated_ids) {
+    add_error(
+      model_path,
+      "duplicate_identifier",
+      paste0("Duplicate state identifier across `dynamic` and `static`: ", id)
+    )
+  }
+
+  invisible(TRUE)
+}
+
+collect_identifiers <- function(x, id_field) {
+  if (length(x) == 0L) {
+    return(character())
+  }
+
+  vapply(x, `[[`, character(1), id_field)
 }
 
 format_semantic_errors <- function(errors) {

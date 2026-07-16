@@ -18,19 +18,15 @@ $PARAM @annotated
 
 $INIT @annotated
 // dynamic states
-{{#states}}
 {{#dynamic}}
 {{&id}} : {{&initial_value}} : {{&title}}
 {{/dynamic}}
-{{/states}}
 
 $PREAMBLE
 // static states
-{{#states}}
 {{#static}}
 double {{&id}} = 0.0; // {{&title}}
 {{/static}}
-{{/states}}
 // triggers
 {{#events}}
 {{#is_non_time}}
@@ -41,18 +37,16 @@ int {{&id}}__charge__ = 0;
 
 $MAIN
 // dynamic states initializations
-{{#states}}
+{{#dynamic}}
 {{#has_expression_initial}}
 {{&id}}_0 = {{&initial_expr}};
 {{/has_expression_initial}}
-{{/states}}
+{{/dynamic}}
 if (NEWIND <= 1) {
 // static states initializations
-{{#states}}
 {{#static}}
 {{&id}} = {{&initial_expr}};
 {{/static}}
-{{/states}}
 // triggers
 {{#events}}
 {{#is_non_time}}
