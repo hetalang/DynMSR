@@ -271,14 +271,26 @@
       }
     },
     "nonTimeEventTrigger": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/crossingTrigger"
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "rhs"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["crossing", "conditional"]
         },
-        {
-          "$ref": "#/$defs/conditionalTrigger"
+        "rhs": {
+          "$ref": "#/$defs/expression"
+        },
+        "detection": {
+          "type": "string",
+          "enum": ["root", "step"]
+        },
+        "atStart": {
+          "type": "boolean",
+          "default": false
         }
-      ]
+      }
     },
     "timeTrigger": {
       "type": "object",
@@ -296,50 +308,6 @@
         "stop": {
           "$ref": "#/$defs/value",
           "description": "Optional upper time bound used mainly for periodic triggers."
-        }
-      }
-    },
-    "crossingTrigger": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "rhs"],
-      "properties": {
-        "type": {
-          "const": "crossing"
-        },
-        "rhs": {
-          "$ref": "#/$defs/expression"
-        },
-        "detection": {
-          "type": "string",
-          "enum": ["root", "step"],
-          "default": "root"
-        },
-        "atStart": {
-          "type": "boolean",
-          "default": false
-        }
-      }
-    },
-    "conditionalTrigger": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "rhs"],
-      "properties": {
-        "type": {
-          "const": "conditional"
-        },
-        "rhs": {
-          "$ref": "#/$defs/expression"
-        },
-        "detection": {
-          "type": "string",
-          "enum": ["root", "step"],
-          "default": "step"
-        },
-        "atStart": {
-          "type": "boolean",
-          "default": false
         }
       }
     },
