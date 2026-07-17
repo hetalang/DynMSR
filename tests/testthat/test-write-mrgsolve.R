@@ -62,6 +62,58 @@ test_that("mrgsolve time event EVID values start at 10", {
   expect_identical(data$timeEvents[[2]]$time_index_, 11L)
 })
 
+test_that("mrgsolve export rejects reserved identifiers", {
+  model <- list(
+    constants = list(list(id = "TIME")),
+    dynamic = list(list(id = "F_CENTRAL")),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  error <- tryCatch(
+    prepare_mrgsolve_template_data(model),
+    error = identity
+  )
+
+  expect_s3_class(error, "error")
+  expect_match(conditionMessage(error), "`constants[1].id` (`TIME`) is a reserved word.", fixed = TRUE)
+  expect_match(
+    conditionMessage(error),
+    "`dynamic[1].id` (`F_CENTRAL`) matches reserved pattern `F_{CMT}`.",
+    fixed = TRUE
+  )
+})
+
+test_that("mrgsolve export rejects reserved event action targets", {
+  model <- list(
+    constants = list(),
+    dynamic = list(),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(list(
+      id = "dose",
+      actions = list(list(state = "RATE"))
+    )),
+    events = list(),
+    observables = list()
+  )
+
+  error <- tryCatch(
+    prepare_mrgsolve_template_data(model),
+    error = identity
+  )
+
+  expect_s3_class(error, "error")
+  expect_match(
+    conditionMessage(error),
+    "`timeEvents[1].actions[1].state` (`RATE`) is a reserved word.",
+    fixed = TRUE
+  )
+})
+
 test_that("write_mrgsolve rejects a platform", {
   platform <- list(models = list(list(id = "model")))
 

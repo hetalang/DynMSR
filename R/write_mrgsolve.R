@@ -7,6 +7,15 @@
   )
 }
 
+.dynms_mrgsolve_reserved_words_path <- function() {
+  system.file(
+    "templates",
+    "reserved-words.json",
+    package = "DynMSR",
+    mustWork = TRUE
+  )
+}
+
 #' Write an mrgsolve model file
 #'
 #' Generates mrgsolve source from one DynMS model.
@@ -54,6 +63,8 @@ check_mrgsolve_model <- function(model, caller) {
 }
 
 prepare_mrgsolve_template_data <- function(model) {
+  validate_mrgsolve_identifiers(model)
+
   data <- model
 
   constants <- unname(model$constants)
@@ -87,6 +98,116 @@ prepare_mrgsolve_template_data <- function(model) {
   data$has_captured_observables_ <- any(vapply(data$observables, `[[`, logical(1), "captured_"))
 
   data
+}
+
+validate_mrgsolve_identifiers <- function(model) {
+  reserved <- jsonlite::fromJSON(.dynms_mrgsolve_reserved_words_path())
+  identifiers <- collect_mrgsolve_identifiers(model)
+  violations <- lapply(identifiers, find_mrgsolve_identifier_violation, reserved = reserved)
+  violations <- Filter(Negate(is.null), violations)
+
+  if (length(violations) == 0L) {
+    return(invisible(model))
+  }
+
+  details <- vapply(
+    violations,
+    function(violation) {
+      paste0(
+        "- `", violation$path, "` (`", violation$identifier, "`) ",
+        violation$reason, "."
+      )
+    },
+    character(1)
+  )
+  stop(
+    paste(
+      "mrgsolve export cannot use reserved identifiers:",
+      paste(details, collapse = "\n"),
+      sep = "\n"
+    ),
+    call. = FALSE
+  )
+}
+
+collect_mrgsolve_identifiers <- function(model) {
+  entries <- c(
+    collect_mrgsolve_field_identifiers(model$constants, "constants", "id"),
+    collect_mrgsolve_field_identifiers(model$dynamic, "dynamic", "id"),
+    collect_mrgsolve_field_identifiers(model$static, "static", "id"),
+    collect_mrgsolve_field_identifiers(model$assignments, "assignments", "id"),
+    collect_mrgsolve_field_identifiers(model$timeEvents, "timeEvents", "id"),
+    collect_mrgsolve_field_identifiers(model$events, "events", "id"),
+    collect_mrgsolve_field_identifiers(model$observables, "observables", "symbol"),
+    collect_mrgsolve_action_identifiers(model$timeEvents, "timeEvents"),
+    collect_mrgsolve_action_identifiers(model$events, "events")
+  )
+
+  unname(entries)
+}
+
+collect_mrgsolve_field_identifiers <- function(items, collection, field) {
+  items <- items %||% list()
+  lapply(seq_along(items), function(index) {
+    list(
+      path = paste0(collection, "[", index, "].", field),
+      identifier = items[[index]][[field]]
+    )
+  })
+}
+
+collect_mrgsolve_action_identifiers <- function(events, collection) {
+  events <- events %||% list()
+  entries <- list()
+
+  for (event_index in seq_along(events)) {
+    actions <- events[[event_index]]$actions %||% list()
+    for (action_index in seq_along(actions)) {
+      entries[[length(entries) + 1L]] <- list(
+        path = paste0(
+          collection, "[", event_index, "].actions[", action_index, "].state"
+        ),
+        identifier = actions[[action_index]]$state
+      )
+    }
+  }
+
+  entries
+}
+
+find_mrgsolve_identifier_violation <- function(entry, reserved) {
+  identifier <- entry$identifier
+  if (identifier %in% reserved$reservedWords) {
+    return(c(entry, list(reason = "is a reserved word")))
+  }
+
+  matching_pattern <- find_mrgsolve_reserved_pattern(
+    identifier,
+    reserved$compartmentDependentPatterns
+  )
+  if (!is.null(matching_pattern)) {
+    return(c(
+      entry,
+      list(reason = paste0("matches reserved pattern `", matching_pattern, "`"))
+    ))
+  }
+
+  NULL
+}
+
+find_mrgsolve_reserved_pattern <- function(identifier, patterns) {
+  for (pattern in patterns) {
+    expression <- paste0(
+      "^",
+      sub("{CMT}", "[A-Za-z][A-Za-z0-9_]*", pattern, fixed = TRUE),
+      "$"
+    )
+    if (grepl(expression, identifier)) {
+      return(pattern)
+    }
+  }
+
+  NULL
 }
 
 prepare_mrgsolve_constant <- function(constant) {
