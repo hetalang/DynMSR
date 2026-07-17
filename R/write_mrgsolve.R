@@ -68,7 +68,7 @@ prepare_mrgsolve_template_data <- function(model) {
   dynamic_index <- stats::setNames(seq_along(dynamic_state_ids), dynamic_state_ids)
 
   time_event_ids <- vapply(time_events, `[[`, character(1), "id")
-  time_event_index <- stats::setNames(seq_along(time_event_ids), time_event_ids)
+  time_event_index <- stats::setNames(seq_along(time_event_ids) + 9L, time_event_ids)
 
   data$constants <- lapply(constants, prepare_mrgsolve_constant)
   data$dynamic <- lapply(dynamic, prepare_mrgsolve_dynamic_state)

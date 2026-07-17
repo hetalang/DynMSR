@@ -33,6 +33,35 @@ test_that("write_mrgsolve creates a temporary file when filepath is omitted", {
   expect_gt(file.info(path)$size, 0)
 })
 
+test_that("mrgsolve time event EVID values start at 10", {
+  model <- list(
+    id = "time-events",
+    constants = list(),
+    dynamic = list(),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(
+      list(
+        id = "first",
+        trigger = list(type = "time", start = 1),
+        actions = list()
+      ),
+      list(
+        id = "second",
+        trigger = list(type = "time", start = 2),
+        actions = list()
+      )
+    ),
+    events = list(),
+    observables = list()
+  )
+
+  data <- prepare_mrgsolve_template_data(model)
+
+  expect_identical(data$timeEvents[[1]]$time_index_, 10L)
+  expect_identical(data$timeEvents[[2]]$time_index_, 11L)
+})
+
 test_that("write_mrgsolve rejects a platform", {
   platform <- list(models = list(list(id = "model")))
 
