@@ -295,8 +295,11 @@
     "timeTrigger": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["start"],
+      "required": ["type", "start"],
       "properties": {
+        "type": {
+          "const": "time"
+        },
         "start": {
           "$ref": "#/$defs/value",
           "description": "Required first activation time."

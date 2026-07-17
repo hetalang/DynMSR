@@ -90,7 +90,7 @@ test_that("dynms_validate_semantic rejects duplicate event ids across timeEvents
         assignments = list(),
         timeEvents = list(list(
           id = "sw",
-          trigger = list(start = 0),
+          trigger = list(type = "time", start = 0),
           actions = list()
         )),
         events = list(list(

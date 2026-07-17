@@ -25,6 +25,7 @@
         {
           "id": "dose",
           "trigger": {
+            "type": "time",
             "start": 0
           },
           "actions": []
@@ -32,6 +33,7 @@
         {
           "id": "dose",
           "trigger": {
+            "type": "time",
             "start": 1
           },
           "actions": []

@@ -39,6 +39,7 @@
         {
           "id": "sw1",
           "trigger": {
+            "type": "time",
             "start": 1
           },
           "priority": 0,
