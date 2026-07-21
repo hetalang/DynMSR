@@ -21,11 +21,12 @@ jobs:
           - { os: windows-latest, r: 'release' }
           - { os: macos-latest, r: 'release' }
           - { os: ubuntu-latest, r: 'devel' }
-          - { os: ubuntu-latest, r: 'release' }
+          - { os: ubuntu-latest, r: 'release', heta_integration: true }
           - { os: ubuntu-latest, r: 'oldrel' }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      DYNMSR_RUN_HETA_INTEGRATION: ${{ matrix.heta_integration && 'true' || 'false' }}
 
     steps:
       - name: Checkout repository
@@ -36,6 +37,23 @@ jobs:
         with:
           r-version: ${{ matrix.r }}
           use-public-rspm: true
+
+      - name: Read configured Heta compiler version
+        if: matrix.heta_integration
+        shell: bash
+        run: |
+          echo "HETA_COMPILER_VERSION=$(jq -r '.testVersion' inst/config/heta-compiler.json)" >> "$GITHUB_ENV"
+
+      - name: Install Heta compiler
+        if: matrix.heta_integration
+        shell: bash
+        run: |
+          wget -q "https://github.com/hetalang/heta-compiler/releases/download/v${HETA_COMPILER_VERSION}/heta-compiler-x64.deb" -O heta-compiler-x64.deb
+          sudo dpkg -i heta-compiler-x64.deb
+          if [[ "$(heta --version)" != *"$HETA_COMPILER_VERSION"* ]]; then
+            echo "Version mismatch: expected $HETA_COMPILER_VERSION, got $(heta --version)"
+            exit 1
+          fi
 
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
