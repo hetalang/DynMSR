@@ -64,6 +64,13 @@ Run the local test suite with:
 Rscript -e "pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
 ```
 
+Heta integration tests are disabled by default. They require the compiler
+version configured in `inst/config/heta-compiler.json` and can be enabled with:
+
+```sh
+Rscript -e "Sys.setenv(DYNMSR_RUN_HETA_INTEGRATION = 'true'); pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
+```
+
 Regenerate roxygen2 documentation, including `NAMESPACE` and `man/*.Rd`, with:
 
 ```sh

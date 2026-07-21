@@ -12,7 +12,7 @@
 heta_check <- function() {
   config <- heta_compiler_config()
   output <- tryCatch(
-    suppressWarnings(system2("heta", "--version", stdout = TRUE, stderr = TRUE)),
+    heta_run_command("--version"),
     error = identity
   )
 
@@ -79,6 +79,10 @@ heta_check <- function() {
     message = message,
     config = config
   )
+}
+
+heta_run_command <- function(args) {
+  suppressWarnings(system2("heta", args, stdout = TRUE, stderr = TRUE))
 }
 
 heta_parse_version <- function(output) {

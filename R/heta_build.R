@@ -67,7 +67,7 @@ heta_build <- function(dir = ".",
   )
 
   output <- tryCatch(
-    suppressWarnings(system2("heta", args, stdout = TRUE, stderr = TRUE)),
+    heta_run_command(args),
     error = identity
   )
 
