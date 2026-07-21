@@ -160,7 +160,7 @@ heta_version_supported <- function(version, range) {
   }
 
   candidate <- heta_semver_components(version)
-  if (is.null(candidate) || !is.na(candidate$prerelease)) {
+  if (is.null(candidate)) {
     return(FALSE)
   }
 
