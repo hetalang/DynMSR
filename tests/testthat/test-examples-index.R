@@ -1,38 +1,16 @@
 test_that("examples index lists existing example files", {
-  index_path <- system.file("examples", "index.json", package = "DynMSR")
-  index <- jsonlite::fromJSON(index_path, simplifyVector = FALSE)
+  paths <- indexed_example_paths("examples")
 
-  expect_true(length(index$examples) > 0L)
-
-  paths <- vapply(
-    index$examples,
-    function(example) {
-      system.file(index$locationBase, example$file, package = "DynMSR")
-    },
-    character(1)
-  )
-
+  expect_true(length(paths) > 0L)
   expect_true(all(nzchar(paths)))
   expect_true(all(file.exists(paths)))
 
-  validation_error_paths <- vapply(
-    index$schemaErrorsExamples,
-    function(example) {
-      system.file(index$locationBase, example$file, package = "DynMSR")
-    },
-    character(1)
-  )
+  validation_error_paths <- indexed_example_paths("schemaErrorsExamples")
 
   expect_true(all(nzchar(validation_error_paths)))
   expect_true(all(file.exists(validation_error_paths)))
 
-  semantic_error_paths <- vapply(
-    index$semanticErrorsExamples,
-    function(example) {
-      system.file(index$locationBase, example$file, package = "DynMSR")
-    },
-    character(1)
-  )
+  semantic_error_paths <- indexed_example_paths("semanticErrorsExamples")
 
   expect_true(all(nzchar(semantic_error_paths)))
   expect_true(all(file.exists(semantic_error_paths)))

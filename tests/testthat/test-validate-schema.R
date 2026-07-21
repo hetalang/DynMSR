@@ -1,16 +1,5 @@
 test_that("dynms_validate_schema validates all indexed examples", {
-  index <- jsonlite::fromJSON(
-    system.file("examples", "index.json", package = "DynMSR"),
-    simplifyVector = FALSE
-  )
-
-  paths <- vapply(
-    index$examples,
-    function(example) {
-      system.file(index$locationBase, example$file, package = "DynMSR")
-    },
-    character(1)
-  )
+  paths <- indexed_example_paths()
 
   valid <- vapply(
     paths,
@@ -24,18 +13,7 @@ test_that("dynms_validate_schema validates all indexed examples", {
 })
 
 test_that("dynms_validate_schema reports messages for all indexed invalid examples", {
-  index <- jsonlite::fromJSON(
-    system.file("examples", "index.json", package = "DynMSR"),
-    simplifyVector = FALSE
-  )
-
-  paths <- vapply(
-    index$schemaErrorsExamples,
-    function(example) {
-      system.file(index$locationBase, example$file, package = "DynMSR")
-    },
-    character(1)
-  )
+  paths <- indexed_example_paths("schemaErrorsExamples")
 
   results <- lapply(paths, dynms_validate_schema)
 
@@ -48,3 +26,28 @@ test_that("dynms_validate_schema reports messages for all indexed invalid exampl
   )))
 })
 
+test_that("dynms_validate_schema accepts raw platforms and raises collected errors", {
+  raw <- minimal_raw_platform()
+  path <- write_test_json(raw)
+  on.exit(unlink(path), add = TRUE)
+
+  expect_true(dynms_validate_schema(raw)$valid)
+  expect_equal(dynms_validate_schema(path), dynms_validate_schema(raw))
+
+  raw$dynms <- NULL
+  result <- dynms_validate_schema(raw)
+
+  expect_false(result$valid)
+  expect_gt(length(result$errors), 0L)
+  expect_error(
+    dynms_validate_schema(raw, error = TRUE),
+    "DynMS schema validation failed"
+  )
+})
+
+test_that("dynms_validate_schema rejects unsupported inputs", {
+  expect_error(
+    dynms_validate_schema("missing-file.json"),
+    "`x` must be a DynMS file path or an R list."
+  )
+})

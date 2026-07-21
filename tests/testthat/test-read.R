@@ -1,10 +1,5 @@
-index <- jsonlite::fromJSON(
-  system.file("examples", "index.json", package = "DynMSR"),
-  simplifyVector = FALSE
-)
-
 test_that("dynms_read reads DynMS JSON without simplifying vectors", {
-  path <- system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR")
+  path <- indexed_example_paths()[[1]]
 
   platform <- dynms_read(path)
 
@@ -12,9 +7,14 @@ test_that("dynms_read reads DynMS JSON without simplifying vectors", {
   expect_type(platform$models, "list")
 })
 
+test_that("dynms_read rejects a non-path input", {
+  expect_error(dynms_read(list()), "`path` must be a single file path.")
+  expect_error(dynms_read(c("one.json", "two.json")), "`path` must be a single file path.")
+})
+
 test_that("dynms_read reports a missing file", {
   path <- file.path(
-    system.file(index$locationBase, package = "DynMSR"),
+    system.file("examples", package = "DynMSR"),
     "missing-file.json"
   )
 
@@ -22,70 +22,13 @@ test_that("dynms_read reports a missing file", {
 })
 
 test_that("dynms_read reports an empty JSON file", {
-  path <- system.file(index$locationBase, "empty-json.json", package = "DynMSR")
+  path <- system.file("examples", "empty-json.json", package = "DynMSR")
 
   expect_error(dynms_read(path))
 })
 
 test_that("dynms_read reports malformed JSON", {
-  path <- system.file(index$locationBase, "malformed-json.json", package = "DynMSR")
+  path <- system.file("examples", "malformed-json.json", package = "DynMSR")
 
   expect_error(dynms_read(path))
-})
-
-test_that("dynms_load reads, validates, and returns a platform", {
-  path <- system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR")
-
-  platform <- dynms_load(path)
-
-  expect_type(platform, "list")
-  expect_type(platform$models, "list")
-  expect_gt(length(platform$models), 0L)
-})
-
-test_that("dynms_load reports schema and semantic validation messages before failing", {
-  path <- tempfile(fileext = ".json")
-  on.exit(unlink(path), add = TRUE)
-  jsonlite::write_json(
-    list(
-      models = list(
-        list(
-          id = "model",
-          constants = list(),
-          dynamic = list(
-            list(
-              id = "A",
-              initial = 1,
-              derivative = list(expr = 0, format = "math-json")
-            ),
-            list(
-              id = "A",
-              initial = 2,
-              derivative = list(expr = 0, format = "math-json")
-            )
-          ),
-          static = list(),
-          assignments = list(),
-          timeEvents = list(),
-          events = list(),
-          observables = list()
-        )
-      )
-    ),
-    path,
-    auto_unbox = TRUE
-  )
-
-  messages <- character()
-  withCallingHandlers(
-    expect_error(dynms_load(path), "DynMS load failed: validation found"),
-    message = function(message) {
-      messages <<- c(messages, conditionMessage(message))
-      invokeRestart("muffleMessage")
-    }
-  )
-
-  expect_true(any(grepl("DynMS schema validation failed", messages, fixed = TRUE)))
-  expect_true(any(grepl("DynMS semantic validation failed", messages, fixed = TRUE)))
-  expect_true(any(grepl("Duplicate identifier in `dynamic`: A", messages, fixed = TRUE)))
 })

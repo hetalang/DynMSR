@@ -1,16 +1,5 @@
-index <- jsonlite::fromJSON(
-  system.file("examples", "index.json", package = "DynMSR"),
-  simplifyVector = FALSE
-)
-
 test_that("dynms_validate_semantic succeeds for all indexed valid examples", {
-  paths <- vapply(
-    index$examples,
-    function(example) {
-      system.file(index$locationBase, example$file, package = "DynMSR")
-    },
-    character(1)
-  )
+  paths <- indexed_example_paths()
 
   results <- lapply(paths, function(path) {
     raw <- dynms_read(path)
@@ -23,13 +12,7 @@ test_that("dynms_validate_semantic succeeds for all indexed valid examples", {
 })
 
 test_that("dynms_validate_semantic reports messages for all indexed semantic error examples", {
-  paths <- vapply(
-    index$semanticErrorsExamples,
-    function(example) {
-      system.file(index$locationBase, example$file, package = "DynMSR")
-    },
-    character(1)
-  )
+  paths <- indexed_example_paths("semanticErrorsExamples")
 
   results <- lapply(paths, function(path) {
     raw <- dynms_read(path)
@@ -44,6 +27,70 @@ test_that("dynms_validate_semantic reports messages for all indexed semantic err
     function(result) all(nzchar(vapply(result$errors, `[[`, character(1), "message"))),
     logical(1)
   )))
+})
+
+test_that("dynms_validate_semantic aggregates errors and can raise them", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$constants <- list(
+    list(id = "k", value = 1),
+    list(id = "k", value = 2)
+  )
+  raw$models[[1]]$dynamic <- list(
+    list(id = "A", initial = 1, derivative = list(expr = 0, format = "math-json")),
+    list(id = "A", initial = 2, derivative = list(expr = 0, format = "math-json"))
+  )
+
+  result <- dynms_validate_semantic(raw)
+
+  expect_false(result$valid)
+  expect_length(result$errors, 2L)
+  expect_error(
+    dynms_validate_semantic(raw, error = TRUE),
+    "DynMS semantic validation failed"
+  )
+})
+
+test_that("dynms_validate_semantic checks duplicate identifiers in every collection", {
+  expression <- list(expr = 0, format = "math-json")
+  duplicate_components <- list(
+    dynamic = list(
+      list(id = "A", initial = 1, derivative = expression),
+      list(id = "A", initial = 2, derivative = expression)
+    ),
+    static = list(list(id = "V", initial = 1), list(id = "V", initial = 2)),
+    constants = list(list(id = "k", value = 1), list(id = "k", value = 2)),
+    assignments = list(
+      list(id = "rate", rhs = expression),
+      list(id = "rate", rhs = expression)
+    ),
+    timeEvents = list(
+      list(id = "dose", trigger = list(type = "time", start = 0), actions = list()),
+      list(id = "dose", trigger = list(type = "time", start = 1), actions = list())
+    ),
+    events = list(
+      list(
+        id = "switch",
+        trigger = list(type = "conditional", rhs = expression),
+        actions = list()
+      ),
+      list(
+        id = "switch",
+        trigger = list(type = "conditional", rhs = expression),
+        actions = list()
+      )
+    ),
+    observables = list(list(symbol = "C"), list(symbol = "C"))
+  )
+
+  for (field in names(duplicate_components)) {
+    raw <- minimal_raw_platform()
+    raw$models[[1]][[field]] <- duplicate_components[[field]]
+    result <- dynms_validate_semantic(raw)
+
+    expect_true(dynms_validate_schema(raw)$valid, info = field)
+    expect_false(result$valid, info = field)
+    expect_equal(result$errors[[1]]$code, "duplicate_identifier", info = field)
+  }
 })
 
 test_that("dynms_validate_semantic rejects duplicate state ids across dynamic and static", {
