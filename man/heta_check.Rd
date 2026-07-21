@@ -7,11 +7,12 @@
 heta_check()
 }
 \value{
-A list with \code{available}, \code{command}, \code{version}, and \code{output} fields.
+A list with \code{available}, \code{supported}, \code{command}, \code{version},
+\code{supported_version}, \code{installation_url}, \code{output}, and \code{message} fields.
 }
 \description{
-Checks whether the \code{heta} command is available and can report its version
-with \code{heta --version}.
+Checks whether the \code{heta} command is available, can report its version with
+\code{heta --version}, and satisfies the bundled DynMSR compatibility rule.
 }
 \examples{
 heta_check()

@@ -45,15 +45,8 @@ heta_build <- function(dir = ".",
   }
 
   heta <- heta_check()
-  if (!isTRUE(heta$available)) {
-    stop(
-      paste(
-        "Heta compiler is not available.",
-        heta$output,
-        sep = "\n"
-      ),
-      call. = FALSE
-    )
+  if (!isTRUE(heta$supported)) {
+    stop(heta$message, call. = FALSE)
   }
 
   args <- c(

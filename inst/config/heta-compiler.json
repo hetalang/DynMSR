@@ -1,0 +1,6 @@
+{
+  "package": "heta-compiler",
+  "supportedVersion": "^0.12.0",
+  "testVersion": "0.12.0",
+  "installationUrl": "https://hetalang.github.io/hetacompiler/installation.html"
+}

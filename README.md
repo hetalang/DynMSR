@@ -43,6 +43,19 @@ model <- platform$models[[1]]
 mrgsolve_model <- build_mrgsolve(model)
 ```
 
+## Optional Heta integration
+
+Heta is an optional DynMS producer; it is not required to read or validate
+DynMS JSON files. The supported compiler range and integration-test pin are
+defined in `inst/config/heta-compiler.json`. Follow the official
+[Heta installation instructions](https://hetalang.github.io/hetacompiler/installation.html)
+to install the compiler.
+
+The machine-readable compatibility rule, test pin, and installation URL are stored in
+`inst/config/heta-compiler.json`. A future GitHub Actions Heta integration job
+must install that exact version; the standard package-check matrix must remain
+independent of Heta.
+
 ## Development
 
 Run the local test suite with:
