@@ -78,8 +78,7 @@ test_that("dynms_validate_semantic checks duplicate identifiers in every collect
         trigger = list(type = "conditional", rhs = expression),
         actions = list()
       )
-    ),
-    observables = list(list(symbol = "C"), list(symbol = "C"))
+    )
   )
 
   for (field in names(duplicate_components)) {
@@ -91,6 +90,31 @@ test_that("dynms_validate_semantic checks duplicate identifiers in every collect
     expect_false(result$valid, info = field)
     expect_equal(result$errors[[1]]$code, "duplicate_identifier", info = field)
   }
+})
+
+test_that("dynms_validate_semantic permits repeated observable references", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$dynamic <- list(list(
+    id = "A", initial = 1, derivative = list(expr = 0, format = "math-json")
+  ))
+  raw$models[[1]]$observables <- list(list(symbol = "A"), list(symbol = "A"))
+
+  expect_true(dynms_validate_semantic(raw)$valid)
+})
+
+test_that("dynms_validate_semantic resolves canonical and compatible MathJSON symbols", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$constants <- list(list(id = "k", value = 1))
+  raw$models[[1]]$dynamic <- list(list(
+    id = "A",
+    initial = 1,
+    derivative = list(
+      expr = list("Add", list(sym = "k"), "Pi"),
+      format = "math-json"
+    )
+  ))
+
+  expect_true(dynms_validate_semantic(raw)$valid)
 })
 
 test_that("dynms_validate_semantic rejects duplicate state ids across dynamic and static", {
@@ -162,4 +186,52 @@ test_that("dynms_validate_semantic rejects duplicate event ids across timeEvents
     messages,
     fixed = TRUE
   )))
+})
+
+test_that("dynms_validate_semantic checks references and initialization contexts", {
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$constants <- list(list(id = "k", value = expression("missing")))
+  raw$models[[1]]$dynamic <- list(list(
+    id = "A", initial = expression("A"), derivative = expression("missing")
+  ))
+  raw$models[[1]]$static <- list(list(id = "V", initial = expression("t")))
+  raw$models[[1]]$assignments <- list(
+    list(id = "first", rhs = expression("second")),
+    list(id = "second", rhs = expression("A"))
+  )
+  raw$models[[1]]$timeEvents <- list(list(
+    id = "dose",
+    trigger = list(type = "time", start = expression("A")),
+    actions = list(
+      list(state = "k", rhs = expression("missing")),
+      list(state = "k", rhs = expression(0))
+    )
+  ))
+  raw$models[[1]]$events <- list(list(
+    id = "limit",
+    trigger = list(type = "conditional", rhs = expression("missing")),
+    actions = list()
+  ))
+  raw$models[[1]]$observables <- list(list(symbol = "k"))
+
+  codes <- vapply(dynms_validate_semantic(raw)$errors, `[[`, character(1), "code")
+
+  expect_true(all(c(
+    "unknown_symbol", "assignment_order", "invalid_action_state",
+    "duplicate_action_state", "invalid_observable"
+  ) %in% codes))
+})
+
+test_that("dynms_validate_semantic checks identifiers across all collections", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$constants <- list(list(id = "shared", value = 1))
+  raw$models[[1]]$assignments <- list(list(
+    id = "shared", rhs = list(expr = 1, format = "math-json")
+  ))
+
+  result <- dynms_validate_semantic(raw)
+
+  expect_false(result$valid)
+  expect_equal(result$errors[[1]]$code, "duplicate_identifier")
 })
