@@ -51,3 +51,13 @@ test_that("dynms_validate_schema rejects unsupported inputs", {
     "`x` must be a DynMS file path or an R list."
   )
 })
+
+test_that("dynms_validate_schema requires numeric constant values", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$constants <- list(list(
+    id = "k",
+    value = list(expr = 1, format = "math-json")
+  ))
+
+  expect_false(dynms_validate_schema(raw)$valid)
+})

@@ -89,9 +89,6 @@ validate_model_references <- function(model, model_path, add_error) {
   state_ids <- c(dynamic_ids, static_ids)
   symbols <- c(constant_ids, state_ids, assignment_ids, "t", mathjson_constants())
 
-  validate_expression_collection(
-    model$constants, "value", paste0(model_path, ".constants"), symbols, add_error
-  )
   validate_state_initials(model$dynamic, "dynamic", model_path, constant_ids, add_error)
   validate_state_initials(model$static, "static", model_path, constant_ids, add_error)
   validate_expression_collection(

@@ -191,7 +191,7 @@ test_that("dynms_validate_semantic rejects duplicate event ids across timeEvents
 test_that("dynms_validate_semantic checks references and initialization contexts", {
   expression <- function(expr) list(expr = expr, format = "math-json")
   raw <- minimal_raw_platform()
-  raw$models[[1]]$constants <- list(list(id = "k", value = expression("missing")))
+  raw$models[[1]]$constants <- list(list(id = "k", value = 1))
   raw$models[[1]]$dynamic <- list(list(
     id = "A", initial = expression("A"), derivative = expression("missing")
   ))
