@@ -3,7 +3,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 dry_run <- "--dry-run" %in% args
 
-config_path <- file.path("inst", "schema", "dynms.schema.source.json")
+config_path <- file.path("inst", "config", "dynms.schema.source.json")
 json_schema_meta_url <- "https://json-schema.org/draft/2020-12/schema"
 
 download_file <- function(url, dest) {
@@ -108,7 +108,7 @@ if (is_url) {
         "",
         "Check internet access, DNS, proxy, or GitHub availability.",
         "The existing local schema was not modified.",
-        "If needed, set `source` in inst/schema/dynms.schema.source.json",
+        "If needed, set `source` in inst/config/dynms.schema.source.json",
         "to a local schema file path and run this command again.",
         sep = "\n"
       ),

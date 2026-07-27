@@ -78,7 +78,7 @@ Rscript -e "roxygen2::roxygenise()"
 ```
 
 The bundled DynMS JSON Schema is stored in `inst/schema/dynms.schema.json`.
-Its upstream source URL is recorded in `inst/schema/dynms.schema.source.json`.
+Its upstream source URL is recorded in `inst/config/dynms.schema.source.json`.
 
 To refresh the local schema copy during development:
 
@@ -88,7 +88,7 @@ Rscript tools/update-dynms-schema.R
 
 If the upstream URL is not reachable from the current network, `source` can be
 temporarily changed to a local schema file path in
-`inst/schema/dynms.schema.source.json`.
+`inst/config/dynms.schema.source.json`.
 
 This is a manual developer step. Package installation, examples, and tests use
 the bundled local schema and do not download files from the internet.
