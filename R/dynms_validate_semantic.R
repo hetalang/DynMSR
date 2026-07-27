@@ -212,6 +212,15 @@ validate_observables <- function(observables, model_path, state_ids, assignment_
 }
 
 validate_expression_symbols <- function(expression, path, allowed, add_error) {
+  if (is.list(expression) && !identical(expression$format, "math-json")) {
+    add_error(
+      path,
+      "unsupported_expression_format",
+      paste0("DynMSR supports only `math-json` expressions; found `", expression$format, "`.")
+    )
+    return(invisible(TRUE))
+  }
+
   references <- expression_symbols(expression)
   invalid <- setdiff(references, allowed)
 

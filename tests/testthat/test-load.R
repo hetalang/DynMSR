@@ -31,6 +31,22 @@ test_that("dynms_load rejects every indexed semantic-invalid example", {
   }
 })
 
+test_that("dynms_load rejects non-MathJSON expressions", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$assignments <- list(list(
+    id = "rate",
+    rhs = list(expr = "k * x", format = "heta")
+  ))
+  path <- write_test_json(raw)
+  on.exit(unlink(path), add = TRUE)
+
+  expect_message(
+    expect_error(dynms_load(path), "DynMS load failed"),
+    "DynMSR supports only `math-json` expressions",
+    fixed = TRUE
+  )
+})
+
 test_that("dynms_load reports schema and semantic errors before failing", {
   raw <- minimal_raw_platform()
   raw$dynms <- NULL

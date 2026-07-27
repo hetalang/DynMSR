@@ -7,6 +7,8 @@
 #' Validation messages are reported with [message()], followed by one final
 #' error when any validation issue is found.
 #'
+#' DynMSR currently supports only expressions with `format: "math-json"`.
+#'
 #' @param path Path to a DynMS JSON file.
 #'
 #' @return A platform list. Use `platform$models[[i]]` to select one model for

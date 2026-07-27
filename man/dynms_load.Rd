@@ -21,4 +21,6 @@ backend-independent semantic validation, and returns a platform list.
 Schema and semantic validation are both attempted before loading fails.
 Validation messages are reported with \code{\link[=message]{message()}}, followed by one final
 error when any validation issue is found.
+
+DynMSR currently supports only expressions with \code{format: "math-json"}.
 }

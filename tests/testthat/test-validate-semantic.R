@@ -235,3 +235,17 @@ test_that("dynms_validate_semantic checks identifiers across all collections", {
   expect_false(result$valid)
   expect_equal(result$errors[[1]]$code, "duplicate_identifier")
 })
+
+test_that("dynms_validate_semantic rejects non-MathJSON expressions", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$assignments <- list(list(
+    id = "rate",
+    rhs = list(expr = "k * x", format = "heta")
+  ))
+
+  result <- dynms_validate_semantic(raw)
+
+  expect_false(result$valid)
+  expect_equal(result$errors[[1]]$code, "unsupported_expression_format")
+  expect_match(result$errors[[1]]$message, "only `math-json`", fixed = TRUE)
+})
