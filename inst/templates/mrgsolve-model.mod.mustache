@@ -108,15 +108,17 @@ if ({{&id}}__active__ && EVID=={{&time_index_}}) {
 {{/static_}}
 {{/actions}}
 {{#trigger.has_period_}}
-  // next event
+  if ({{&trigger.period_expr_}} > 0.0) {
+    // next event
 {{#trigger.has_stop_}}
-  if (TIME < {{&trigger.stop_expr_}}) {
-    self.mevent(TIME + {{&trigger.period_expr_}}, {{&time_index_}});
-  }
+    if (TIME < {{&trigger.stop_expr_}}) {
+      self.mevent(TIME + {{&trigger.period_expr_}}, {{&time_index_}});
+    }
 {{/trigger.has_stop_}}
 {{^trigger.has_stop_}}
-  self.mevent(TIME + {{&trigger.period_expr_}}, {{&time_index_}});
+    self.mevent(TIME + {{&trigger.period_expr_}}, {{&time_index_}});
 {{/trigger.has_stop_}}
+  }
 {{/trigger.has_period_}}
  } // end time event
 

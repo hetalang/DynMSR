@@ -62,6 +62,35 @@ test_that("mrgsolve time event EVID values start at 10", {
   expect_identical(data$timeEvents[[2]]$time_index_, 11L)
 })
 
+test_that("mrgsolve time events repeat only for positive periods", {
+  testthat::skip_if_not_installed("mrgsolve")
+
+  model <- list(
+    id = "one-shot-period",
+    constants = list(list(id = "k", value = 1)),
+    dynamic = list(list(
+      id = "A",
+      initial = 1,
+      derivative = list(expr = 0, format = "math-json")
+    )),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(list(
+      id = "event",
+      trigger = list(type = "time", start = 1, period = 0),
+      actions = list()
+    )),
+    events = list(),
+    observables = list()
+  )
+  path <- write_mrgsolve(model)
+  on.exit(unlink(path), add = TRUE)
+  code <- paste(readLines(path, warn = FALSE), collapse = "\n")
+
+  expect_match(code, "if (0 > 0.0) {", fixed = TRUE)
+  expect_s4_class(build_mrgsolve(model, quiet = TRUE), "mrgmod")
+})
+
 test_that("mrgsolve export rejects reserved identifiers", {
   model <- list(
     constants = list(list(id = "TIME")),
