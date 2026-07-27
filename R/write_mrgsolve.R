@@ -20,6 +20,12 @@
 #'
 #' Generates mrgsolve source from one DynMS model.
 #'
+#' @details
+#' The exporter warns and ignores unsupported DynMS features: algebraic dynamic
+#' states, `stopSimulation`, and state-event trigger `detection`. Algebraic
+#' states are emitted as ordinary ODE states; state-event conditions are
+#' evaluated in generated code without root finding.
+#'
 #' @param model A model list, such as one element of `platform$models`.
 #' @param filepath Path where the generated model source should be written. If
 #'   omitted, a temporary `.mod` file is created.
@@ -64,6 +70,7 @@ check_mrgsolve_model <- function(model, caller) {
 
 prepare_mrgsolve_template_data <- function(model) {
   validate_mrgsolve_identifiers(model)
+  warn_mrgsolve_unsupported_features(model)
 
   data <- model
 
@@ -98,6 +105,55 @@ prepare_mrgsolve_template_data <- function(model) {
   data$has_captured_observables_ <- any(vapply(data$observables, `[[`, logical(1), "captured_"))
 
   data
+}
+
+warn_mrgsolve_unsupported_features <- function(model) {
+  issues <- character()
+  dynamic <- model$dynamic %||% list()
+
+  for (index in seq_along(dynamic)) {
+    if (isTRUE(dynamic[[index]]$algebraic)) {
+      issues <- c(
+        issues,
+        paste0("`dynamic[", index, "].algebraic`: algebraic states are emitted as ordinary ODE states")
+      )
+    }
+  }
+
+  for (field in c("timeEvents", "events")) {
+    events <- model[[field]] %||% list()
+    for (index in seq_along(events)) {
+      event <- events[[index]]
+      if (isTRUE(event$stopSimulation)) {
+        issues <- c(
+          issues,
+          paste0("`", field, "[", index, "].stopSimulation`: simulation will not stop")
+        )
+      }
+      if (identical(field, "events") && !is.null(event$trigger$detection)) {
+        issues <- c(
+          issues,
+          paste0(
+            "`events[", index, "].trigger.detection`: detection mode is ignored; ",
+            "the condition is evaluated without root finding"
+          )
+        )
+      }
+    }
+  }
+
+  if (length(issues) > 0L) {
+    warning(
+      paste(
+        "mrgsolve export ignores unsupported DynMS features:",
+        paste(paste0("- ", issues), collapse = "\n"),
+        sep = "\n"
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(NULL)
 }
 
 validate_mrgsolve_identifiers <- function(model) {

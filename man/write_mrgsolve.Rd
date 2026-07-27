@@ -18,3 +18,9 @@ The path to the generated model file.
 \description{
 Generates mrgsolve source from one DynMS model.
 }
+\details{
+The exporter warns and ignores unsupported DynMS features: algebraic dynamic
+states, \code{stopSimulation}, and state-event trigger \code{detection}. Algebraic
+states are emitted as ordinary ODE states; state-event conditions are
+evaluated in generated code without root finding.
+}

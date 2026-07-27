@@ -114,6 +114,48 @@ test_that("mrgsolve export rejects reserved event action targets", {
   )
 })
 
+test_that("mrgsolve export warns about ignored DynMS features", {
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  model <- list(
+    id = "unsupported-features",
+    constants = list(),
+    dynamic = list(list(id = "A", initial = 1, derivative = expression(0), algebraic = TRUE)),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(list(
+      id = "time-stop",
+      trigger = list(type = "time", start = 1),
+      actions = list(),
+      stopSimulation = TRUE
+    )),
+    events = list(list(
+      id = "root-stop",
+      trigger = list(type = "crossing", rhs = expression(0), detection = "root"),
+      actions = list(),
+      stopSimulation = TRUE
+    )),
+    observables = list()
+  )
+  path <- tempfile(fileext = ".mod")
+  on.exit(unlink(path), add = TRUE)
+  messages <- character()
+
+  withCallingHandlers(
+    write_mrgsolve(model, path),
+    warning = function(warning) {
+      messages <<- c(messages, conditionMessage(warning))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_true(file.exists(path))
+  expect_length(messages, 1L)
+  expect_match(messages, "dynamic[1].algebraic", fixed = TRUE)
+  expect_match(messages, "timeEvents[1].stopSimulation", fixed = TRUE)
+  expect_match(messages, "events[1].stopSimulation", fixed = TRUE)
+  expect_match(messages, "events[1].trigger.detection", fixed = TRUE)
+})
+
 test_that("mrgsolve export converts extended MathJSON numbers", {
   model <- list(
     id = "extended-numbers",
