@@ -8,10 +8,13 @@ dynms_mathjson_to_c <- function(node) {
     return(node)
   }
   if (is.list(node) && !is.null(node$num)) {
-    return(node$num)
+    return(dynms_extended_number_to_c(node$num))
   }
   if (is.list(node) && !is.null(node$sym)) {
     return(node$sym)
+  }
+  if (is.list(node) && !is.null(node$str)) {
+    return(dynms_string_to_c(node$str))
   }
   if (is.list(node) && !is.null(node$fn)) {
     return(dynms_mathjson_to_c(node$fn))
@@ -71,6 +74,24 @@ dynms_mathjson_to_c <- function(node) {
     Xor = dynms_infix_c(args, "!="),
     stop("Unsupported MathJSON operator for C export: ", op, call. = FALSE)
   )
+}
+
+dynms_extended_number_to_c <- function(value) {
+  switch(
+    value,
+    "NaN" = "std::numeric_limits<double>::quiet_NaN()",
+    "+Infinity" = "std::numeric_limits<double>::infinity()",
+    "-Infinity" = "-std::numeric_limits<double>::infinity()",
+    stop("Unsupported MathJSON extended number: ", value, call. = FALSE)
+  )
+}
+
+dynms_string_to_c <- function(value) {
+  if (!is.character(value) || length(value) != 1L) {
+    stop("MathJSON `str` must contain one string.", call. = FALSE)
+  }
+
+  as.character(jsonlite::toJSON(value, auto_unbox = TRUE))
 }
 
 dynms_number_to_c <- function(x) {

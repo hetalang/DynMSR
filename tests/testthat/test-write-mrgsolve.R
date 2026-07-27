@@ -114,6 +114,37 @@ test_that("mrgsolve export rejects reserved event action targets", {
   )
 })
 
+test_that("mrgsolve export converts extended MathJSON numbers", {
+  model <- list(
+    id = "extended-numbers",
+    constants = list(list(id = "k", value = 1)),
+    dynamic = list(),
+    static = list(list(id = "x", initial = 0)),
+    assignments = list(list(
+      id = "value",
+      rhs = list(
+        expr = list("Add", list(num = "NaN"), list(num = "+Infinity"), list(num = "-Infinity")),
+        format = "math-json"
+      )
+    )),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  path <- write_mrgsolve(model)
+  on.exit(unlink(path), add = TRUE)
+  code <- paste(readLines(path, warn = FALSE), collapse = "\n")
+
+  expect_match(code, "std::numeric_limits<double>::quiet_NaN()", fixed = TRUE)
+  expect_match(code, "std::numeric_limits<double>::infinity()", fixed = TRUE)
+  expect_match(code, "-std::numeric_limits<double>::infinity()", fixed = TRUE)
+})
+
+test_that("mrgsolve export quotes MathJSON strings", {
+  expect_identical(dynms_mathjson_to_c(list(str = "a \"quoted\" string")), '"a \\"quoted\\" string"')
+})
+
 test_that("write_mrgsolve rejects a platform", {
   platform <- list(models = list(list(id = "model")))
 
@@ -136,6 +167,31 @@ test_that("build_mrgsolve compiles a model when mrgsolve is available", {
   raw <- dynms_read(system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR"))
   model <- new_platform(raw)$models[[1]]
 
+  compiled <- build_mrgsolve(model, quiet = TRUE)
+
+  expect_s4_class(compiled, "mrgmod")
+})
+
+test_that("build_mrgsolve compiles extended MathJSON numbers", {
+  testthat::skip_if_not_installed("mrgsolve")
+
+  model <- list(
+    id = "extended-numbers",
+    dynamic = list(list(
+      id = "x",
+      initial = 1,
+      derivative = list(
+        expr = list("Add", list(num = "NaN"), list(num = "+Infinity"), list(num = "-Infinity")),
+        format = "math-json"
+      )
+    )),
+    constants = list(list(id = "k", value = 1)),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
   compiled <- build_mrgsolve(model, quiet = TRUE)
 
   expect_s4_class(compiled, "mrgmod")
