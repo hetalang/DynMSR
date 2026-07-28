@@ -1,30 +1,34 @@
 # C specific helpers for converting DynMS MathJSON to C code
 
-dynms_mathjson_to_c <- function(node) {
+dynms_mathjson_to_c <- function(node, time_symbol = "t") {
   if (is.numeric(node)) {
     return(dynms_number_to_c(node))
   }
   if (is.character(node) && length(node) == 1L) {
-    return(node)
+    return(dynms_symbol_to_c(node, time_symbol))
   }
   if (is.list(node) && !is.null(node$num)) {
     return(dynms_extended_number_to_c(node$num))
   }
   if (is.list(node) && !is.null(node$sym)) {
-    return(node$sym)
+    return(dynms_symbol_to_c(node$sym, time_symbol))
   }
   if (is.list(node) && !is.null(node$str)) {
     return(dynms_string_to_c(node$str))
   }
   if (is.list(node) && !is.null(node$fn)) {
-    return(dynms_mathjson_to_c(node$fn))
+    return(dynms_mathjson_to_c(node$fn, time_symbol))
   }
   if (!is.list(node) || length(node) == 0L || !is.character(node[[1]])) {
     stop("Unsupported MathJSON node in C export.", call. = FALSE)
   }
 
   op <- node[[1]]
-  args <- lapply(node[-1], dynms_mathjson_to_c)
+  args <- lapply(
+    node[-1],
+    dynms_mathjson_to_c,
+    time_symbol = time_symbol
+  )
 
   switch(
     op,
@@ -74,6 +78,14 @@ dynms_mathjson_to_c <- function(node) {
     Xor = dynms_infix_c(args, "!="),
     stop("Unsupported MathJSON operator for C export: ", op, call. = FALSE)
   )
+}
+
+dynms_symbol_to_c <- function(symbol, time_symbol) {
+  if (identical(symbol, "t")) {
+    return(time_symbol)
+  }
+
+  symbol
 }
 
 dynms_extended_number_to_c <- function(value) {

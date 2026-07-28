@@ -91,56 +91,60 @@ test_that("mrgsolve time events repeat only for positive periods", {
   expect_s4_class(build_mrgsolve(model, quiet = TRUE), "mrgmod")
 })
 
-test_that("mrgsolve export rejects reserved identifiers", {
+test_that("mrgsolve export renames reserved identifiers and references", {
+  expression <- function(expr) list(expr = expr, format = "math-json")
   model <- list(
-    constants = list(list(id = "TIME")),
-    dynamic = list(list(id = "F_CENTRAL")),
+    id = "renaming",
+    constants = list(
+      list(id = "TIME", value = 1),
+      list(id = "TIME_rnm_", value = 2)
+    ),
+    dynamic = list(list(
+      id = "F_CENTRAL",
+      initial = 1,
+      derivative = expression(list("Add", "TIME", "F_CENTRAL", "t"))
+    )),
     static = list(),
-    assignments = list(),
-    timeEvents = list(),
-    events = list(),
-    observables = list()
-  )
-
-  error <- tryCatch(
-    prepare_mrgsolve_template_data(model),
-    error = identity
-  )
-
-  expect_s3_class(error, "error")
-  expect_match(conditionMessage(error), "`constants[1].id` (`TIME`) is a reserved word.", fixed = TRUE)
-  expect_match(
-    conditionMessage(error),
-    "`dynamic[1].id` (`F_CENTRAL`) matches reserved pattern `F_{CMT}`.",
-    fixed = TRUE
-  )
-})
-
-test_that("mrgsolve export rejects reserved event action targets", {
-  model <- list(
-    constants = list(),
-    dynamic = list(),
-    static = list(),
-    assignments = list(),
+    assignments = list(list(id = "RATE", rhs = expression("TIME"))),
     timeEvents = list(list(
       id = "dose",
-      actions = list(list(state = "RATE"))
+      trigger = list(type = "time", start = 1),
+      actions = list(list(
+        state = "F_CENTRAL",
+        rhs = expression(list("Add", "F_CENTRAL", "t"))
+      ))
     )),
     events = list(),
-    observables = list()
+    observables = list(
+      list(symbol = "F_CENTRAL"),
+      list(symbol = "RATE")
+    )
   )
+  original <- model
+  path <- tempfile(fileext = ".mod")
+  on.exit(unlink(path), add = TRUE)
+  messages <- character()
 
-  error <- tryCatch(
-    prepare_mrgsolve_template_data(model),
-    error = identity
+  withCallingHandlers(
+    write_mrgsolve(model, path),
+    warning = function(warning) {
+      messages <<- c(messages, conditionMessage(warning))
+      invokeRestart("muffleWarning")
+    }
   )
+  code <- paste(readLines(path, warn = FALSE), collapse = "\n")
 
-  expect_s3_class(error, "error")
-  expect_match(
-    conditionMessage(error),
-    "`timeEvents[1].actions[1].state` (`RATE`) is a reserved word.",
-    fixed = TRUE
-  )
+  expect_length(messages, 1L)
+  expect_match(messages, "`TIME` -> `TIME_rnm_2`", fixed = TRUE)
+  expect_match(messages, "`F_CENTRAL` -> `rnm_F_CENTRAL_rnm_`", fixed = TRUE)
+  expect_match(messages, "`RATE` -> `RATE_rnm_`", fixed = TRUE)
+  expect_match(code, "- `TIME` -> `TIME_rnm_2`", fixed = TRUE)
+  expect_match(code, "TIME_rnm_2 : 1", fixed = TRUE)
+  expect_match(code, "rnm_F_CENTRAL_rnm_ : 1", fixed = TRUE)
+  expect_match(code, "RATE_rnm_", fixed = TRUE)
+  expect_match(code, "SOLVERTIME", fixed = TRUE)
+  expect_match(code, "(rnm_F_CENTRAL_rnm_ + TIME)", fixed = TRUE)
+  expect_identical(model, original)
 })
 
 test_that("mrgsolve export warns about ignored DynMS features", {
@@ -265,5 +269,42 @@ test_that("build_mrgsolve compiles extended MathJSON numbers", {
   )
   compiled <- build_mrgsolve(model, quiet = TRUE)
 
+  expect_s4_class(compiled, "mrgmod")
+})
+
+test_that("build_mrgsolve compiles renamed identifiers and time symbols", {
+  testthat::skip_if_not_installed("mrgsolve")
+
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  model <- list(
+    id = "renamed-build",
+    constants = list(list(id = "TIME", value = 1)),
+    dynamic = list(list(
+      id = "F_CENTRAL",
+      initial = 1,
+      derivative = expression(list("Add", "RATE", "t"))
+    )),
+    static = list(),
+    assignments = list(list(
+      id = "RATE",
+      rhs = expression(list("Multiply", "TIME", "F_CENTRAL"))
+    )),
+    timeEvents = list(list(
+      id = "dose",
+      trigger = list(type = "time", start = 1),
+      actions = list(list(
+        state = "F_CENTRAL",
+        rhs = expression(list("Add", "F_CENTRAL", "t"))
+      ))
+    )),
+    events = list(),
+    observables = list(list(symbol = "RATE"))
+  )
+
+  expect_warning(
+    compiled <- build_mrgsolve(model, quiet = TRUE),
+    "mrgsolve export renamed reserved identifiers",
+    fixed = TRUE
+  )
   expect_s4_class(compiled, "mrgmod")
 })

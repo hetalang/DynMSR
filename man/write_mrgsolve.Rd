@@ -23,4 +23,10 @@ The exporter warns and ignores unsupported DynMS features: algebraic dynamic
 states, \code{stopSimulation}, and state-event trigger \code{detection}. Algebraic
 states are emitted as ordinary ODE states; state-event conditions are
 evaluated in generated code without root finding.
+
+Identifiers reserved by mrgsolve are renamed with an \verb{_rnm_} suffix. Further
+numeric suffixes are added when needed to avoid collisions. The exporter
+emits one warning and records the complete mapping in the generated model.
+The DynMS time symbol \code{t} is emitted as \code{SOLVERTIME} in \verb{$ODE} and as \code{TIME}
+in other blocks.
 }

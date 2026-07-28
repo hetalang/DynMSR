@@ -61,3 +61,10 @@ test_that("dynms_validate_schema requires numeric constant values", {
 
   expect_false(dynms_validate_schema(raw)$valid)
 })
+
+test_that("dynms_validate_schema reserves t for the time symbol", {
+  raw <- minimal_raw_platform()
+  raw$models[[1]]$constants <- list(list(id = "t", value = 1))
+
+  expect_false(dynms_validate_schema(raw)$valid)
+})
