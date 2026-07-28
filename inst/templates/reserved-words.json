@@ -55,13 +55,17 @@
     "bool",
     "capture",
     "until",
-    "now"
+    "now",
+    "mrg",
+    "std"
   ],
   "compartmentDependentPatterns": [
     "F_{CMT}",
     "R_{CMT}",
     "D_{CMT}",
     "ALAG_{CMT}",
-    "N_{CMT}"
+    "N_{CMT}",
+    "dxdt_{CMT}",
+    "{CMT}_0"
   ]
 }

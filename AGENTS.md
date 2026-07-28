@@ -36,7 +36,9 @@ Core boundaries:
   schema, not the schema itself.
 * `dynms_validate_semantic()` is for backend-independent model checks. Add new
   semantic rules deliberately, collect all relevant issues where practical, and
-  cover them with focused tests.
+  cover them with focused tests. DynMSR currently supports only
+  `format: "math-json"` expressions; schema-valid line-expression formats must
+  fail semantic validation with a clear message.
 * `new_platform()` is an internal constructor for light S3 markers:
   top-level `platform` and per-model `model`. Do not put backend preparation
   there.
@@ -48,6 +50,20 @@ or `get_model(platform, 1)`.
 
 Core parsing and generation should be R-native. Generate backend code from R
 data structures; do not write a C program that reads DynMS JSON and emits C.
+
+Identifier renaming is a staged transformation:
+
+* backend-specific code decides which identifiers need renaming and constructs
+  the mapping;
+* the internal backend-independent `rename_model_identifiers()` applies an
+  explicit mapping to a copy of one model, including definitions, MathJSON
+  references, event-action targets, and observables;
+* backend writers consume the renamed copy and retain the mapping for warnings
+  and generated-source documentation.
+
+Do not mutate the loaded model during backend preparation. Keep
+`rename_model_identifiers()` internal unless a concrete public workflow
+requires exposing it.
 
 ## Public API
 
@@ -69,7 +85,9 @@ Keep S3 classes `platform` and `model` as light object markers for now.
 
 Do not add a public general `dynms_normalize()` unless a real
 backend-independent normal form is deliberately designed and documented.
-Backend-specific preparation should remain backend-specific.
+Backend-specific preparation and rename-policy construction should remain
+backend-specific. Reusable structural transformations may be internal
+backend-independent helpers.
 
 ## Backend generation
 
@@ -78,6 +96,9 @@ Keep backend assumptions out of the core DynMS parser.
 For generated code:
 
 * Prepare template data in R inside the relevant backend writer/builder.
+* Apply backend-specific identifier mappings before expression conversion and
+  template rendering. Do not embed backend rename mappings in generic
+  MathJSON-to-code converters.
 * Preserve the model shape where practical. Prefer helper fields on existing
   objects over parallel backend-only collections.
 * Convert MathJSON expressions to backend expressions in R before rendering.
@@ -90,7 +111,24 @@ deSolve's compiled model interface.
 
 For mrgsolve, generate mrgsolve model source and keep compilation/loading logic
 backend-specific. Template paths should remain package-internal unless there is
-a real public API need.
+a real public API need. Construct reserved-identifier mappings from
+`inst/templates/reserved-words.json`, apply them with
+`rename_model_identifiers()`, emit one informative warning, and record the
+mapping in the generated source. Use deterministic names: prefer an `_rnm_`
+suffix, add numeric suffixes to resolve collisions, and use a safe prefix when
+an mrgsolve compartment-dependent reserved pattern would still match.
+
+The DynMS symbol `t` is the global time symbol, not a model identifier. The
+schema must reject `t` wherever the shared identifier definition is used. In
+mrgsolve expressions, render `t` as `SOLVERTIME` in `$ODE` and as `TIME` in
+other blocks; keep this context-specific rule out of general identifier
+renaming.
+
+If an mrgsolve model requests `dynamic[].algebraic = true`,
+`stopSimulation = true`, or an explicit state-event `detection` mode, generate
+the model while emitting an informative warning that the feature is ignored or
+approximated. Keep these limitations documented in `write_mrgsolve()`. For time
+events, schedule repetitions only when the evaluated `period` is positive.
 
 ## Schema, examples, and CRAN constraints
 
@@ -98,6 +136,10 @@ Normal package use must rely on the bundled schema and must not require internet
 access. The schema update script is a manual development tool only; do not run
 it during installation, examples, tests, or checks. If schema refresh fails, the
 existing bundled schema must remain unchanged.
+
+`constants[].value` is numeric-only. Keep that type rule in schema validation;
+do not reintroduce constant-expression handling in semantic validation or
+backend preparation.
 
 Do not assume a specific example filename. Examples used by tests or
 documentation must be listed in `inst/examples/index.json`; do not scan the
@@ -120,8 +162,8 @@ complexity.
 ## Testing
 
 Test each layer independently: reading, schema validation, semantic validation,
-platform construction, expression conversion, code generation, backend build
-helpers, and public API behavior.
+platform construction, identifier remapping, expression conversion, code
+generation, backend build helpers, and public API behavior.
 
 Package tests should cover DynMSR implementation details and use external
 benchmark suites only for interoperability or reference behavior. Keep
@@ -130,7 +172,9 @@ implementation-specific regressions in this package.
 Validation and error-handling tests should cover invalid JSON or source data,
 missing fields, duplicate identifiers, unknown references, unsupported model
 constructs, invalid argument combinations, and stable informative errors.
-Unsupported features must not be silently ignored.
+Unsupported features must not be silently ignored. Backend features that are
+intentionally ignored while generation continues must produce an informative
+warning and be documented in the relevant public writer.
 
 Backend tests should check generated code structure, state and parameter
 ordering, backend-specific declarations, temporary file behavior, compilation,

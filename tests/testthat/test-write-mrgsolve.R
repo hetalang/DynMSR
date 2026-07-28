@@ -147,6 +147,27 @@ test_that("mrgsolve export renames reserved identifiers and references", {
   expect_identical(model, original)
 })
 
+test_that("mrgsolve export reserves generated compartment identifiers", {
+  model <- list(
+    constants = list(
+      list(id = "dxdt_CENTRAL", value = 1),
+      list(id = "CENTRAL_0", value = 2)
+    ),
+    dynamic = list(),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(),
+    events = list()
+  )
+
+  mapping <- build_mrgsolve_identifier_map(model)
+
+  expect_identical(
+    unname(mapping[c("dxdt_CENTRAL", "CENTRAL_0")]),
+    c("rnm_dxdt_CENTRAL_rnm_", "CENTRAL_0_rnm_")
+  )
+})
+
 test_that("mrgsolve export warns about ignored DynMS features", {
   expression <- function(expr) list(expr = expr, format = "math-json")
   model <- list(
