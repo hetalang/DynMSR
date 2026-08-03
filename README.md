@@ -11,13 +11,13 @@ Toolkit for working with DynMS models in R.
 compiling, and eventually simulating models stored in the DynMS format. DynMSR
 is an interoperability toolkit between DynMS and the R modeling ecosystem.
 
-## Planned features
+## Main features
 
 - Read and validate DynMS models
-- Convert DynMS models to **deSolve**
+- Optional import workflows from Heta & SBML via the DynMS intermediate format
 - Convert DynMS models to **mrgsolve**
+- Convert DynMS models to **deSolve** (experimental)
 - Compile generated C code for fast simulation
-- Optional import workflows from Heta via the DynMS intermediate format
 
 ## Installation
 
@@ -28,7 +28,7 @@ is an interoperability toolkit between DynMS and the R modeling ecosystem.
 devtools::install_github("hetalang/DynMSR")
 ```
 
-## Example
+## Quick start
 
 ```r
 library(DynMSR)
@@ -37,10 +37,14 @@ library(DynMSR)
 platform <- dynms_load("x.json")
 
 # Select the first model in the platform
-model <- platform$models[[1]]
+model <- get_model(platform, 1)
 
 # Build a compiled mrgsolve model object
 mrgsolve_model <- build_mrgsolve(model)
+
+# Run a simulation with the mrgsolve model
+library(mrgsolve)
+res <- mrgsim(mrgsolve_model)
 ```
 
 ## Optional Heta integration
