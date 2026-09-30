@@ -46,8 +46,10 @@ dynms_validate_schema <- function(x, error = FALSE) {
   result
 }
 
-# XXX: We convert the input back to JSON here, mybe this is not the best approach. 
-# We can validate just from file or file content inside dynms_read() function.
+# jsonvalidate accepts JSON text or a file path. Passing a path through avoids
+# an R round trip; an R list is serialized to support programmatic validation.
+# Serializing an R list can normalize JSON details such as numeric lexemes and
+# duplicate object keys, so file-based validation is preferred when available.
 dynms_json_input <- function(x) {
   if (is.character(x) && length(x) == 1L && file.exists(x)) {
     return(x)
