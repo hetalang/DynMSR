@@ -97,7 +97,8 @@ test_that("mrgsolve export renames reserved identifiers and references", {
     id = "renaming",
     constants = list(
       list(id = "TIME", value = 1),
-      list(id = "TIME_rnm_", value = 2)
+      list(id = "TIME_rnm_", value = 2),
+      list(id = "TIME_rnm_1", value = 3)
     ),
     dynamic = list(list(
       id = "F_CENTRAL",
@@ -140,6 +141,7 @@ test_that("mrgsolve export renames reserved identifiers and references", {
   expect_match(messages, "`RATE` -> `RATE_rnm_`", fixed = TRUE)
   expect_match(code, "- `TIME` -> `TIME_rnm_2`", fixed = TRUE)
   expect_match(code, "TIME_rnm_2 : 1", fixed = TRUE)
+  expect_match(code, "TIME_rnm_1 : 3", fixed = TRUE)
   expect_match(code, "rnm_F_CENTRAL_rnm_ : 1", fixed = TRUE)
   expect_match(code, "RATE_rnm_", fixed = TRUE)
   expect_match(code, "SOLVERTIME", fixed = TRUE)
