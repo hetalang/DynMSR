@@ -243,6 +243,11 @@ test_that("mrgsolve export quotes MathJSON strings", {
   expect_identical(dynms_mathjson_to_c(list(str = "a \"quoted\" string")), '"a \\"quoted\\" string"')
 })
 
+test_that("mrgsolve export converts MathJSON boolean literals", {
+  expect_identical(dynms_mathjson_to_c("True"), "true")
+  expect_identical(dynms_mathjson_to_c(list(sym = "False")), "false")
+})
+
 test_that("write_mrgsolve rejects a platform", {
   platform <- list(models = list(list(id = "model")))
 

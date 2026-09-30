@@ -84,6 +84,12 @@ dynms_symbol_to_c <- function(symbol, time_symbol) {
   if (identical(symbol, "t")) {
     return(time_symbol)
   }
+  if (identical(symbol, "True")) {
+    return("true")
+  }
+  if (identical(symbol, "False")) {
+    return("false")
+  }
 
   symbol
 }
