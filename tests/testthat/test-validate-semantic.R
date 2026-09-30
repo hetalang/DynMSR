@@ -119,7 +119,7 @@ test_that("dynms_validate_semantic resolves canonical and compatible MathJSON sy
 
 test_that("dynms_validate_semantic rejects duplicate state ids across dynamic and static", {
   raw <- list(
-    dynms = "0.2.0",
+    dynms = "0.2.1",
     models = list(
       list(
         id = "model",
@@ -151,7 +151,7 @@ test_that("dynms_validate_semantic rejects duplicate state ids across dynamic an
 
 test_that("dynms_validate_semantic rejects duplicate event ids across timeEvents and events", {
   raw <- list(
-    dynms = "0.2.0",
+    dynms = "0.2.1",
     models = list(
       list(
         id = "model",

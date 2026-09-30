@@ -1,6 +1,6 @@
 test_that("new_platform adds S3 classes to platform and models", {
   raw <- list(
-    dynms = "0.2.0",
+    dynms = "0.2.1",
     models = list(
       list(id = "model_1"),
       list(id = "model_2")
@@ -23,7 +23,7 @@ test_that("new_platform validates platform and model inputs lightly", {
 
 test_that("print.platform displays a compact model inventory", {
   platform <- new_platform(list(
-    dynms = "0.2.0",
+    dynms = "0.2.1",
     platformId = "example-platform",
     models = list(list(
       id = "example-model",
@@ -42,7 +42,7 @@ test_that("print.platform displays a compact model inventory", {
   expect_identical(result, platform)
   expect_equal(output, c(
     "<DynMS platform>",
-    "  DynMS version: 0.2.0",
+    "  DynMS version: 0.2.1",
     "  Platform ID: example-platform",
     "  Models: 1",
     "    [1] example-model: 1 dynamic, 0 static, 1 constants, 0 assignments, 0 time events, 0 events, 0 observables"

@@ -20,7 +20,7 @@ structure.
 \examples{
 path <- tempfile(fileext = ".json")
 jsonlite::write_json(
-  list(dynms = "0.1.0", models = list()),
+  list(dynms = "0.2.1", models = list()),
   path,
   auto_unbox = TRUE
 )

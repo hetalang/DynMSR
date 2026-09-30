@@ -1,4 +1,4 @@
 {
-  "source": "https://raw.githubusercontent.com/hetalang/heta-compiler/master/src/dynms/dynms.schema.json",
+  "source": "https://raw.githubusercontent.com/hetalang/heta-compiler/v0.12.2/src/dynms/dynms.schema.json",
   "target": "inst/schema/dynms.schema.json"
 }
