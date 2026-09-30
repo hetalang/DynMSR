@@ -248,6 +248,11 @@ test_that("mrgsolve export converts MathJSON boolean literals", {
   expect_identical(dynms_mathjson_to_c(list(sym = "False")), "false")
 })
 
+test_that("mrgsolve export converts MathJSON ExponentialE", {
+  expect_identical(dynms_mathjson_to_c("ExponentialE"), "exp(1.0)")
+  expect_identical(dynms_mathjson_to_c(list(sym = "ExponentialE")), "exp(1.0)")
+})
+
 test_that("write_mrgsolve rejects a platform", {
   platform <- list(models = list(list(id = "model")))
 

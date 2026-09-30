@@ -90,6 +90,9 @@ dynms_symbol_to_c <- function(symbol, time_symbol) {
   if (identical(symbol, "False")) {
     return("false")
   }
+  if (identical(symbol, "ExponentialE")) {
+    return("exp(1.0)")
+  }
 
   symbol
 }
