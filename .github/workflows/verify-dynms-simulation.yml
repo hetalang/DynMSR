@@ -15,6 +15,8 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      FCTS_ROOT: ${{ github.workspace }}/fcts-run/node_modules/@hetalang/format-conversion-test-suite
 
     steps:
       - name: Checkout DynMSR
@@ -52,7 +54,6 @@ jobs:
         shell: bash
         run: |
           npm install --prefix fcts-run git+https://github.com/hetalang/format-conversion-test-suite.git#main
-          echo "FCTS_ROOT=$GITHUB_WORKSPACE/fcts-run/node_modules/@hetalang/format-conversion-test-suite" >> "$GITHUB_ENV"
 
       - name: Download and index SBML cases
         shell: bash
