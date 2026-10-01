@@ -1,0 +1,26 @@
+Running compilation in directory "/home/runner/work/DynMSR/DynMSR/fcts-run/node_modules/@hetalang/format-conversion-test-suite/results/dynms-simulation-l3v1/01712"...
+
+No declaration file, running with defaults...
+
+[info]	Heta compiler v0.12.2 is initialized for the platform "undefined"
+[info]	Reading module of type "heta" from file "input.heta"...
+[info]	Reading module of type "sbml" from file "../../../cases/semantic/01712/01712-sbml-l3v1.xml"...
+[error]	"delay" in event is not supported in SBML module when converting module "../../../cases/semantic/01712/01712-sbml-l3v1.xml"
+[info]	Platform hash: 2e4ca5991d25d53f659bb463a1f59c5963434b9d4d3b13f98478ade79b34ae25
+[info]	Setting references in elements, total length 90
+[info]	Checking for circular references in Records.
+[warn]	Units checking and export were skipped because of errors in compilation.
+
+ +-------------------------------------------------------------------+ 
+ | Internal "Heta compiler" error, contact the developers.           | 
+ | Create an issue: https://github.com/hetalang/heta-compiler/issues | 
+ | or mail to: dev@insysbio.com                                      | 
+ +-------------------------------------------------------------------+ 
+
+
+SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at parseJSONFromBytes (node:internal/deps/undici/undici:4394:19)
+    at successSteps (node:internal/deps/undici/undici:7048:27)
+    at readAllBytes (node:internal/deps/undici/undici:5965:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
