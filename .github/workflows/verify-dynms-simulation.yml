@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FCTS_ROOT: ${{ github.workspace }}/fcts-run/node_modules/@hetalang/format-conversion-test-suite
+      HETA_BIN: ${{ github.workspace }}/heta-run/node_modules/.bin
 
     steps:
       - name: Checkout DynMSR
@@ -38,8 +39,8 @@ jobs:
       - name: Install Heta compiler
         shell: bash
         run: |
-          npm install --global git+https://github.com/hetalang/heta-compiler.git#v0.12.x
-          heta --version
+          npm install --prefix heta-run git+https://github.com/hetalang/heta-compiler.git#v0.12.x
+          "$HETA_BIN/heta" --version
 
       - name: Install R dependencies and DynMSR
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -64,7 +65,7 @@ jobs:
       - name: Simulate SBML L2V5 DynMS models
         shell: bash
         run: |
-          "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
+          PATH="$HETA_BIN:$PATH" "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
             --input-field=sbmlL2V5Path \
             --target=results/dynms-simulation-l2v5 \
             --skip-component-tags=StoichiometryMath,CSymbolDelay,EventWithDelay,AlgebraicRule \
@@ -74,7 +75,7 @@ jobs:
       - name: Simulate SBML L3V1 DynMS models
         shell: bash
         run: |
-          "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
+          PATH="$HETA_BIN:$PATH" "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
             --input-field=sbmlL3V1Path \
             --target=results/dynms-simulation-l3v1 \
             --skip-component-tags=CSymbolDelay,EventWithDelay,AlgebraicRule,CSymbolRateOf,comp:Deletion,comp:ModelDefinition,comp:Port,comp:ReplacedBy,comp:ReplacedElement,comp:SBaseRef,comp:Submodel,fbc:FluxBound,fbc:FluxObjective,fbc:Objective \
