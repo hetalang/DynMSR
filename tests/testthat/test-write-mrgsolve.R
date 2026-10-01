@@ -91,6 +91,33 @@ test_that("mrgsolve time events repeat only for positive periods", {
   expect_s4_class(build_mrgsolve(model, quiet = TRUE), "mrgmod")
 })
 
+test_that("mrgsolve export captures static states and assignments", {
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  model <- list(
+    id = "captured-values",
+    constants = list(list(id = "k", value = 2)),
+    dynamic = list(list(id = "A", initial = 1, derivative = expression(0))),
+    static = list(list(id = "V", initial = 3)),
+    assignments = list(list(id = "rate_value", rhs = expression("k"))),
+    timeEvents = list(),
+    events = list(),
+    observables = list(
+      list(symbol = "A"),
+      list(symbol = "V"),
+      list(symbol = "rate_value")
+    )
+  )
+  path <- write_mrgsolve(model)
+  on.exit(unlink(path), add = TRUE)
+  code <- paste(readLines(path, warn = FALSE), collapse = "\n")
+
+  expect_match(code, "$CAPTURE @annotated", fixed = TRUE)
+  expect_match(code, "V : -", fixed = TRUE)
+  expect_match(code, "rate_value : -", fixed = TRUE)
+  expect_false(grepl("A : -", code, fixed = TRUE))
+  expect_true(dynms_validate_semantic(list(dynms = "0.2.1", models = list(model)))$valid)
+})
+
 test_that("mrgsolve export renames reserved identifiers and references", {
   expression <- function(expr) list(expr = expr, format = "math-json")
   model <- list(
@@ -263,6 +290,96 @@ test_that("build_mrgsolve rejects a platform before requiring mrgsolve", {
   platform <- list(models = list(list(id = "model")))
 
   expect_error(build_mrgsolve(platform), "expects one model, not a platform")
+})
+
+test_that("build_mrgsolve rejects mrgsolve-specific capture arguments", {
+  model <- list(
+    id = "capture-validation",
+    constants = list(list(id = "k", value = 1)),
+    dynamic = list(list(
+      id = "S1", initial = 1, derivative = list(expr = 0, format = "math-json")
+    )),
+    static = list(list(id = "S2", initial = 2)),
+    assignments = list(list(id = "rate_value", rhs = list(expr = "k", format = "math-json"))),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  expect_error(
+    build_mrgsolve(model, capture = "S2"),
+    "Use `observables` instead"
+  )
+})
+
+test_that("build_mrgsolve prepares requested observables", {
+  model <- list(
+    id = "observable-validation",
+    constants = list(list(id = "k", value = 1)),
+    dynamic = list(list(
+      id = "S1", initial = 1, derivative = list(expr = 0, format = "math-json")
+    )),
+    static = list(list(id = "S2", initial = 2)),
+    assignments = list(list(id = "rate_value", rhs = list(expr = "k", format = "math-json"))),
+    timeEvents = list(),
+    events = list(),
+    observables = list(list(symbol = "S2"))
+  )
+
+  expect_identical(
+    prepare_mrgsolve_observable_capture(
+      model, c("S1", "S2", "rate_value", "k", "rate_value")
+    ),
+    c("rate_value", "k")
+  )
+  expect_error(
+    prepare_mrgsolve_observable_capture(model, "S5"),
+    "identifier.*do not exist.*S5"
+  )
+  expect_error(
+    prepare_mrgsolve_observable_capture(model, ""),
+    "non-empty identifiers"
+  )
+})
+
+test_that("build_mrgsolve captures requested static states", {
+  testthat::skip_if_not_installed("mrgsolve")
+  model <- list(
+    id = "capture-static",
+    constants = list(list(id = "k", value = 1)),
+    dynamic = list(list(
+      id = "S1", initial = 1, derivative = list(expr = 0, format = "math-json")
+    )),
+    static = list(list(id = "S2", initial = 0.0002)),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  compiled <- build_mrgsolve(model, observables = c("S1", "S2"), quiet = TRUE)
+
+  expect_identical(mrgsolve::outvars(compiled)$capture, "S2")
+})
+
+test_that("build_mrgsolve captures requested constants", {
+  testthat::skip_if_not_installed("mrgsolve")
+  model <- list(
+    id = "capture-constant",
+    constants = list(list(id = "k", value = 2.5)),
+    dynamic = list(list(
+      id = "S1", initial = 1, derivative = list(expr = 0, format = "math-json")
+    )),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  compiled <- build_mrgsolve(model, observables = "k", quiet = TRUE)
+
+  expect_identical(mrgsolve::outvars(compiled)$capture, "k")
 })
 
 test_that("build_mrgsolve compiles a model when mrgsolve is available", {
