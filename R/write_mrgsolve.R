@@ -134,6 +134,9 @@ prepare_mrgsolve_template_data <- function(model) {
     dynamic_index = dynamic_index
   )
   data$has_events_ <- length(time_events) + length(events) > 0L
+  data$has_parameters_ <- length(constants) + length(time_events) + length(events) > 0L
+  data$has_dynamic_ <- length(dynamic) > 0L
+  data$has_table_ <- length(assignments) + length(time_events) + length(events) > 0L
   data$has_captured_observables_ <- any(vapply(data$observables, `[[`, logical(1), "captured_"))
 
   data
@@ -304,6 +307,7 @@ prepare_mrgsolve_static_state <- function(state) {
 
 prepare_mrgsolve_assignment <- function(assignment) {
   assignment$rhs_expr_ <- dynms_expression_to_mrgsolve(assignment$rhs, "SOLVERTIME")
+  assignment$rhs_expr_table_ <- dynms_expression_to_mrgsolve(assignment$rhs, "TIME")
   assignment$title <- assignment$title %||% "-"
   assignment
 }

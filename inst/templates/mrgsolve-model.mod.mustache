@@ -12,6 +12,7 @@ $PROB
 
 $SET end=120, delta=0.1, hmax=0.01, hmin=0.0, rtol=1e-3, atol=1e-6
 
+{{#has_parameters_}}
 $PARAM @annotated
 // constants
 {{#constants}}
@@ -24,12 +25,15 @@ $PARAM @annotated
 {{#events}}
 {{&id}}__active__ : {{&active_value_}} : -
 {{/events}}
+{{/has_parameters_}}
 
+{{#has_dynamic_}}
 $INIT @annotated
 // dynamic states
 {{#dynamic}}
 {{&id}} : {{&initial_value_}} : {{&title}}
 {{/dynamic}}
+{{/has_dynamic_}}
 
 $PREAMBLE
 #include <limits>
@@ -96,8 +100,14 @@ $CAPTURE @annotated
 {{/observables}}
 {{/has_captured_observables_}}
 
-{{#has_events_}}
+{{#has_table_}}
 $TABLE
+// assignments
+{{#assignments}}
+{{&id}} = {{&rhs_expr_table_}};
+{{/assignments}}
+
+{{#has_events_}}
 {{#timeEvents}}
 // {{&id}} // {{&title}}
 if ({{&id}}__active__ && EVID=={{&time_index_}}) {
@@ -149,3 +159,4 @@ for (int {{&id}}__i__ = 0; {{&id}}__i__ < {{&id}}__charge__; {{&id}}__i__++) {
 
 {{/events}}
 {{/has_events_}}
+{{/has_table_}}

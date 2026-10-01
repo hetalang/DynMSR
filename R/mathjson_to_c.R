@@ -62,7 +62,7 @@ dynms_mathjson_to_c <- function(node, time_symbol = "t") {
     Max = dynms_call_c("fmax", args),
     Min = dynms_call_c("fmin", args),
     Multiply = dynms_infix_c(args, "*"),
-    Negate = dynms_paren_c(paste0("-", args[[1]])),
+    Negate = dynms_paren_c(paste0("-(", args[[1]], ")")),
     Not = dynms_paren_c(paste0("!", args[[1]])),
     NotEqual = dynms_infix_c(args, "!="),
     Or = dynms_infix_c(args, "||"),
@@ -92,6 +92,9 @@ dynms_symbol_to_c <- function(symbol, time_symbol) {
   }
   if (identical(symbol, "ExponentialE")) {
     return("exp(1.0)")
+  }
+  if (identical(symbol, "Pi")) {
+    return("acos(-1.0)")
   }
 
   symbol

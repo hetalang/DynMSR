@@ -280,6 +280,12 @@ test_that("mrgsolve export converts MathJSON ExponentialE", {
   expect_identical(dynms_mathjson_to_c(list(sym = "ExponentialE")), "exp(1.0)")
 })
 
+test_that("mrgsolve export converts Pi and safely negates negative values", {
+  expect_identical(dynms_mathjson_to_c("Pi"), "acos(-1.0)")
+  expect_identical(dynms_mathjson_to_c(list(sym = "Pi")), "acos(-1.0)")
+  expect_identical(dynms_mathjson_to_c(list("Negate", -2)), "(-(-2))")
+})
+
 test_that("write_mrgsolve rejects a platform", {
   platform <- list(models = list(list(id = "model")))
 
@@ -380,6 +386,27 @@ test_that("build_mrgsolve captures requested constants", {
   compiled <- build_mrgsolve(model, observables = "k", quiet = TRUE)
 
   expect_identical(mrgsolve::outvars(compiled)$capture, "k")
+})
+
+test_that("build_mrgsolve evaluates assignments without dynamic states", {
+  testthat::skip_if_not_installed("mrgsolve")
+  model <- list(
+    id = "assignment-only",
+    constants = list(list(id = "k", value = 2)),
+    dynamic = list(),
+    static = list(),
+    assignments = list(list(
+      id = "value", rhs = list(expr = list("Multiply", "k", 3), format = "math-json")
+    )),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+  compiled <- build_mrgsolve(model, observables = "value", quiet = TRUE)
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 0.1, delta = 0.1)
+
+  expect_identical(mrgsolve::outvars(compiled)$capture, "value")
+  expect_equal(simulation$value, c(6, 6))
 })
 
 test_that("build_mrgsolve compiles a model when mrgsolve is available", {
