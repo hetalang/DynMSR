@@ -1,0 +1,204 @@
+name: Verify DynMS simulation
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fcts-reports-publication
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout DynMSR
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || github.sha }}
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Install Heta compiler
+        shell: bash
+        run: |
+          npm install --global git+https://github.com/hetalang/heta-compiler.git#v0.12.x
+          heta --version
+
+      - name: Install R dependencies and DynMSR
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::mrgsolve
+          needs: check
+
+      - name: Install DynMSR from this checkout
+        run: R CMD INSTALL .
+
+      - name: Install Format Conversion Test Suite
+        shell: bash
+        run: |
+          npm install --prefix fcts-run git+https://github.com/hetalang/format-conversion-test-suite.git#main
+          echo "FCTS_ROOT=$GITHUB_WORKSPACE/fcts-run/node_modules/@hetalang/format-conversion-test-suite" >> "$GITHUB_ENV"
+
+      - name: Download and index SBML cases
+        shell: bash
+        run: |
+          npm --prefix "$FCTS_ROOT" run fetch:sbml
+          npm --prefix "$FCTS_ROOT" run index:sbml
+
+      - name: Simulate SBML L2V5 DynMS models
+        shell: bash
+        run: |
+          "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
+            --input-field=sbmlL2V5Path \
+            --target=results/dynms-simulation-l2v5 \
+            --skip-component-tags=StoichiometryMath,CSymbolDelay,EventWithDelay,AlgebraicRule \
+            --skip-test-tags=FastReaction \
+            --concurrency=2
+
+      - name: Simulate SBML L3V1 DynMS models
+        shell: bash
+        run: |
+          "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
+            --input-field=sbmlL3V1Path \
+            --target=results/dynms-simulation-l3v1 \
+            --skip-component-tags=CSymbolDelay,EventWithDelay,AlgebraicRule,CSymbolRateOf,comp:Deletion,comp:ModelDefinition,comp:Port,comp:ReplacedBy,comp:ReplacedElement,comp:SBaseRef,comp:Submodel,fbc:FluxBound,fbc:FluxObjective,fbc:Objective \
+            --skip-test-tags=AssignedVariableStoichiometry,AssignedConstantStoichiometry,SpeciesReferenceInMath,NoMathML,comp:SubmodelOutput,fbc:BoundEqual,fbc:BoundGreaterEqual,fbc:BoundLessEqual,fbc:MaximizeObjective,fbc:MinimizeObjective,fbc:NonStrict,BoolNumericSwap,FastReaction \
+            --concurrency=2
+
+      - name: Summarize simulation report
+        if: always()
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const reports = [
+            ['SBML L2V5', 'dynms-simulation-l2v5'],
+            ['SBML L3V1', 'dynms-simulation-l3v1'],
+          ];
+          const lines = [
+            '| Report | Successful | Failed | Not evaluated |',
+            '| --- | ---: | ---: | ---: |',
+          ];
+
+          for (const [label, directory] of reports) {
+            const reportPath = path.join(process.env.FCTS_ROOT, 'results', directory, 'report.json');
+            if (!fs.existsSync(reportPath)) {
+              lines.push(`| ${label} | — | — | — |`);
+              continue;
+            }
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            const counts = { success: 0, failed: 0, notEvaluated: 0 };
+            for (const caseResult of report.cases) {
+              if (caseResult.status === 'success') counts.success += 1;
+              else if (caseResult.status === 'failed') counts.failed += 1;
+              else if (caseResult.status === 'not-evaluated') counts.notEvaluated += 1;
+            }
+            lines.push(`| ${label} | ${counts.success} | ${counts.failed} | ${counts.notEvaluated} |`);
+          }
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+
+          NODE
+
+      - name: Checkout reports publication branch
+        if: always()
+        uses: actions/checkout@v6
+        with:
+          ref: reports
+          path: reports-publication
+
+      - name: Publish latest report for the source branch
+        if: always() && github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          for report_name in l2v5 l3v1; do
+            if [[ ! -f "$FCTS_ROOT/results/dynms-simulation-$report_name/report.json" ]]; then
+              echo "DynMS simulation $report_name report is unavailable; preserving the previously published reports."
+              exit 0
+            fi
+          done
+
+          publish_root="$GITHUB_WORKSPACE/reports-publication/dynms-simulation/branches/$GITHUB_REF_NAME"
+          rm -rf "$publish_root"
+          mkdir -p "$publish_root"
+          for report_name in l2v5 l3v1; do
+            cp -a "$FCTS_ROOT/results/dynms-simulation-$report_name" "$publish_root/$report_name"
+          done
+
+          git -C "$GITHUB_WORKSPACE/reports-publication" config user.name 'github-actions[bot]'
+          git -C "$GITHUB_WORKSPACE/reports-publication" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$GITHUB_WORKSPACE/reports-publication" add "dynms-simulation/branches/$GITHUB_REF_NAME"
+          if git -C "$GITHUB_WORKSPACE/reports-publication" diff --cached --quiet; then
+            echo 'Published report is unchanged.'
+            exit 0
+          fi
+          git -C "$GITHUB_WORKSPACE/reports-publication" commit -m "Update DynMS simulation report for $GITHUB_REF_NAME from $GITHUB_SHA"
+          git -C "$GITHUB_WORKSPACE/reports-publication" push origin HEAD:reports
+
+      - name: Publish report for the release
+        if: always() && github.event_name == 'release'
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          for report_name in l2v5 l3v1; do
+            if [[ ! -f "$FCTS_ROOT/results/dynms-simulation-$report_name/report.json" ]]; then
+              echo "DynMS simulation $report_name report is unavailable; preserving the previously published reports."
+              exit 0
+            fi
+          done
+
+          release_root="$GITHUB_WORKSPACE/reports-publication/dynms-simulation/releases/$RELEASE_TAG"
+          latest_root="$GITHUB_WORKSPACE/reports-publication/dynms-simulation/releases/latest"
+          rm -rf "$release_root"
+          mkdir -p "$release_root"
+          if [[ "$PRERELEASE" == "false" ]]; then
+            rm -rf "$latest_root"
+            mkdir -p "$latest_root"
+          fi
+          for report_name in l2v5 l3v1; do
+            cp -a "$FCTS_ROOT/results/dynms-simulation-$report_name" "$release_root/$report_name"
+            if [[ "$PRERELEASE" == "false" ]]; then
+              cp -a "$FCTS_ROOT/results/dynms-simulation-$report_name" "$latest_root/$report_name"
+            fi
+          done
+
+          git -C "$GITHUB_WORKSPACE/reports-publication" config user.name 'github-actions[bot]'
+          git -C "$GITHUB_WORKSPACE/reports-publication" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$GITHUB_WORKSPACE/reports-publication" add "dynms-simulation/releases/$RELEASE_TAG"
+          if [[ "$PRERELEASE" == "false" ]]; then
+            git -C "$GITHUB_WORKSPACE/reports-publication" add "dynms-simulation/releases/latest"
+          fi
+          if git -C "$GITHUB_WORKSPACE/reports-publication" diff --cached --quiet; then
+            echo 'Published release report is unchanged.'
+            exit 0
+          fi
+          git -C "$GITHUB_WORKSPACE/reports-publication" commit -m "Publish DynMS simulation report for release $RELEASE_TAG from $GITHUB_SHA"
+          git -C "$GITHUB_WORKSPACE/reports-publication" push origin HEAD:reports
+
+      - name: Upload DynMS simulation report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fcts-dynms-simulation-${{ github.run_id }}
+          path: |
+            ${{ env.FCTS_ROOT }}/results/dynms-simulation-l2v5
+            ${{ env.FCTS_ROOT }}/results/dynms-simulation-l3v1
+          if-no-files-found: warn
