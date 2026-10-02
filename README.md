@@ -47,6 +47,26 @@ library(mrgsolve)
 res <- mrgsim(mrgsolve_model)
 ```
 
+## mrgsolve limitations
+
+The mrgsolve backend does not use root finding for DynMS state-event triggers.
+It detects a trigger during integration, but processes the generated event at
+an output record. Consequently, a state update may be delayed by up to one
+output interval (`delta`). This limitation does not apply to DynMS time events,
+whose scheduled times are passed directly to mrgsolve.
+
+For a closer step-based approximation, use a smaller output interval:
+
+```r
+res <- mrgsolve::mrgsim(mrgsolve_model, delta = 0.01)
+```
+
+Reducing `delta` makes the event-delay bound smaller but increases the number
+of output records; it does not reproduce the exact root-crossing time. Reducing
+the solver's `hmax` can improve integration accuracy, but does not by itself
+move event processing off the output grid. Very small `hmax` values may also
+require increasing mrgsolve's `maxsteps`.
+
 ## Optional Heta integration
 
 Heta is an optional DynMS producer; it is not required to read or validate
