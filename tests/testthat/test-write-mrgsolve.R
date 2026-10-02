@@ -87,7 +87,7 @@ test_that("mrgsolve time events repeat only for positive periods", {
   on.exit(unlink(path), add = TRUE)
   code <- paste(readLines(path, warn = FALSE), collapse = "\n")
 
-  expect_match(code, "if (0 > 0.0) {", fixed = TRUE)
+  expect_match(code, "if (0.0 > 0.0) {", fixed = TRUE)
   expect_s4_class(build_mrgsolve(model, quiet = TRUE), "mrgmod")
 })
 
@@ -283,7 +283,41 @@ test_that("mrgsolve export converts MathJSON ExponentialE", {
 test_that("mrgsolve export converts Pi and safely negates negative values", {
   expect_identical(dynms_mathjson_to_c("Pi"), "acos(-1.0)")
   expect_identical(dynms_mathjson_to_c(list(sym = "Pi")), "acos(-1.0)")
-  expect_identical(dynms_mathjson_to_c(list("Negate", -2)), "(-(-2))")
+  expect_identical(dynms_mathjson_to_c(list("Negate", -2)), "(-(-2.0))")
+})
+
+test_that("mrgsolve export renders numeric literals as doubles", {
+  expect_identical(dynms_number_to_c(1), "1.0")
+  expect_identical(dynms_number_to_c(-2), "-2.0")
+  expect_identical(dynms_number_to_c(0.001), "0.001")
+  expect_identical(
+    dynms_mathjson_to_c(list("Divide", 1, 1000)),
+    "(1.0 / 1000.0)"
+  )
+})
+
+test_that("mrgsolve export preserves rational dynamic derivatives", {
+  testthat::skip_if_not_installed("mrgsolve")
+
+  model <- list(
+    id = "rational-rate-rule",
+    constants = list(),
+    dynamic = list(list(
+      id = "S4",
+      initial = 0.001,
+      derivative = list(expr = list("Divide", 1, 1000), format = "math-json")
+    )),
+    static = list(),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  compiled <- build_mrgsolve(model, quiet = TRUE)
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 0.06, delta = 0.06)
+
+  expect_equal(simulation$S4[[2]], 0.00106, tolerance = 1e-10)
 })
 
 test_that("write_mrgsolve rejects a platform", {

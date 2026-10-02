@@ -123,7 +123,11 @@ dynms_number_to_c <- function(x) {
     stop("Expected a single numeric value.", call. = FALSE)
   }
 
-  format(x, scientific = FALSE, trim = TRUE, digits = 17)
+  value <- format(x, scientific = FALSE, trim = TRUE, digits = 17)
+  if (!grepl("[.eE]", value)) {
+    value <- paste0(value, ".0")
+  }
+  value
 }
 
 dynms_paren_c <- function(x) {
