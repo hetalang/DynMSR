@@ -53,6 +53,8 @@
     "double",
     "int",
     "bool",
+    "true",
+    "false",
     "capture",
     "until",
     "now",

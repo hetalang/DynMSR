@@ -435,7 +435,9 @@ test_that("build_mrgsolve captures renamed reserved identifiers", {
     static = list(
       list(id = "time", initial = 10),
       list(id = "Time", initial = 11),
-      list(id = "TIME", initial = 12)
+      list(id = "TIME", initial = 12),
+      list(id = "true", initial = 13),
+      list(id = "false", initial = 14)
     ),
     assignments = list(),
     timeEvents = list(),
@@ -444,12 +446,14 @@ test_that("build_mrgsolve captures renamed reserved identifiers", {
   )
 
   expect_identical(
-    prepare_mrgsolve_observable_capture(model, c("time", "Time", "TIME")),
-    c("time_rnm_", "Time", "TIME_rnm_")
+    prepare_mrgsolve_observable_capture(
+      model, c("time", "Time", "TIME", "true", "false")
+    ),
+    c("time_rnm_", "Time", "TIME_rnm_", "true_rnm_", "false_rnm_")
   )
   compiled <- build_mrgsolve(
     model,
-    observables = c("time", "Time", "TIME"),
+    observables = c("time", "Time", "TIME", "true", "false"),
     quiet = TRUE
   )
   simulation <- mrgsolve::mrgsim_df(compiled, end = 0, delta = 1)
@@ -457,6 +461,8 @@ test_that("build_mrgsolve captures renamed reserved identifiers", {
   expect_equal(simulation$time_rnm_[[1]], 10)
   expect_equal(simulation$Time[[1]], 11)
   expect_equal(simulation$TIME_rnm_[[1]], 12)
+  expect_equal(simulation$true_rnm_[[1]], 13)
+  expect_equal(simulation$false_rnm_[[1]], 14)
 })
 
 test_that("build_mrgsolve captures requested static states", {
