@@ -11,7 +11,8 @@
 #' @param observables Optional character vector of additional model symbols to
 #'   return from mrgsolve. Dynamic states and symbols already listed in the
 #'   DynMS model's `observables` are skipped. Every requested symbol must exist
-#'   as a DynMS constant, dynamic state, static state, or assignment.
+#'   as a DynMS constant, dynamic state, static state, or assignment. Symbols
+#'   renamed for mrgsolve are returned under their generated backend names.
 #' @param ... Additional arguments passed to [mrgsolve::mread()].
 #'
 #' @return A compiled mrgsolve model object.
@@ -81,5 +82,13 @@ prepare_mrgsolve_observable_capture <- function(model, observables) {
 
   dynamic <- collect_identifiers(model$dynamic, "id")
   existing <- vapply(model$observables %||% list(), `[[`, character(1), "symbol")
-  setdiff(observables, c(dynamic, existing))
+  capture <- setdiff(observables, c(dynamic, existing))
+  identifier_map <- build_mrgsolve_identifier_map(model)
+  unname(vapply(capture, function(identifier) {
+    if (identifier %in% names(identifier_map)) {
+      unname(identifier_map[[identifier]])
+    } else {
+      identifier
+    }
+  }, character(1)))
 }

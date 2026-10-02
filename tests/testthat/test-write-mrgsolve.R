@@ -425,6 +425,40 @@ test_that("build_mrgsolve prepares requested observables", {
   )
 })
 
+test_that("build_mrgsolve captures renamed reserved identifiers", {
+  testthat::skip_if_not_installed("mrgsolve")
+
+  model <- list(
+    id = "reserved-capture",
+    constants = list(),
+    dynamic = list(),
+    static = list(
+      list(id = "time", initial = 10),
+      list(id = "Time", initial = 11),
+      list(id = "TIME", initial = 12)
+    ),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  expect_identical(
+    prepare_mrgsolve_observable_capture(model, c("time", "Time", "TIME")),
+    c("time_rnm_", "Time", "TIME_rnm_")
+  )
+  compiled <- build_mrgsolve(
+    model,
+    observables = c("time", "Time", "TIME"),
+    quiet = TRUE
+  )
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 0, delta = 1)
+
+  expect_equal(simulation$time_rnm_[[1]], 10)
+  expect_equal(simulation$Time[[1]], 11)
+  expect_equal(simulation$TIME_rnm_[[1]], 12)
+})
+
 test_that("build_mrgsolve captures requested static states", {
   testthat::skip_if_not_installed("mrgsolve")
   model <- list(

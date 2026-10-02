@@ -20,7 +20,8 @@ written. If omitted, a temporary \code{.mod} file is created.}
 \item{observables}{Optional character vector of additional model symbols to
 return from mrgsolve. Dynamic states and symbols already listed in the
 DynMS model's \code{observables} are skipped. Every requested symbol must exist
-as a DynMS constant, dynamic state, static state, or assignment.}
+as a DynMS constant, dynamic state, static state, or assignment. Symbols
+renamed for mrgsolve are returned under their generated backend names.}
 
 \item{...}{Additional arguments passed to \code{\link[mrgsolve:mread]{mrgsolve::mread()}}.}
 }
