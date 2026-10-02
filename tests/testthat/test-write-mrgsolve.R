@@ -296,6 +296,49 @@ test_that("mrgsolve export renders numeric literals as doubles", {
   )
 })
 
+test_that("mrgsolve export converts multibranch MathJSON Which", {
+  expression <- list(
+    "Which",
+    list("Greater", "a", 0), 1,
+    list("LessEqual", "a", 0), 2,
+    "True", list(num = "NaN")
+  )
+
+  expect_identical(
+    dynms_mathjson_to_c(expression),
+    "((a > 0.0) ? 1.0 : ((a <= 0.0) ? 2.0 : (true ? std::numeric_limits<double>::quiet_NaN() : std::numeric_limits<double>::quiet_NaN())))"
+  )
+})
+
+test_that("mrgsolve export evaluates multibranch Which initial values", {
+  testthat::skip_if_not_installed("mrgsolve")
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  model <- list(
+    id = "which-initial-values",
+    constants = list(),
+    dynamic = list(list(id = "A", initial = 0, derivative = expression(0))),
+    static = list(
+      list(id = "a", initial = expression(list("If", "True", 1, list(num = "NaN")))),
+      list(id = "b", initial = expression(list(
+        "Which",
+        list("Greater", "a", 0), 1,
+        list("LessEqual", "a", 0), 2,
+        "True", list(num = "NaN")
+      )))
+    ),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  compiled <- build_mrgsolve(model, observables = c("a", "b"), quiet = TRUE)
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 0.1, delta = 0.1)
+
+  expect_equal(simulation$a[[1]], 1)
+  expect_equal(simulation$b[[1]], 1)
+})
+
 test_that("mrgsolve export preserves rational dynamic derivatives", {
   testthat::skip_if_not_installed("mrgsolve")
 

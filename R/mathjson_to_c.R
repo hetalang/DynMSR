@@ -74,7 +74,7 @@ dynms_mathjson_to_c <- function(node, time_symbol = "t") {
     Sqrt = dynms_call_c("sqrt", args),
     Square = dynms_call_c("pow", list(args[[1]], "2.0")),
     Tan = dynms_call_c("tan", args),
-    Which = dynms_if_c(args),
+    Which = dynms_which_c(args),
     Xor = dynms_infix_c(args, "!="),
     stop("Unsupported MathJSON operator for C export: ", op, call. = FALSE)
   )
@@ -148,6 +148,20 @@ dynms_if_c <- function(args) {
   }
 
   dynms_paren_c(paste0(args[[1]], " ? ", args[[2]], " : ", args[[3]]))
+}
+
+dynms_which_c <- function(args) {
+  if (length(args) < 2L || length(args) %% 2L != 0L) {
+    stop("MathJSON `Which` requires condition/value pairs.", call. = FALSE)
+  }
+
+  fallback <- "std::numeric_limits<double>::quiet_NaN()"
+  for (index in seq.int(length(args) - 1L, 1L, by = -2L)) {
+    fallback <- dynms_paren_c(paste0(
+      args[[index]], " ? ", args[[index + 1L]], " : ", fallback
+    ))
+  }
+  fallback
 }
 
 dynms_log_c <- function(args) {
