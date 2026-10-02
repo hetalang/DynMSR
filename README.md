@@ -50,10 +50,11 @@ res <- mrgsim(mrgsolve_model)
 ## mrgsolve limitations
 
 The mrgsolve backend does not use root finding for DynMS state-event triggers.
-It detects a trigger during integration, but processes the generated event at
-an output record. Consequently, a state update may be delayed by up to one
-output interval (`delta`). This limitation does not apply to DynMS time events,
-whose scheduled times are passed directly to mrgsolve.
+The current exporter evaluates such conditions in `$ODE`; mrgsolve may call
+that block at internal trial times rather than only at output records.
+Consequently, the generated state update can occur at an output record before
+or after the true threshold crossing. This limitation does not apply to DynMS
+time events, whose scheduled times are passed directly to mrgsolve.
 
 For a closer step-based approximation, use a smaller output interval:
 
@@ -61,11 +62,11 @@ For a closer step-based approximation, use a smaller output interval:
 res <- mrgsolve::mrgsim(mrgsolve_model, delta = 0.01)
 ```
 
-Reducing `delta` makes the event-delay bound smaller but increases the number
-of output records; it does not reproduce the exact root-crossing time. Reducing
-the solver's `hmax` can improve integration accuracy, but does not by itself
-move event processing off the output grid. Very small `hmax` values may also
-require increasing mrgsolve's `maxsteps`.
+Reducing `delta` and limiting `hmax` can sometimes make the approximation
+closer, but neither reproduces the exact root-crossing time nor guarantees
+which side of the threshold an event will be placed. A robust step-based
+implementation would evaluate and latch state-event conditions in `$TABLE`,
+where they run on the output grid, rather than in `$ODE`.
 
 ## Optional Heta integration
 

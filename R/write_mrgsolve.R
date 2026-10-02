@@ -24,12 +24,13 @@
 #' The exporter warns and ignores unsupported DynMS features: algebraic dynamic
 #' states, `stopSimulation`, and state-event trigger `detection`. Algebraic
 #' states are emitted as ordinary ODE states; state-event conditions are
-#' evaluated in generated code without root finding. A detected state event is
-#' processed at an mrgsolve output record, so its state update can be delayed by
-#' up to one output interval. Use a smaller `delta` in [mrgsolve::mrgsim()] for
-#' a closer step-based approximation; this does not reproduce the exact
-#' root-crossing time. Reducing mrgsolve's `hmax` improves integration accuracy
-#' but does not change the output-record event-processing rule.
+#' evaluated in generated code without root finding. The current exporter
+#' evaluates state-event conditions in `$ODE`, which mrgsolve may call at
+#' internal trial times. The resulting state update can therefore occur at an
+#' output record before or after the true threshold crossing. Smaller `delta`
+#' or `hmax` values can sometimes make the approximation closer, but cannot
+#' reproduce the exact root-crossing time or guarantee which side of the
+#' threshold an event will be placed.
 #'
 #' Identifiers reserved by mrgsolve are renamed with an `_rnm_` suffix. Further
 #' numeric suffixes are added when needed to avoid collisions. The exporter
