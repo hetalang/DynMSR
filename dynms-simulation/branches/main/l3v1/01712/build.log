@@ -10,17 +10,5 @@ No declaration file, running with defaults...
 [info]	Setting references in elements, total length 90
 [info]	Checking for circular references in Records.
 [warn]	Units checking and export were skipped because of errors in compilation.
+Compilation ERROR! See logs.
 
- +-------------------------------------------------------------------+ 
- | Internal "Heta compiler" error, contact the developers.           | 
- | Create an issue: https://github.com/hetalang/heta-compiler/issues | 
- | or mail to: dev@insysbio.com                                      | 
- +-------------------------------------------------------------------+ 
-
-
-SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
-    at JSON.parse (<anonymous>)
-    at parseJSONFromBytes (node:internal/deps/undici/undici:4394:19)
-    at successSteps (node:internal/deps/undici/undici:7048:27)
-    at readAllBytes (node:internal/deps/undici/undici:5965:13)
-    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

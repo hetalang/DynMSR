@@ -20,5 +20,27 @@
     "start": 0,
     "duration": 20,
     "steps": 50
+  },
+  "speciesOutputs": {
+    "X0": {
+      "compartment": "C",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "X1": {
+      "compartment": "C",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "T": {
+      "compartment": "C",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "S1": {
+      "compartment": "C",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    }
   }
 }

@@ -18,5 +18,17 @@
     "start": 0,
     "duration": 1,
     "steps": 10
+  },
+  "speciesOutputs": {
+    "S1": {
+      "compartment": "C1",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "S2": {
+      "compartment": "C1",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    }
   }
 }

@@ -15,5 +15,12 @@
     "start": 0,
     "duration": 2,
     "steps": 20
+  },
+  "speciesOutputs": {
+    "S3": {
+      "compartment": "comp",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    }
   }
 }

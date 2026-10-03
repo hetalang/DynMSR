@@ -139,5 +139,97 @@
     "start": 0,
     "duration": 1,
     "steps": 100
+  },
+  "speciesOutputs": {
+    "pp9_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p9": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp8_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p8": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp7_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p7": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp6_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p6": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp5_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p5": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp4_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p4": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp3_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p3": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp2_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p2": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "pp1_mrna": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "p1": {
+      "compartment": "DefaultCompartment",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    }
   }
 }

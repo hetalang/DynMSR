@@ -15,5 +15,12 @@
     "start": 0,
     "duration": 3,
     "steps": 300
+  },
+  "speciesOutputs": {
+    "S1": {
+      "compartment": "C",
+      "modelValue": "concentration",
+      "referenceValue": "concentration"
+    }
   }
 }

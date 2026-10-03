@@ -15,5 +15,12 @@
     "start": 0,
     "duration": 10,
     "steps": 10
+  },
+  "speciesOutputs": {
+    "S1": {
+      "compartment": "c",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    }
   }
 }

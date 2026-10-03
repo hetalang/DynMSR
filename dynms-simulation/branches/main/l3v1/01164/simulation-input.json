@@ -28,5 +28,6 @@
     "start": 0,
     "duration": 1,
     "steps": 10
-  }
+  },
+  "speciesOutputs": {}
 }

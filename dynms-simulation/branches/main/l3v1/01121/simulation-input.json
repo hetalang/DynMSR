@@ -28,5 +28,27 @@
     "start": 0,
     "duration": 3,
     "steps": 305
+  },
+  "speciesOutputs": {
+    "S1": {
+      "compartment": "comp",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "S2": {
+      "compartment": "comp2",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "S3": {
+      "compartment": "comp2",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "S4": {
+      "compartment": "comp2",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    }
   }
 }

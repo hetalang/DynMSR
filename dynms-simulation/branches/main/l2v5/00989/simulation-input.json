@@ -16,5 +16,17 @@
     "start": 0,
     "duration": 10,
     "steps": 100
+  },
+  "speciesOutputs": {
+    "X": {
+      "compartment": "default_compartment",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "Y": {
+      "compartment": "default_compartment",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    }
   }
 }

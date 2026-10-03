@@ -38,5 +38,47 @@
     "start": 0,
     "duration": 10,
     "steps": 10
+  },
+  "speciesOutputs": {
+    "S1": {
+      "compartment": "comp1",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "S2": {
+      "compartment": "comp1",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "S3": {
+      "compartment": "comp1",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "S4": {
+      "compartment": "comp1",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "S5": {
+      "compartment": "comp2",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "S6": {
+      "compartment": "comp2",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    },
+    "S7": {
+      "compartment": "comp2",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "S8": {
+      "compartment": "comp2",
+      "modelValue": "amount",
+      "referenceValue": "amount"
+    }
   }
 }

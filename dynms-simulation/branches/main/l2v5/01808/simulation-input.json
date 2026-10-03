@@ -22,5 +22,22 @@
     "start": 0,
     "duration": 10,
     "steps": 10
+  },
+  "speciesOutputs": {
+    "spec": {
+      "compartment": "C",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "Spec": {
+      "compartment": "c",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    },
+    "sPeC": {
+      "compartment": "C",
+      "modelValue": "concentration",
+      "referenceValue": "amount"
+    }
   }
 }
