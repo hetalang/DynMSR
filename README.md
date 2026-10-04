@@ -244,6 +244,6 @@ the bundled local schema and do not download files from the internet.
 - [heta-compiler](https://github.com/hetalang/heta-compiler) — compiler from Heta to DynMS and other formats
 - [SBML](https://sbml.org/) — Systems Biology Markup Language
 - [DynMS](https://hetalang.github.io/hetacompiler/dynms/description.html) — lightweight, portable intermediate representation for dynamical simulation models
-- [mrgsolve](https://mrgsolve.github.io/) — R package for model specification and simulation
+- [mrgsolve](https://mrgsolve.org/) — R package for model specification and simulation
 - [deSolve](https://cran.r-project.org/package=deSolve) — R package for solving differential equations
 - [HetaImporter.jl](https://github.com/hetalang/HetaImporter.jl) - Julia package to read DynMS and Heta models and convert them to use in Julia
