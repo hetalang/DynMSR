@@ -2,7 +2,9 @@
 ^\.github$
 ^\.Rproj\.user$
 ^AGENTS\.md$
+^LICENSE\.md$
 ^README\.Rmd$
+^SECURITY\.md$
 ^TODO\.md$
 ^cran-comments\.md$
 ^tools$
