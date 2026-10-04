@@ -20,8 +20,8 @@ new_model <- function(raw_model) {
 #'
 #' Selects one model from a DynMS platform by numeric index or by name.
 #'
-#' @param platform A platform object returned by [dynms_load()] or
-#'   [heta_load()].
+#' @param platform A platform object returned by [dynms_load()],
+#'   [heta_load()], or [sbml_load()].
 #' @param model A single model index or model name.
 #'
 #' @return A model list.

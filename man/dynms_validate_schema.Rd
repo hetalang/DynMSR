@@ -18,7 +18,7 @@ A list with \code{valid}, \code{errors}, and \code{warnings} fields.
 }
 \description{
 Validates a DynMS document against a JSON Schema. The document can be passed
-as a file path or as the raw R list returned by \code{\link[=dynms_read]{dynms_read()}}. By default,
-the schema bundled with DynMSR is used. Validation uses the \code{ajv} engine
+as a file path or as the raw R list returned by \code{\link[=dynms_read]{dynms_read()}}. Validation
+always uses the schema bundled with DynMSR. It uses the \code{ajv} engine
 because the bundled schema uses modern JSON Schema features.
 }

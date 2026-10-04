@@ -19,10 +19,11 @@ structure.
 }
 \examples{
 path <- tempfile(fileext = ".json")
+on.exit(unlink(path))
 jsonlite::write_json(
   list(dynms = "0.2.1", models = list()),
   path,
   auto_unbox = TRUE
 )
-try(dynms_read(path))
+dynms_read(path)
 }

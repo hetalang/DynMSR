@@ -3,6 +3,9 @@
 #' Builds one SBML file through Heta compiler with the DynMS export enabled,
 #' reads the generated DynMS JSON file, and returns a DynMS platform object.
 #'
+#' Requires a compatible `heta-compiler` installation. The generated DynMS
+#' export is written to a temporary directory and removed after loading.
+#'
 #' @param path Path to an SBML file.
 #' @param debug If `TRUE`, passed to [heta_load()].
 #' @param units_check If `TRUE`, passed to [heta_load()].

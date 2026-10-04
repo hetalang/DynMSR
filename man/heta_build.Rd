@@ -57,6 +57,11 @@ Runs \verb{heta build} for a Heta project directory. The arguments map directly
 to Heta compiler CLI options, for example \code{units_check = TRUE} adds
 \code{--units-check}.
 }
+\details{
+Requires a \code{heta} command that satisfies DynMSR's bundled compatibility
+rule. Use \code{\link[=heta_check]{heta_check()}} to inspect availability and the supported version
+range before building.
+}
 \examples{
 \dontrun{
 heta_build("_drafts/0-hello-world", export = "DynMS")

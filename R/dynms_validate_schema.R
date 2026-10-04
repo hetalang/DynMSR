@@ -10,8 +10,8 @@
 #' Validate a DynMS document against the JSON Schema
 #'
 #' Validates a DynMS document against a JSON Schema. The document can be passed
-#' as a file path or as the raw R list returned by [dynms_read()]. By default,
-#' the schema bundled with DynMSR is used. Validation uses the `ajv` engine
+#' as a file path or as the raw R list returned by [dynms_read()]. Validation
+#' always uses the schema bundled with DynMSR. It uses the `ajv` engine
 #' because the bundled schema uses modern JSON Schema features.
 #'
 #' @param x Path to a DynMS JSON file, or the raw R list returned by

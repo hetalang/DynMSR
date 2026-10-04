@@ -19,5 +19,7 @@ A list with \code{valid}, \code{errors}, and \code{warnings} fields.
 \description{
 Validates backend-independent semantic consistency of a schema-valid raw
 DynMS platform object. Unlike schema validation, this function collects all
-currently known semantic issues before returning.
+currently known semantic issues before returning. It does not validate the
+document structure; use \code{\link[=dynms_validate_schema]{dynms_validate_schema()}} first when the input has
+not already passed schema validation.
 }

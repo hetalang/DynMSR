@@ -6,14 +6,16 @@
 format. Treat DynMS as a language-independent intermediate representation for
 Systems Biology and Systems Pharmacology models.
 
-Do not narrow the project to a Heta importer, a deSolve wrapper, or a simulator.
-Heta is one optional DynMS producer; DynMSR must also work with DynMS JSON files
-that come from other frontends.
+Do not narrow the project to a Heta importer or a simulator. Heta and SBML are
+optional input formats; DynMSR must also work with DynMS JSON files that come
+from other frontends.
 
 The intended flow is:
 
 ```text
-Heta or other frontend -> DynMS JSON -> DynMSR -> deSolve / mrgsolve / future R backends
+Heta project ── heta-compiler ──┐
+SBML file ───── heta-compiler ──┼──> DynMS JSON -> DynMSR -> mrgsolve / future R backends
+Other frontend ─────────────────┘
 ```
 
 Keep the initial scope focused on DynMS loading, validation, platform/model
@@ -105,9 +107,6 @@ For generated code:
 * Keep templates logic-light and generated files reproducible.
 * Use temporary directories unless a public function explicitly promises an
   output path.
-
-For deSolve, target compiled C compatible with `R CMD SHLIB`, `dyn.load()`, and
-deSolve's compiled model interface.
 
 For mrgsolve, generate mrgsolve model source and keep compilation/loading logic
 backend-specific. Template paths should remain package-internal unless there is
@@ -206,12 +205,16 @@ Rscript -e "roxygen2::roxygenise()"
 
 Keep the README concise and user-oriented.
 
-## Heta integration
+## Heta and SBML integration
 
 Heta support is optional and must stay separate from core DynMS parsing. If Heta
 workflows are changed, they must detect unavailable tooling, fail gracefully,
 avoid CRAN-time execution unless explicitly enabled, and must not make Node.js,
 npm, or heta-compiler core package requirements.
+
+SBML loading is a Heta-based convenience workflow and must follow the same
+optional-tooling and CRAN-time constraints. It must not change the fact that
+DynMS JSON is the core, language-independent input format.
 
 ## Agent rules
 

@@ -44,6 +44,10 @@ A platform list. Use \code{\link[=get_model]{get_model()}} or ordinary list acce
 Builds one SBML file through Heta compiler with the DynMS export enabled,
 reads the generated DynMS JSON file, and returns a DynMS platform object.
 }
+\details{
+Requires a compatible \code{heta-compiler} installation. The generated DynMS
+export is written to a temporary directory and removed after loading.
+}
 \examples{
 \dontrun{
 platform <- sbml_load("model.xml")

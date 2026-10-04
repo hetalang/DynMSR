@@ -3,6 +3,9 @@
 #' Builds a Heta project with the DynMS export enabled, reads the generated
 #' DynMS JSON file, and returns a DynMS platform object.
 #'
+#' Requires a compatible `heta-compiler` installation. The generated DynMS
+#' export is written to a temporary directory and removed after loading.
+#'
 #' @param dir Heta project working directory.
 #' @param source Path to the main source file, passed to [heta_build()].
 #' @param type Source file type, passed to [heta_build()].

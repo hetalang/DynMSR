@@ -5,10 +5,11 @@ Authors@R: c(
     person(given = "Evgeny", family = "Metelkin", role = c("aut", "cre"),
            email = "evgeny.metelkin@gmail.com")
   )
-Description: Provides tools to read, validate, and export models
-    stored in the DynMS format. DynMSR is intended as an interoperability
-    toolkit between DynMS and R modeling backends such as deSolve and
-    mrgsolve.
+Description: Provides tools to read and validate models stored in the DynMS
+    format, and to generate and build an 'mrgsolve' backend. Heta projects and
+    SBML files can be loaded through a compatible optional 'heta-compiler'
+    installation. DynMSR is intended as an interoperability toolkit between
+    DynMS and R modeling backends.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

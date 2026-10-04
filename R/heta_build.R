@@ -4,6 +4,11 @@
 #' to Heta compiler CLI options, for example `units_check = TRUE` adds
 #' `--units-check`.
 #'
+#' @details
+#' Requires a `heta` command that satisfies DynMSR's bundled compatibility
+#' rule. Use [heta_check()] to inspect availability and the supported version
+#' range before building.
+#'
 #' @param dir Project working directory passed as the final CLI argument.
 #' @param source Path to the main source file, passed as `--source`.
 #' @param type Source file type, passed as `--type`.

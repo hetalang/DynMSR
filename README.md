@@ -1,23 +1,36 @@
 # DynMSR
 
-Toolkit for working with DynMS models in R.
+An R toolkit for systems-biology and systems-pharmacology models in
+[Heta](https://hetalang.github.io/hetacompiler/),
+[SBML](https://sbml.org/), and
+[DynMS](https://hetalang.github.io/hetacompiler/dynms/description.html) formats.
 
 [![Heta project](https://img.shields.io/badge/%CD%B1-Heta_project-blue)](https://hetalang.github.io/)
 [![GitHub issues](https://img.shields.io/badge/issues-GitHub-blue.svg)](https://github.com/hetalang/DynMSR/issues/)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/hetalang/DynMSR/blob/master/LICENSE.md)
 [![Autotests](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml/badge.svg)](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml)
 
-**DynMSR** provides tools for reading, validating, normalizing, converting,
-compiling, and eventually simulating models stored in the DynMS format. DynMSR
-is an interoperability toolkit between DynMS and the R modeling ecosystem.
+**DynMSR** helps you take a Heta project, an SBML model, or a DynMS JSON file
+and run it from R. It provides one convenient interface between these model
+formats and simulation backends: load a model, select it, and build it for
+simulation. DynMS (Dynamic Model Specification) is a lightweight, portable
+intermediate representation for dynamical simulation models. DynMS files are
+read directly; Heta projects and SBML files are converted to DynMS with
+`heta-compiler` first.
+
+```text
+Heta project ── heta-compiler ──> DynMS JSON ───────┐
+SBML file ───── heta-compiler ──> DynMS JSON ───────┼──> DynMSR ──> R backend
+DynMS JSON ─────────────────────────────────────────┘
+```
 
 ## Main features
 
-- Read and validate DynMS models
-- Optional import workflows from Heta & SBML via the DynMS intermediate format
-- Convert DynMS models to **mrgsolve**
-- Convert DynMS models to **deSolve** (experimental)
-- Compile generated C code for fast simulation
+- Load [Heta](https://hetalang.github.io/hetacompiler/) projects through
+  `heta-compiler` and DynMS.
+- Load [SBML](https://sbml.org/) files through `heta-compiler` and DynMS.
+- Load and validate DynMS JSON models.
+- Generate and build an **mrgsolve** backend from a DynMS model.
 
 ## Installation
 
@@ -28,7 +41,95 @@ is an interoperability toolkit between DynMS and the R modeling ecosystem.
 devtools::install_github("hetalang/DynMSR")
 ```
 
-## Quick start
+## Heta project quick start
+
+DynMSR can also build a Heta project and load its DynMS export. This workflow,
+as well as `sbml_load()`, requires a compatible `heta-compiler` installation.
+
+Install the compiler by following the [official Heta installation
+instructions](https://hetalang.github.io/hetacompiler/installation.html). Then
+create an empty directory, such as `heta-quick-start`, and save this file as
+`heta-quick-start/index.heta`:
+
+```heta
+comp1 @Compartment .= 1;
+
+A @Species { compartment: comp1 } .= 10;
+B @Species { compartment: comp1 } .= 0;
+r1 @Reaction { actors: A => 2B } := k1 * A * comp1;
+
+k1 @Const = 1.2e-1;
+```
+
+The model describes a reaction in which one unit of `A` produces two units of
+`B`.
+
+```r
+library(DynMSR)
+
+# heta_check()
+platform <- heta_load("path/to/heta-quick-start")
+model <- get_model(platform, 1)
+
+# install.packages("mrgsolve")
+mrgsolve_model <- build_mrgsolve(model)
+result <- mrgsolve::mrgsim(mrgsolve_model, end = 100, delta = 1)
+plot(result)
+```
+
+## SBML quick start
+
+With `heta-compiler` installed as above, create a file named
+`sbml-quick-start.xml` with this SBML Level 2 Version 5 model. Like the Heta
+example, it describes the reaction `A → 2B`.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2/version5" level="2" version="5">
+  <model id="simple_conversion">
+    <listOfCompartments>
+      <compartment id="comp1" size="1"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="A" compartment="comp1" initialAmount="10"/>
+      <species id="B" compartment="comp1" initialAmount="0"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="k1" value="0.12"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="r1" reversible="false">
+        <listOfReactants>
+          <speciesReference species="A"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="B" stoichiometry="2"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML"><apply><times/><ci>k1</ci><ci>A</ci></apply></math>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>
+```
+
+Load and simulate the model from R:
+
+```r
+library(DynMSR)
+
+platform <- sbml_load("path/to/sbml-quick-start.xml")
+model <- get_model(platform, 1)
+
+mrgsolve_model <- build_mrgsolve(model)
+result <- mrgsolve::mrgsim(mrgsolve_model, end = 100, delta = 1)
+plot(result)
+```
+
+## DynMS quick start
+
+Use this path when you already have a DynMS JSON document.
 
 ```r
 library(DynMSR)
@@ -47,7 +148,15 @@ library(mrgsolve)
 res <- mrgsim(mrgsolve_model)
 ```
 
-## mrgsolve limitations
+## Backends
+
+DynMSR treats **mrgsolve** and **deSolve** as backend targets in
+its architecture: the same loaded DynMS model is intended to support either
+backend without changing the core loader or validator. The mrgsolve backend is
+available now. The deSolve backend is planned, but is not yet implemented and
+cannot currently be used for code generation or simulation.
+
+### mrgsolve
 
 The mrgsolve backend does not use root finding for DynMS state-event triggers.
 The current exporter evaluates such conditions in `$ODE`; mrgsolve may call
@@ -68,19 +177,12 @@ which side of the threshold an event will be placed. A robust step-based
 implementation would evaluate and latch state-event conditions in `$TABLE`,
 where they run on the output grid, rather than in `$ODE`.
 
-## Optional Heta integration
-
-Heta is an optional DynMS producer; it is not required to read or validate
-DynMS JSON files. The supported compiler range and integration-test pin are
-defined in `inst/config/heta-compiler.json`. Follow the official
-[Heta installation instructions](https://hetalang.github.io/hetacompiler/installation.html)
-to install the compiler.
-
 ## Reproducibility reports
 
 This section presents automated DynMS simulation checks for the `main` branch.
 Each selected SBML Semantic Test Suite case is converted with Heta, loaded by
 DynMSR, simulated with mrgsolve, and compared with its reference time course.
+The checks use `heta-compiler` from the `v0.12.x` branch.
 
 | Test set | Simulation check | Latest `main` |
 | --- | --- | --- |
@@ -126,11 +228,18 @@ If the upstream URL is not reachable from the current network, `source` can be
 temporarily changed to a local schema file path in
 `inst/config/dynms.schema.source.json`.
 
+Heta is an optional DynMS producer; it is not required to read or validate
+DynMS JSON files. The supported compiler range and integration-test pin are
+defined in `inst/config/heta-compiler.json`.
+
 This is a manual developer step. Package installation, examples, and tests use
 the bundled local schema and do not download files from the internet.
 
 ## Related projects
 
-- [DynMS](https://hetalang.github.io/hetacompiler/dynms.html) — model representation format and specification (currently part of the **heta-compiler**)
 - [heta-compiler](https://github.com/hetalang/heta-compiler) — compiler from Heta to DynMS and other formats
+- [SBML](https://sbml.org/) — Systems Biology Markup Language
+- [DynMS](https://hetalang.github.io/hetacompiler/dynms/description.html) — lightweight, portable intermediate representation for dynamical simulation models
+- [mrgsolve](https://mrgsolve.github.io/) — R package for model specification and simulation
+- [deSolve](https://cran.r-project.org/package=deSolve) — R package for solving differential equations
 - [HetaImporter.jl](https://github.com/hetalang/HetaImporter.jl) - Julia package to read DynMS and Heta models and convert them to use in Julia

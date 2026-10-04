@@ -7,8 +7,8 @@
 get_model(platform, model)
 }
 \arguments{
-\item{platform}{A platform object returned by \code{\link[=dynms_load]{dynms_load()}} or
-\code{\link[=heta_load]{heta_load()}}.}
+\item{platform}{A platform object returned by \code{\link[=dynms_load]{dynms_load()}},
+\code{\link[=heta_load]{heta_load()}}, or \code{\link[=sbml_load]{sbml_load()}}.}
 
 \item{model}{A single model index or model name.}
 }
