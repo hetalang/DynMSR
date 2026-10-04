@@ -75,8 +75,9 @@ platform <- heta_load("path/to/heta-quick-start")
 model <- get_model(platform, 1)
 
 # install.packages("mrgsolve")
+require(mrgsolve)
 mrgsolve_model <- build_mrgsolve(model)
-result <- mrgsolve::mrgsim(mrgsolve_model, end = 100, delta = 1)
+result <- mrgsim(mrgsolve_model, end = 100, delta = 1)
 plot(result)
 ```
 
@@ -125,8 +126,9 @@ library(DynMSR)
 platform <- sbml_load("path/to/sbml-quick-start.xml")
 model <- get_model(platform, 1)
 
+require(mrgsolve)
 mrgsolve_model <- build_mrgsolve(model)
-result <- mrgsolve::mrgsim(mrgsolve_model, end = 100, delta = 1)
+result <- mrgsim(mrgsolve_model, end = 100, delta = 1)
 plot(result)
 ```
 
