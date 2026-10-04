@@ -1,15 +1,18 @@
 Package: DynMSR
-Title: Toolkit for Working with DynMS Models in R
+Title: Run Heta, SBML and DynMS Models in R
 Version: 0.1.0
 Authors@R: c(
     person(given = "Evgeny", family = "Metelkin", role = c("aut", "cre"),
            email = "evgeny.metelkin@gmail.com")
   )
-Description: Provides tools to read and validate models stored in the DynMS
-    format, and to generate and build an 'mrgsolve' backend. Heta projects and
-    SBML files can be loaded through a compatible optional 'heta-compiler'
-    installation. DynMSR is intended as an interoperability toolkit between
-    DynMS and R modeling backends.
+Author: Evgeny Metelkin [aut, cre]
+Maintainer: Evgeny Metelkin <evgeny.metelkin@gmail.com>
+Description: Provides a convenient R interface for systems-biology and
+    systems-pharmacology models in Heta, SBML, and DynMS formats. DynMS JSON
+    files are loaded directly; Heta projects and SBML files are converted to
+    DynMS by an optional compatible installation of 'heta-compiler'. Models
+    can be validated, selected from a platform, and generated or built for
+    simulation with 'mrgsolve' as a backend.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

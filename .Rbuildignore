@@ -3,6 +3,7 @@
 ^\.Rproj\.user$
 ^AGENTS\.md$
 ^README\.Rmd$
+^TODO\.md$
 ^cran-comments\.md$
 ^tools$
 ^_drafts$

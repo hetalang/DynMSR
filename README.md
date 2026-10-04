@@ -45,8 +45,9 @@ devtools::install_github("hetalang/DynMSR")
 
 DynMSR can also build a Heta project and load its DynMS export. This workflow,
 as well as `sbml_load()`, requires a compatible `heta-compiler` installation.
-DynMSR currently supports only `heta-compiler` version **0.12.2**; other
-versions are not supported.
+DynMSR is currently tested with `heta-compiler` version **0.12.2**. The
+supported version range and integration-test version are recorded in
+`inst/config/heta-compiler.json`.
 
 Install the compiler by following the [official Heta installation
 instructions](https://hetalang.github.io/hetacompiler/installation.html),
@@ -184,7 +185,6 @@ where they run on the output grid, rather than in `$ODE`.
 This section presents automated DynMS simulation checks for the `main` branch.
 Each selected SBML Semantic Test Suite case is converted with Heta, loaded by
 DynMSR, simulated with mrgsolve, and compared with its reference time course.
-The checks use `heta-compiler` from the `v0.12.x` branch.
 
 | Test set | Simulation check | Latest `main` |
 | --- | --- | --- |
@@ -231,8 +231,8 @@ temporarily changed to a local schema file path in
 `inst/config/dynms.schema.source.json`.
 
 Heta is an optional DynMS producer; it is not required to read or validate
-DynMS JSON files. The supported compiler range and integration-test pin are
-defined in `inst/config/heta-compiler.json`.
+DynMS JSON files. The supported compiler range and integration-test version
+are defined in `inst/config/heta-compiler.json`.
 
 This is a manual developer step. Package installation, examples, and tests use
 the bundled local schema and do not download files from the internet.
