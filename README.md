@@ -45,11 +45,13 @@ devtools::install_github("hetalang/DynMSR")
 
 DynMSR can also build a Heta project and load its DynMS export. This workflow,
 as well as `sbml_load()`, requires a compatible `heta-compiler` installation.
+DynMSR currently supports only `heta-compiler` version **0.12.2**; other
+versions are not supported.
 
 Install the compiler by following the [official Heta installation
-instructions](https://hetalang.github.io/hetacompiler/installation.html). Then
-create an empty directory, such as `heta-quick-start`, and save this file as
-`heta-quick-start/index.heta`:
+instructions](https://hetalang.github.io/hetacompiler/installation.html),
+selecting version 0.12.2. Then create an empty directory, such as
+`heta-quick-start`, and save this file as `heta-quick-start/index.heta`:
 
 ```heta
 comp1 @Compartment .= 1;
@@ -202,8 +204,8 @@ Run the local test suite with:
 Rscript -e "pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
 ```
 
-Heta integration tests are disabled by default. They require the compiler
-version configured in `inst/config/heta-compiler.json` and can be enabled with:
+Heta integration tests are disabled by default. They require
+`heta-compiler` version 0.12.2 and can be enabled with:
 
 ```sh
 Rscript -e "Sys.setenv(DYNMSR_RUN_HETA_INTEGRATION = 'true'); pkgload::load_all('.'); testthat::test_dir('tests/testthat')"

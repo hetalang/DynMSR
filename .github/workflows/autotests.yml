@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   check:
-    name: R ${{ matrix.r }} - ${{ matrix.os }}
+    name: R ${{ matrix.r }} - ${{ matrix.os }}${{ matrix.heta_integration && ' - Heta integration' || '' }}
     runs-on: ${{ matrix.os }}
 
     strategy:
