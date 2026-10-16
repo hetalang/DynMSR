@@ -24,3 +24,7 @@ error when any validation issue is found.
 
 DynMSR currently supports only expressions with \code{format: "math-json"}.
 }
+\examples{
+platform <- dynms_load(dynms_lib("two-state-conversion"))
+platform
+}

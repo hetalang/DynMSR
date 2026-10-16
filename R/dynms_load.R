@@ -14,6 +14,10 @@
 #' @return A platform list. Use `platform$models[[i]]` to select one model for
 #'   backend-specific operations.
 #' @export
+#'
+#' @examples
+#' platform <- dynms_load(dynms_lib("two-state-conversion"))
+#' platform
 dynms_load <- function(path) {
   raw_platform <- dynms_read(path)
   schema <- dynms_validate_schema(raw_platform, error = FALSE)

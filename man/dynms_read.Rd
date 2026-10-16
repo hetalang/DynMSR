@@ -18,12 +18,6 @@ Reads a DynMS JSON file into an R list. DynMS documents are parsed with
 structure.
 }
 \examples{
-path <- tempfile(fileext = ".json")
-jsonlite::write_json(
-  list(dynms = "0.2.1", models = list()),
-  path,
-  auto_unbox = TRUE
-)
+path <- dynms_lib("first-order-decay")
 dynms_read(path)
-unlink(path)
 }

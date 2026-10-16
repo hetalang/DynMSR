@@ -8,6 +8,10 @@
 #'
 #' @return `x`, invisibly.
 #' @export
+#'
+#' @examples
+#' platform <- dynms_load(dynms_lib("first-order-decay"))
+#' print(platform)
 print.platform <- function(x, ...) {
   cat("<DynMS platform>\n")
   cat("  DynMS version: ", x$dynms %||% "unknown", "\n", sep = "")
@@ -38,6 +42,10 @@ print.platform <- function(x, ...) {
 #'
 #' @return `x`, invisibly.
 #' @export
+#'
+#' @examples
+#' model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
+#' print(model)
 print.model <- function(x, ...) {
   cat("<DynMS model: ", x$id %||% "<unnamed>", ">\n", sep = "")
   if (!is.null(x$title)) {

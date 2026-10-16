@@ -4,8 +4,9 @@
 #' DynMS JSON file, and returns a DynMS platform object.
 #'
 #' Requires a compatible `heta-compiler` installation. Compiler output is
-#' placed under `output_dir` in `dist/`, `meta/`, and `build.log`. When
-#' `output_dir` is omitted, a temporary directory is removed after loading.
+#' placed under `output_dir` in `dist/`, `meta/`, and, when selected by
+#' `log_mode`, `build.log`. When `output_dir` is omitted, a temporary directory
+#' is removed after loading.
 #'
 #' @param dir Heta project working directory.
 #' @param output_dir Optional directory for compiler output. If omitted, a
@@ -14,7 +15,8 @@
 #' @param type Source file type, passed to [heta_build()].
 #' @param debug If `TRUE`, passed to [heta_build()].
 #' @param units_check If `TRUE`, passed to [heta_build()].
-#' @param log_mode Log file saving mode, passed to [heta_build()].
+#' @param log_mode Log file saving mode, passed to [heta_build()]. Use
+#'   `"always"` to write `build.log` after a successful build.
 #' @param declaration Declaration file path without extension, passed to
 #'   [heta_build()].
 #' @param log_level Log level, passed to [heta_build()].
@@ -26,7 +28,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' platform <- heta_load("_drafts/0-hello-world")
+#' platform <- heta_load("path/to/your/heta-project")
+#' model <- get_model(platform, 1)
+#' compiled <- build_mrgsolve(model, quiet = TRUE)
+#' simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
 #' }
 heta_load <- function(dir,
                       output_dir = NULL,

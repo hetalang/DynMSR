@@ -35,3 +35,9 @@ emits one warning and records the complete mapping in the generated model.
 The DynMS time symbol \code{t} is emitted as \code{SOLVERTIME} in \verb{$ODE} and as \code{TIME}
 in other blocks.
 }
+\examples{
+model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
+path <- tempfile(fileext = ".mod")
+write_mrgsolve(model, path)
+unlink(path)
+}

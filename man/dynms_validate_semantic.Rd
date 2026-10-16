@@ -23,3 +23,8 @@ currently known semantic issues before returning. It does not validate the
 document structure; use \code{\link[=dynms_validate_schema]{dynms_validate_schema()}} first when the input has
 not already passed schema validation.
 }
+\examples{
+raw_platform <- dynms_read(dynms_lib("first-order-decay"))
+validation <- dynms_validate_semantic(raw_platform)
+validation$valid
+}

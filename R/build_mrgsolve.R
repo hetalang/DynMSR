@@ -17,6 +17,13 @@
 #'
 #' @return A compiled mrgsolve model object.
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
+#' compiled <- build_mrgsolve(model, quiet = TRUE)
+#' simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
+#' }
 build_mrgsolve <- function(
   model, filepath = NULL, observables = NULL, ...
 ) {

@@ -19,8 +19,7 @@ A model list.
 Selects one model from a DynMS platform by numeric index or by name.
 }
 \examples{
-\dontrun{
-platform <- heta_load("_drafts/0-hello-world")
-model <- get_model(platform, 2)
-}
+dynms_path = dynms_lib("repeated-dose")
+platform <- dynms_load(dynms_path)
+model <- get_model(platform, 1)
 }

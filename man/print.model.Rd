@@ -17,3 +17,7 @@
 \description{
 Displays a compact inventory of model components and their identifiers.
 }
+\examples{
+model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
+print(model)
+}

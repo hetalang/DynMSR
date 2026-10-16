@@ -32,7 +32,8 @@ heta_build(
 
 \item{units_check}{If \code{TRUE}, add \code{--units-check}.}
 
-\item{log_mode}{Log file saving mode, passed as \code{--log-mode}.}
+\item{log_mode}{Log file saving mode, passed as \code{--log-mode}. Use \code{"always"}
+to write \code{build.log} after a successful build.}
 
 \item{declaration}{Declaration file path without extension, passed as
 \code{--declaration}.}
@@ -55,14 +56,15 @@ to Heta compiler CLI options, for example \code{units_check = TRUE} adds
 \details{
 Requires a \code{heta} command that satisfies DynMSR's bundled compatibility
 rule. Use \code{\link[=heta_check]{heta_check()}} to inspect availability and the supported version
-range before building. All compiler output is placed under \code{output_dir}:
-\verb{dist/}, \verb{meta/}, and \code{build.log}. The output directory must be supplied
-explicitly and remains available after the build.
+range before building. Compiler output paths are placed under \code{output_dir}:
+\verb{dist/}, \verb{meta/}, and, when selected by \code{log_mode}, \code{build.log}. The output
+directory must be supplied explicitly and remains available after the build.
 }
 \examples{
 \dontrun{
-output_dir <- tempfile("dynmsr-heta-example-")
-heta_build("_drafts/0-hello-world", output_dir = output_dir, export = "DynMS")
-unlink(output_dir, recursive = TRUE)
+project_dir <- "path/to/your/heta-project"
+# Save exports and build.log in the project directory.
+heta_build(project_dir, output_dir = project_dir, export = "SBML",
+           log_mode = "always")
 }
 }

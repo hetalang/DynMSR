@@ -21,6 +21,10 @@
 #'
 #' @return A list with `valid`, `errors`, and `warnings` fields.
 #' @export
+#'
+#' @examples
+#' validation <- dynms_validate_schema(dynms_lib("first-order-decay"))
+#' validation$valid
 dynms_validate_schema <- function(x, error = FALSE) {
   json <- dynms_json_input(x)
   validation <- jsonvalidate::json_validate(

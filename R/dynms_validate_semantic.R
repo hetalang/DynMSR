@@ -13,6 +13,11 @@
 #'
 #' @return A list with `valid`, `errors`, and `warnings` fields.
 #' @export
+#'
+#' @examples
+#' raw_platform <- dynms_read(dynms_lib("first-order-decay"))
+#' validation <- dynms_validate_semantic(raw_platform)
+#' validation$valid
 dynms_validate_semantic <- function(raw_platform, error = FALSE) {
   issues <- list()
 

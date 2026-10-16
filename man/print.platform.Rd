@@ -18,3 +18,7 @@
 Displays the DynMS version and a compact summary of each model in a
 platform.
 }
+\examples{
+platform <- dynms_load(dynms_lib("first-order-decay"))
+print(platform)
+}

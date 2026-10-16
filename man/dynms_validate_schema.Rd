@@ -22,3 +22,7 @@ as a file path or as the raw R list returned by \code{\link[=dynms_read]{dynms_r
 always uses the schema bundled with DynMSR. It uses the \code{ajv} engine
 because the bundled schema uses modern JSON Schema features.
 }
+\examples{
+validation <- dynms_validate_schema(dynms_lib("first-order-decay"))
+validation$valid
+}

@@ -31,7 +31,8 @@ temporary directory is used and removed after loading.}
 
 \item{units_check}{If \code{TRUE}, passed to \code{\link[=heta_build]{heta_build()}}.}
 
-\item{log_mode}{Log file saving mode, passed to \code{\link[=heta_build]{heta_build()}}.}
+\item{log_mode}{Log file saving mode, passed to \code{\link[=heta_build]{heta_build()}}. Use
+\code{"always"} to write \code{build.log} after a successful build.}
 
 \item{declaration}{Declaration file path without extension, passed to
 \code{\link[=heta_build]{heta_build()}}.}
@@ -50,11 +51,15 @@ DynMS JSON file, and returns a DynMS platform object.
 }
 \details{
 Requires a compatible \code{heta-compiler} installation. Compiler output is
-placed under \code{output_dir} in \verb{dist/}, \verb{meta/}, and \code{build.log}. When
-\code{output_dir} is omitted, a temporary directory is removed after loading.
+placed under \code{output_dir} in \verb{dist/}, \verb{meta/}, and, when selected by
+\code{log_mode}, \code{build.log}. When \code{output_dir} is omitted, a temporary directory
+is removed after loading.
 }
 \examples{
 \dontrun{
-platform <- heta_load("_drafts/0-hello-world")
+platform <- heta_load("path/to/your/heta-project")
+model <- get_model(platform, 1)
+compiled <- build_mrgsolve(model, quiet = TRUE)
+simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
 }
 }

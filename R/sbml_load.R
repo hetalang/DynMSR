@@ -24,7 +24,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' platform <- sbml_load("model.xml")
+#' sbml_path <- "path/to/your/model.xml"
+#' platform <- sbml_load(sbml_path)
+#' model <- get_model(platform, 1)
+#' compiled <- build_mrgsolve(model, quiet = TRUE)
+#' simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
 #' }
 sbml_load <- function(path,
                       output_dir = NULL,

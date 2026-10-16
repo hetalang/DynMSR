@@ -43,6 +43,12 @@
 #'
 #' @return The path to the generated model file.
 #' @export
+#'
+#' @examples
+#' model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
+#' path <- tempfile(fileext = ".mod")
+#' write_mrgsolve(model, path)
+#' unlink(path)
 write_mrgsolve <- function(model, filepath) {
   check_mrgsolve_model(model, "write_mrgsolve")
   if (missing(filepath)) {

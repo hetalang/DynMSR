@@ -49,6 +49,10 @@ export is written to a temporary directory and removed after loading unless
 }
 \examples{
 \dontrun{
-platform <- sbml_load("model.xml")
+sbml_path <- "path/to/your/model.xml"
+platform <- sbml_load(sbml_path)
+model <- get_model(platform, 1)
+compiled <- build_mrgsolve(model, quiet = TRUE)
+simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
 }
 }

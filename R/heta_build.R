@@ -7,9 +7,9 @@
 #' @details
 #' Requires a `heta` command that satisfies DynMSR's bundled compatibility
 #' rule. Use [heta_check()] to inspect availability and the supported version
-#' range before building. All compiler output is placed under `output_dir`:
-#' `dist/`, `meta/`, and `build.log`. The output directory must be supplied
-#' explicitly and remains available after the build.
+#' range before building. Compiler output paths are placed under `output_dir`:
+#' `dist/`, `meta/`, and, when selected by `log_mode`, `build.log`. The output
+#' directory must be supplied explicitly and remains available after the build.
 #'
 #' @param dir Project working directory passed as the final CLI argument.
 #' @param output_dir Directory for all compiler output. Required. Use
@@ -18,7 +18,8 @@
 #' @param type Source file type, passed as `--type`.
 #' @param debug If `TRUE`, add `--debug`.
 #' @param units_check If `TRUE`, add `--units-check`.
-#' @param log_mode Log file saving mode, passed as `--log-mode`.
+#' @param log_mode Log file saving mode, passed as `--log-mode`. Use `"always"`
+#'   to write `build.log` after a successful build.
 #' @param declaration Declaration file path without extension, passed as
 #'   `--declaration`.
 #' @param log_level Log level, passed as `--log-level`.
@@ -31,9 +32,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' output_dir <- tempfile("dynmsr-heta-example-")
-#' heta_build("_drafts/0-hello-world", output_dir = output_dir, export = "DynMS")
-#' unlink(output_dir, recursive = TRUE)
+#' project_dir <- "path/to/your/heta-project"
+#' # Save exports and build.log in the project directory.
+#' heta_build(project_dir, output_dir = project_dir, export = "SBML",
+#'            log_mode = "always")
 #' }
 heta_build <- function(dir,
                        output_dir,
