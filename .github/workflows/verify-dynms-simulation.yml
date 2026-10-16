@@ -55,7 +55,7 @@ jobs:
       - name: Install Format Conversion Test Suite
         shell: bash
         run: |
-          npm install --prefix fcts-run git+https://github.com/hetalang/format-conversion-test-suite.git#v0.3.0
+          npm install --prefix fcts-run git+https://github.com/hetalang/format-conversion-test-suite.git#v0.3.1
 
       - name: Download and index SBML cases
         shell: bash
@@ -66,9 +66,9 @@ jobs:
       - name: Simulate SBML L2V5 DynMS models
         shell: bash
         run: |
-          PATH="$HETA_BIN:$PATH" "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
+          PATH="$HETA_BIN:$PATH" "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynmsr-simulation --source=cases/index \
             --input-field=sbmlL2V5Path \
-            --target=results/dynms-simulation-l2v5 \
+            --target=results/dynmsr-simulation-l2v5 \
             --skip-component-tags=StoichiometryMath,CSymbolDelay,EventWithDelay,AlgebraicRule \
             --skip-test-tags=FastReaction \
             --concurrency=4
@@ -76,15 +76,14 @@ jobs:
       - name: Simulate SBML L3V1 DynMS models
         shell: bash
         run: |
-          PATH="$HETA_BIN:$PATH" "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynms-simulation --source=cases/index \
+          PATH="$HETA_BIN:$PATH" "$GITHUB_WORKSPACE/fcts-run/node_modules/.bin/fcts" sbml-dynmsr-simulation --source=cases/index \
             --input-field=sbmlL3V1Path \
-            --target=results/dynms-simulation-l3v1 \
+            --target=results/dynmsr-simulation-l3v1 \
             --skip-component-tags=CSymbolDelay,EventWithDelay,AlgebraicRule,CSymbolRateOf,comp:Deletion,comp:ModelDefinition,comp:Port,comp:ReplacedBy,comp:ReplacedElement,comp:SBaseRef,comp:Submodel,fbc:FluxBound,fbc:FluxObjective,fbc:Objective \
             --skip-test-tags=AssignedVariableStoichiometry,AssignedConstantStoichiometry,SpeciesReferenceInMath,NoMathML,comp:SubmodelOutput,fbc:BoundEqual,fbc:BoundGreaterEqual,fbc:BoundLessEqual,fbc:MaximizeObjective,fbc:MinimizeObjective,fbc:NonStrict,BoolNumericSwap,FastReaction \
             --concurrency=4
 
       - name: Summarize simulation report
-        if: always()
         shell: bash
         run: |
           node <<'NODE'
@@ -92,8 +91,8 @@ jobs:
           const path = require('node:path');
 
           const reports = [
-            ['SBML L2V5', 'dynms-simulation-l2v5'],
-            ['SBML L3V1', 'dynms-simulation-l3v1'],
+            ['SBML L2V5', 'dynmsr-simulation-l2v5'],
+            ['SBML L3V1', 'dynmsr-simulation-l3v1'],
           ];
           const lines = [
             '| Report | Successful | Failed | Not evaluated |',
@@ -120,33 +119,32 @@ jobs:
           NODE
 
       - name: Checkout reports publication branch
-        if: always()
         uses: actions/checkout@v6
         with:
           ref: reports
           path: reports-publication
 
       - name: Publish latest report for the source branch
-        if: always() && github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
           for report_name in l2v5 l3v1; do
-            if [[ ! -f "$FCTS_ROOT/results/dynms-simulation-$report_name/report.json" ]]; then
+            if [[ ! -f "$FCTS_ROOT/results/dynmsr-simulation-$report_name/report.json" ]]; then
               echo "DynMS simulation $report_name report is unavailable; preserving the previously published reports."
               exit 0
             fi
           done
 
-          publish_root="$GITHUB_WORKSPACE/reports-publication/dynms-simulation/branches/$GITHUB_REF_NAME"
+          publish_root="$GITHUB_WORKSPACE/reports-publication/dynmsr-simulation/branches/$GITHUB_REF_NAME"
           rm -rf "$publish_root"
           mkdir -p "$publish_root"
           for report_name in l2v5 l3v1; do
-            cp -a "$FCTS_ROOT/results/dynms-simulation-$report_name" "$publish_root/$report_name"
+            cp -a "$FCTS_ROOT/results/dynmsr-simulation-$report_name" "$publish_root/$report_name"
           done
 
           git -C "$GITHUB_WORKSPACE/reports-publication" config user.name 'github-actions[bot]'
           git -C "$GITHUB_WORKSPACE/reports-publication" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C "$GITHUB_WORKSPACE/reports-publication" add "dynms-simulation/branches/$GITHUB_REF_NAME"
+          git -C "$GITHUB_WORKSPACE/reports-publication" add "dynmsr-simulation/branches/$GITHUB_REF_NAME"
           if git -C "$GITHUB_WORKSPACE/reports-publication" diff --cached --quiet; then
             echo 'Published report is unchanged.'
             exit 0
@@ -155,21 +153,21 @@ jobs:
           git -C "$GITHUB_WORKSPACE/reports-publication" push origin HEAD:reports
 
       - name: Publish report for the release
-        if: always() && github.event_name == 'release'
+        if: github.event_name == 'release'
         shell: bash
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           PRERELEASE: ${{ github.event.release.prerelease }}
         run: |
           for report_name in l2v5 l3v1; do
-            if [[ ! -f "$FCTS_ROOT/results/dynms-simulation-$report_name/report.json" ]]; then
+            if [[ ! -f "$FCTS_ROOT/results/dynmsr-simulation-$report_name/report.json" ]]; then
               echo "DynMS simulation $report_name report is unavailable; preserving the previously published reports."
               exit 0
             fi
           done
 
-          release_root="$GITHUB_WORKSPACE/reports-publication/dynms-simulation/releases/$RELEASE_TAG"
-          latest_root="$GITHUB_WORKSPACE/reports-publication/dynms-simulation/releases/latest"
+          release_root="$GITHUB_WORKSPACE/reports-publication/dynmsr-simulation/releases/$RELEASE_TAG"
+          latest_root="$GITHUB_WORKSPACE/reports-publication/dynmsr-simulation/releases/latest"
           rm -rf "$release_root"
           mkdir -p "$release_root"
           if [[ "$PRERELEASE" == "false" ]]; then
@@ -177,17 +175,17 @@ jobs:
             mkdir -p "$latest_root"
           fi
           for report_name in l2v5 l3v1; do
-            cp -a "$FCTS_ROOT/results/dynms-simulation-$report_name" "$release_root/$report_name"
+            cp -a "$FCTS_ROOT/results/dynmsr-simulation-$report_name" "$release_root/$report_name"
             if [[ "$PRERELEASE" == "false" ]]; then
-              cp -a "$FCTS_ROOT/results/dynms-simulation-$report_name" "$latest_root/$report_name"
+              cp -a "$FCTS_ROOT/results/dynmsr-simulation-$report_name" "$latest_root/$report_name"
             fi
           done
 
           git -C "$GITHUB_WORKSPACE/reports-publication" config user.name 'github-actions[bot]'
           git -C "$GITHUB_WORKSPACE/reports-publication" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C "$GITHUB_WORKSPACE/reports-publication" add "dynms-simulation/releases/$RELEASE_TAG"
+          git -C "$GITHUB_WORKSPACE/reports-publication" add "dynmsr-simulation/releases/$RELEASE_TAG"
           if [[ "$PRERELEASE" == "false" ]]; then
-            git -C "$GITHUB_WORKSPACE/reports-publication" add "dynms-simulation/releases/latest"
+            git -C "$GITHUB_WORKSPACE/reports-publication" add "dynmsr-simulation/releases/latest"
           fi
           if git -C "$GITHUB_WORKSPACE/reports-publication" diff --cached --quiet; then
             echo 'Published release report is unchanged.'
@@ -197,11 +195,10 @@ jobs:
           git -C "$GITHUB_WORKSPACE/reports-publication" push origin HEAD:reports
 
       - name: Upload DynMS simulation report
-        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: fcts-dynms-simulation-${{ github.run_id }}
+          name: fcts-dynmsr-simulation-${{ github.run_id }}
           path: |
-            ${{ env.FCTS_ROOT }}/results/dynms-simulation-l2v5
-            ${{ env.FCTS_ROOT }}/results/dynms-simulation-l3v1
+            ${{ env.FCTS_ROOT }}/results/dynmsr-simulation-l2v5
+            ${{ env.FCTS_ROOT }}/results/dynmsr-simulation-l3v1
           if-no-files-found: warn
