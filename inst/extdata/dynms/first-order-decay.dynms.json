@@ -1,0 +1,38 @@
+{
+  "dynms": "0.2.1",
+  "models": [
+    {
+      "id": "first_order_decay",
+      "constants": [
+        {"id": "ke", "value": 0.2},
+        {"id": "volume", "value": 10}
+      ],
+      "dynamic": [
+        {
+          "id": "amount",
+          "initial": 100,
+          "derivative": {
+            "expr": ["Negate", ["Multiply", "ke", "amount"]],
+            "format": "math-json"
+          }
+        }
+      ],
+      "static": [],
+      "assignments": [
+        {
+          "id": "concentration",
+          "rhs": {
+            "expr": ["Divide", "amount", "volume"],
+            "format": "math-json"
+          }
+        }
+      ],
+      "timeEvents": [],
+      "events": [],
+      "observables": [
+        {"symbol": "amount"},
+        {"symbol": "concentration"}
+      ]
+    }
+  ]
+}

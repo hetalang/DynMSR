@@ -1,0 +1,19 @@
+{
+  "examples": [
+    {
+      "id": "first-order-decay",
+      "file": "first-order-decay.dynms.json",
+      "title": "First-order decay"
+    },
+    {
+      "id": "two-state-conversion",
+      "file": "two-state-conversion.dynms.json",
+      "title": "Two-state conversion"
+    },
+    {
+      "id": "repeated-dose",
+      "file": "repeated-dose.dynms.json",
+      "title": "Repeated dose with first-order elimination"
+    }
+  ]
+}

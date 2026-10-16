@@ -3,6 +3,7 @@
 S3method(print,model)
 S3method(print,platform)
 export(build_mrgsolve)
+export(dynms_lib)
 export(dynms_load)
 export(dynms_read)
 export(dynms_validate_schema)

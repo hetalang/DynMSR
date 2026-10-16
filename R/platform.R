@@ -28,10 +28,9 @@ new_model <- function(raw_model) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' platform <- heta_load("_drafts/0-hello-world")
-#' model <- get_model(platform, 2)
-#' }
+#' dynms_path = dynms_lib("repeated-dose")
+#' platform <- dynms_load(dynms_path)
+#' model <- get_model(platform, 1)
 get_model <- function(platform, model) {
   if (!inherits(platform, "platform")) {
     stop("`platform` must be a DynMS platform object.", call. = FALSE)

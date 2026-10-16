@@ -1,0 +1,42 @@
+{
+  "dynms": "0.2.1",
+  "models": [
+    {
+      "id": "two_state_conversion",
+      "constants": [
+        {"id": "k12", "value": 0.4},
+        {"id": "k20", "value": 0.1}
+      ],
+      "dynamic": [
+        {
+          "id": "state_a",
+          "initial": 100,
+          "derivative": {
+            "expr": ["Negate", ["Multiply", "k12", "state_a"]],
+            "format": "math-json"
+          }
+        },
+        {
+          "id": "state_b",
+          "initial": 0,
+          "derivative": {
+            "expr": [
+              "Add",
+              ["Multiply", "k12", "state_a"],
+              ["Negate", ["Multiply", "k20", "state_b"]]
+            ],
+            "format": "math-json"
+          }
+        }
+      ],
+      "static": [],
+      "assignments": [],
+      "timeEvents": [],
+      "events": [],
+      "observables": [
+        {"symbol": "state_a"},
+        {"symbol": "state_b"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "dynms": "0.2.1",
+  "models": [
+    {
+      "id": "repeated_dose",
+      "constants": [
+        {"id": "dose", "value": 100},
+        {"id": "ke", "value": 0.15}
+      ],
+      "dynamic": [
+        {
+          "id": "amount",
+          "initial": 0,
+          "derivative": {
+            "expr": ["Negate", ["Multiply", "ke", "amount"]],
+            "format": "math-json"
+          }
+        }
+      ],
+      "static": [],
+      "assignments": [],
+      "timeEvents": [
+        {
+          "id": "dose_every_12_hours",
+          "trigger": {
+            "type": "time",
+            "start": 0,
+            "period": 12,
+            "stop": 48
+          },
+          "priority": 0,
+          "actions": [
+            {
+              "state": "amount",
+              "rhs": {
+                "expr": ["Add", "amount", "dose"],
+                "format": "math-json"
+              }
+            }
+          ],
+          "active": true
+        }
+      ],
+      "events": [],
+      "observables": [
+        {"symbol": "amount"}
+      ]
+    }
+  ]
+}
