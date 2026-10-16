@@ -191,8 +191,8 @@ DynMSR, simulated with mrgsolve, and compared with its reference time course.
 
 | Test set | Simulation check | Latest `main` |
 | --- | --- | --- |
-| sbmlteam/sbml-test-suite | SBML L2V5 → Heta → DynMSR/mrgsolve | [![SBML L2V5 DynMS simulation](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynms-simulation%2Fbranches%2Fmain%2Fl2v5%2Fbadge.json)](https://hetalang.github.io/format-conversion-test-suite/report/?ref=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynms-simulation%2Fbranches%2Fmain%2Fl2v5%2Freport.json) |
-| sbmlteam/sbml-test-suite | SBML L3V1 → Heta → DynMSR/mrgsolve | [![SBML L3V1 DynMS simulation](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynms-simulation%2Fbranches%2Fmain%2Fl3v1%2Fbadge.json)](https://hetalang.github.io/format-conversion-test-suite/report/?ref=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynms-simulation%2Fbranches%2Fmain%2Fl3v1%2Freport.json) |
+| sbmlteam/sbml-test-suite | SBML L2V5 → Heta → DynMSR/mrgsolve | [![SBML L2V5 DynMS simulation](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl2v5%2Fbadge.json)](https://hetalang.github.io/format-conversion-test-suite/report/?ref=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl2v5%2Freport.json) |
+| sbmlteam/sbml-test-suite | SBML L3V1 → Heta → DynMSR/mrgsolve | [![SBML L3V1 DynMS simulation](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl3v1%2Fbadge.json)](https://hetalang.github.io/format-conversion-test-suite/report/?ref=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl3v1%2Freport.json) |
 
 The machine-readable compatibility rule, test pin, and installation URL are stored in
 `inst/config/heta-compiler.json`. A future GitHub Actions Heta integration job
