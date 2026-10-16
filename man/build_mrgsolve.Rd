@@ -29,9 +29,11 @@ The \code{mrgsolve} package is optional and is required only when this function 
 called.
 }
 \examples{
-\dontrun{
-model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
-compiled <- build_mrgsolve(model, quiet = TRUE)
-simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
+\donttest{
+if (requireNamespace("mrgsolve", quietly = TRUE)) {
+  model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
+  compiled <- build_mrgsolve(model, quiet = TRUE)
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
+}
 }
 }
