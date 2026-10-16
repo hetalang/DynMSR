@@ -21,9 +21,9 @@
 #' @examples
 #' \donttest{
 #' if (requireNamespace("mrgsolve", quietly = TRUE)) {
-#'   model <- get_model(dynms_load(dynms_lib("first-order-decay")), 1)
-#'   compiled <- build_mrgsolve(model, quiet = TRUE)
-#'   simulation <- mrgsolve::mrgsim_df(compiled, end = 24, delta = 0.1)
+#'   model <- get_model(dynms_load(dynms_lib("repeated-dose")), 1)
+#'   compiled <- build_mrgsolve(model, observables = "ke", quiet = TRUE)
+#'   simulation <- mrgsolve::mrgsim_df(compiled, end = 48, delta = 0.1)
 #' }
 #' }
 build_mrgsolve <- function(

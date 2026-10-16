@@ -63,8 +63,8 @@ directory must be supplied explicitly and remains available after the build.
 \examples{
 \dontrun{
 project_dir <- "path/to/your/heta-project"
-# Save exports and build.log in the project directory.
-heta_build(project_dir, output_dir = project_dir, export = "SBML",
+output_dir <- tempfile("dynmsr-heta-output-")
+heta_build(project_dir, output_dir, export = "SBML",
            log_mode = "always")
 }
 }

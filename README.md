@@ -134,13 +134,14 @@ plot(result)
 
 ## DynMS quick start
 
-Use this path when you already have a DynMS JSON document.
+Use `dynms_lib()` to start with a bundled DynMS JSON document. Replace its
+call with a path to your own DynMS JSON document when needed.
 
 ```r
 library(DynMSR)
 
 # Load the DynMS JSON file as a platform
-platform <- dynms_load("x.json")
+platform <- dynms_load(dynms_lib("repeated-dose"))
 
 # Select the first model in the platform
 model <- get_model(platform, 1)
