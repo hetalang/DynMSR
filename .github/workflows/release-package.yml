@@ -35,7 +35,9 @@ jobs:
       - name: Check package as CRAN
         uses: r-lib/actions/check-r-package@v2
         with:
-          args: 'c("--as-cran")'
+          args: 'c("--no-manual", "--as-cran")'
+          error-on: '"warning"'
+          upload-results: always
 
   build-and-upload:
     name: Build and attach package source
@@ -76,12 +78,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "${{ github.event.release.tag_name }}" "$TARBALL" --clobber
 
-      # Add a CRAN submission step here after its authentication and submission
-      # mechanism have been chosen. It must run only for a published release:
+      # Future CRAN submission flow:
       #
-      # - name: Submit package to CRAN
+      # 1. Upload "$TARBALL" through a documented CRAN submission API, after
+      #    verifying that the release is not a draft.
+      # 2. Save the response from the submission service as a workflow artifact
+      #    so that the maintainer can trace the submission.
+      # 3. CRAN sends the confirmation link to the Maintainer email in
+      #    DESCRIPTION. The maintainer confirms the submission manually.
+      #
+      # - name: Upload package to CRAN
       #   if: github.event.release.draft == false
-      #   env:
-      #     CRAN_USERNAME: ${{ secrets.CRAN_USERNAME }}
-      #     CRAN_PASSWORD: ${{ secrets.CRAN_PASSWORD }}
-      #   run: <submission command>
+      #   run: <submission upload command>

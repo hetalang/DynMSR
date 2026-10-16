@@ -36,6 +36,7 @@ jobs:
         with:
           node-version: '24'
 
+      # TODO: when we use verify for release we must use heta-compiler of specific version
       - name: Install Heta compiler
         shell: bash
         run: |

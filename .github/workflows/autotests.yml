@@ -20,6 +20,7 @@ jobs:
       matrix:
         include:
           - { os: windows-latest, r: 'release' }
+          - { os: windows-latest, r: 'devel' }
           - { os: macos-latest, r: 'release' }
           - { os: ubuntu-latest, r: 'devel' }
           - { os: ubuntu-latest, r: 'release', heta_integration: true }
