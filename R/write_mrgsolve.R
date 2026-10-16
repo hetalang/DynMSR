@@ -39,16 +39,18 @@
 #' in other blocks.
 #'
 #' @param model A model list, such as one element of `platform$models`.
-#' @param filepath Path where the generated model source should be written. If
-#'   omitted, a temporary `.mod` file is created.
+#' @param filepath Path where the generated model source should be written.
 #'
 #' @return The path to the generated model file.
 #' @export
-write_mrgsolve <- function(model, filepath = tempfile(fileext = ".mod")) {
+write_mrgsolve <- function(model, filepath) {
+  check_mrgsolve_model(model, "write_mrgsolve")
+  if (missing(filepath)) {
+    stop("`filepath` must be supplied for `write_mrgsolve()`.", call. = FALSE)
+  }
   if (!is.character(filepath) || length(filepath) != 1L || is.na(filepath)) {
     stop("`filepath` must be a single output file path.", call. = FALSE)
   }
-  check_mrgsolve_model(model, "write_mrgsolve")
 
   data <- prepare_mrgsolve_template_data(model)
   template <- readLines(.dynms_mrgsolve_template_path(), warn = FALSE)

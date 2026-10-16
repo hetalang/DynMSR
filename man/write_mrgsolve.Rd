@@ -4,13 +4,12 @@
 \alias{write_mrgsolve}
 \title{Write an mrgsolve model file}
 \usage{
-write_mrgsolve(model, filepath = tempfile(fileext = ".mod"))
+write_mrgsolve(model, filepath)
 }
 \arguments{
 \item{model}{A model list, such as one element of \code{platform$models}.}
 
-\item{filepath}{Path where the generated model source should be written. If
-omitted, a temporary \code{.mod} file is created.}
+\item{filepath}{Path where the generated model source should be written.}
 }
 \value{
 The path to the generated model file.

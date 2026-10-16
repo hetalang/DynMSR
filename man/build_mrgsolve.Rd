@@ -4,18 +4,13 @@
 \alias{build_mrgsolve}
 \title{Compile a DynMS model with mrgsolve}
 \usage{
-build_mrgsolve(
-  model,
-  filepath = tempfile(fileext = ".mod"),
-  observables = NULL,
-  ...
-)
+build_mrgsolve(model, filepath = NULL, observables = NULL, ...)
 }
 \arguments{
 \item{model}{A model list, such as one element of \code{platform$models}.}
 
-\item{filepath}{Path where the intermediate mrgsolve model source should be
-written. If omitted, a temporary \code{.mod} file is created.}
+\item{filepath}{Optional path for the intermediate mrgsolve model source.
+If omitted, it is written to a temporary file.}
 
 \item{observables}{Optional character vector of additional model symbols to
 return from mrgsolve. Dynamic states and symbols already listed in the

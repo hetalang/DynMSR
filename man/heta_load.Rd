@@ -5,14 +5,13 @@
 \title{Load a Heta project as a DynMS platform}
 \usage{
 heta_load(
-  dir = ".",
+  dir,
+  output_dir = NULL,
   source = NULL,
   type = NULL,
   debug = FALSE,
   units_check = FALSE,
-  meta_dir = NULL,
   log_mode = NULL,
-  log_path = NULL,
   declaration = NULL,
   log_level = NULL,
   skip_updates = FALSE
@@ -20,6 +19,9 @@ heta_load(
 }
 \arguments{
 \item{dir}{Heta project working directory.}
+
+\item{output_dir}{Optional directory for compiler output. If omitted, a
+temporary directory is used and removed after loading.}
 
 \item{source}{Path to the main source file, passed to \code{\link[=heta_build]{heta_build()}}.}
 
@@ -29,11 +31,7 @@ heta_load(
 
 \item{units_check}{If \code{TRUE}, passed to \code{\link[=heta_build]{heta_build()}}.}
 
-\item{meta_dir}{Meta directory path, passed to \code{\link[=heta_build]{heta_build()}}.}
-
 \item{log_mode}{Log file saving mode, passed to \code{\link[=heta_build]{heta_build()}}.}
-
-\item{log_path}{Log file path, passed to \code{\link[=heta_build]{heta_build()}}.}
 
 \item{declaration}{Declaration file path without extension, passed to
 \code{\link[=heta_build]{heta_build()}}.}
@@ -51,8 +49,9 @@ Builds a Heta project with the DynMS export enabled, reads the generated
 DynMS JSON file, and returns a DynMS platform object.
 }
 \details{
-Requires a compatible \code{heta-compiler} installation. The generated DynMS
-export is written to a temporary directory and removed after loading.
+Requires a compatible \code{heta-compiler} installation. Compiler output is
+placed under \code{output_dir} in \verb{dist/}, \verb{meta/}, and \code{build.log}. When
+\code{output_dir} is omitted, a temporary directory is removed after loading.
 }
 \examples{
 \dontrun{

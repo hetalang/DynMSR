@@ -11,13 +11,13 @@
 #'
 #' @examples
 #' path <- tempfile(fileext = ".json")
-#' on.exit(unlink(path))
 #' jsonlite::write_json(
 #'   list(dynms = "0.2.1", models = list()),
 #'   path,
 #'   auto_unbox = TRUE
 #' )
 #' dynms_read(path)
+#' unlink(path)
 dynms_read <- function(path) {
   if (!is.character(path) || length(path) != 1L || is.na(path)) {
     stop("`path` must be a single file path.", call. = FALSE)

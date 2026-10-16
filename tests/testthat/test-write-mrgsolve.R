@@ -15,7 +15,7 @@ test_that("write_mrgsolve writes to an explicit file path", {
   expect_gt(file.info(path)$size, 0)
 })
 
-test_that("write_mrgsolve creates a temporary file when filepath is omitted", {
+test_that("write_mrgsolve requires an explicit file path", {
   index <- jsonlite::fromJSON(
     system.file("examples", "index.json", package = "DynMSR"),
     simplifyVector = FALSE
@@ -23,14 +23,7 @@ test_that("write_mrgsolve creates a temporary file when filepath is omitted", {
   raw <- dynms_read(system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR"))
   model <- new_platform(raw)$models[[1]]
 
-  path <- write_mrgsolve(model)
-  on.exit(unlink(path), add = TRUE)
-
-  expect_type(path, "character")
-  expect_length(path, 1L)
-  expect_true(file.exists(path))
-  expect_match(basename(path), "\\.mod$")
-  expect_gt(file.info(path)$size, 0)
+  expect_error(write_mrgsolve(model), "`filepath` must be supplied", fixed = TRUE)
 })
 
 test_that("mrgsolve time event EVID values start at 10", {
@@ -83,7 +76,8 @@ test_that("mrgsolve time events repeat only for positive periods", {
     events = list(),
     observables = list()
   )
-  path <- write_mrgsolve(model)
+  path <- tempfile(fileext = ".mod")
+  write_mrgsolve(model, path)
   on.exit(unlink(path), add = TRUE)
   code <- paste(readLines(path, warn = FALSE), collapse = "\n")
 
@@ -107,7 +101,8 @@ test_that("mrgsolve export captures static states and assignments", {
       list(symbol = "rate_value")
     )
   )
-  path <- write_mrgsolve(model)
+  path <- tempfile(fileext = ".mod")
+  write_mrgsolve(model, path)
   on.exit(unlink(path), add = TRUE)
   code <- paste(readLines(path, warn = FALSE), collapse = "\n")
 
@@ -257,7 +252,8 @@ test_that("mrgsolve export converts extended MathJSON numbers", {
     observables = list()
   )
 
-  path <- write_mrgsolve(model)
+  path <- tempfile(fileext = ".mod")
+  write_mrgsolve(model, path)
   on.exit(unlink(path), add = TRUE)
   code <- paste(readLines(path, warn = FALSE), collapse = "\n")
 
@@ -451,11 +447,20 @@ test_that("build_mrgsolve captures renamed reserved identifiers", {
     ),
     c("time_rnm_", "Time", "TIME_rnm_", "true_rnm_", "false_rnm_")
   )
-  compiled <- build_mrgsolve(
-    model,
-    observables = c("time", "Time", "TIME", "true", "false"),
-    quiet = TRUE
+  warnings <- character()
+  compiled <- withCallingHandlers(
+    build_mrgsolve(
+      model,
+      observables = c("time", "Time", "TIME", "true", "false"),
+      quiet = TRUE
+    ),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
   )
+  expect_true(any(grepl("mrgsolve export renamed reserved identifiers:", warnings, fixed = TRUE)))
+  expect_true(any(grepl("Could not find a $INIT or $CMT block.", warnings, fixed = TRUE)))
   simulation <- mrgsolve::mrgsim_df(compiled, end = 0, delta = 1)
 
   expect_equal(simulation$time_rnm_[[1]], 10)
@@ -519,7 +524,11 @@ test_that("build_mrgsolve evaluates assignments without dynamic states", {
     events = list(),
     observables = list()
   )
-  compiled <- build_mrgsolve(model, observables = "value", quiet = TRUE)
+  expect_warning(
+    compiled <- build_mrgsolve(model, observables = "value", quiet = TRUE),
+    "Could not find a $INIT or $CMT block.",
+    fixed = TRUE
+  )
   simulation <- mrgsolve::mrgsim_df(compiled, end = 0.1, delta = 0.1)
 
   expect_identical(mrgsolve::outvars(compiled)$capture, "value")
@@ -536,9 +545,19 @@ test_that("build_mrgsolve compiles a model when mrgsolve is available", {
   raw <- dynms_read(system.file(index$locationBase, index$examples[[1]]$file, package = "DynMSR"))
   model <- new_platform(raw)$models[[1]]
 
+  written_path <- NULL
+  original_writer <- write_mrgsolve
+  testthat::local_mocked_bindings(
+    write_mrgsolve = function(model, filepath) {
+      written_path <<- filepath
+      original_writer(model, filepath)
+    },
+    .package = "DynMSR"
+  )
   compiled <- build_mrgsolve(model, quiet = TRUE)
 
   expect_s4_class(compiled, "mrgmod")
+  expect_false(file.exists(written_path))
 })
 
 test_that("build_mrgsolve compiles extended MathJSON numbers", {

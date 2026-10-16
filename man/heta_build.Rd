@@ -5,15 +5,13 @@
 \title{Build a Heta project}
 \usage{
 heta_build(
-  dir = ".",
+  dir,
+  output_dir,
   source = NULL,
   type = NULL,
   debug = FALSE,
   units_check = FALSE,
-  dist_dir = NULL,
-  meta_dir = NULL,
   log_mode = NULL,
-  log_path = NULL,
   declaration = NULL,
   log_level = NULL,
   skip_updates = FALSE,
@@ -23,6 +21,9 @@ heta_build(
 \arguments{
 \item{dir}{Project working directory passed as the final CLI argument.}
 
+\item{output_dir}{Directory for all compiler output. Required. Use
+\code{output_dir = dir} to place output under the project directory.}
+
 \item{source}{Path to the main source file, passed as \code{--source}.}
 
 \item{type}{Source file type, passed as \code{--type}.}
@@ -31,13 +32,7 @@ heta_build(
 
 \item{units_check}{If \code{TRUE}, add \code{--units-check}.}
 
-\item{dist_dir}{Export directory path, passed as \code{--dist-dir}.}
-
-\item{meta_dir}{Meta directory path, passed as \code{--meta-dir}.}
-
 \item{log_mode}{Log file saving mode, passed as \code{--log-mode}.}
-
-\item{log_path}{Log file path, passed as \code{--log-path}.}
 
 \item{declaration}{Declaration file path without extension, passed as
 \code{--declaration}.}
@@ -50,7 +45,7 @@ heta_build(
 }
 \value{
 Invisibly returns a list with the command, arguments, exit status,
-and captured output.
+captured output, and \code{output_dir}.
 }
 \description{
 Runs \verb{heta build} for a Heta project directory. The arguments map directly
@@ -60,10 +55,14 @@ to Heta compiler CLI options, for example \code{units_check = TRUE} adds
 \details{
 Requires a \code{heta} command that satisfies DynMSR's bundled compatibility
 rule. Use \code{\link[=heta_check]{heta_check()}} to inspect availability and the supported version
-range before building.
+range before building. All compiler output is placed under \code{output_dir}:
+\verb{dist/}, \verb{meta/}, and \code{build.log}. The output directory must be supplied
+explicitly and remains available after the build.
 }
 \examples{
 \dontrun{
-heta_build("_drafts/0-hello-world", export = "DynMS")
+output_dir <- tempfile("dynmsr-heta-example-")
+heta_build("_drafts/0-hello-world", output_dir = output_dir, export = "DynMS")
+unlink(output_dir, recursive = TRUE)
 }
 }

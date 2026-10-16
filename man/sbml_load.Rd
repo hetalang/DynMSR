@@ -6,11 +6,10 @@
 \usage{
 sbml_load(
   path,
+  output_dir = NULL,
   debug = FALSE,
   units_check = FALSE,
-  meta_dir = NULL,
   log_mode = NULL,
-  log_path = NULL,
   declaration = NULL,
   log_level = NULL,
   skip_updates = FALSE
@@ -19,15 +18,14 @@ sbml_load(
 \arguments{
 \item{path}{Path to an SBML file.}
 
+\item{output_dir}{Optional directory for compiler output, passed to
+\code{\link[=heta_load]{heta_load()}}.}
+
 \item{debug}{If \code{TRUE}, passed to \code{\link[=heta_load]{heta_load()}}.}
 
 \item{units_check}{If \code{TRUE}, passed to \code{\link[=heta_load]{heta_load()}}.}
 
-\item{meta_dir}{Meta directory path, passed to \code{\link[=heta_load]{heta_load()}}.}
-
 \item{log_mode}{Log file saving mode, passed to \code{\link[=heta_load]{heta_load()}}.}
-
-\item{log_path}{Log file path, passed to \code{\link[=heta_load]{heta_load()}}.}
 
 \item{declaration}{Declaration file path without extension, passed to
 \code{\link[=heta_load]{heta_load()}}.}
@@ -46,7 +44,8 @@ reads the generated DynMS JSON file, and returns a DynMS platform object.
 }
 \details{
 Requires a compatible \code{heta-compiler} installation. The generated DynMS
-export is written to a temporary directory and removed after loading.
+export is written to a temporary directory and removed after loading unless
+\code{output_dir} is supplied.
 }
 \examples{
 \dontrun{

@@ -4,14 +4,15 @@
 #' reads the generated DynMS JSON file, and returns a DynMS platform object.
 #'
 #' Requires a compatible `heta-compiler` installation. The generated DynMS
-#' export is written to a temporary directory and removed after loading.
+#' export is written to a temporary directory and removed after loading unless
+#' `output_dir` is supplied.
 #'
 #' @param path Path to an SBML file.
+#' @param output_dir Optional directory for compiler output, passed to
+#'   [heta_load()].
 #' @param debug If `TRUE`, passed to [heta_load()].
 #' @param units_check If `TRUE`, passed to [heta_load()].
-#' @param meta_dir Meta directory path, passed to [heta_load()].
 #' @param log_mode Log file saving mode, passed to [heta_load()].
-#' @param log_path Log file path, passed to [heta_load()].
 #' @param declaration Declaration file path without extension, passed to
 #'   [heta_load()].
 #' @param log_level Log level, passed to [heta_load()].
@@ -26,11 +27,10 @@
 #' platform <- sbml_load("model.xml")
 #' }
 sbml_load <- function(path,
+                      output_dir = NULL,
                       debug = FALSE,
                       units_check = FALSE,
-                      meta_dir = NULL,
                       log_mode = NULL,
-                      log_path = NULL,
                       declaration = NULL,
                       log_level = NULL,
                       skip_updates = FALSE) {
@@ -47,13 +47,12 @@ sbml_load <- function(path,
 
   heta_load(
     dir = dir,
+    output_dir = output_dir,
     source = source,
     type = "sbml",
     debug = debug,
     units_check = units_check,
-    meta_dir = meta_dir,
     log_mode = log_mode,
-    log_path = log_path,
     declaration = declaration,
     log_level = log_level,
     skip_updates = skip_updates

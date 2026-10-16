@@ -6,8 +6,8 @@
 #' called.
 #'
 #' @param model A model list, such as one element of `platform$models`.
-#' @param filepath Path where the intermediate mrgsolve model source should be
-#'   written. If omitted, a temporary `.mod` file is created.
+#' @param filepath Optional path for the intermediate mrgsolve model source.
+#'   If omitted, it is written to a temporary file.
 #' @param observables Optional character vector of additional model symbols to
 #'   return from mrgsolve. Dynamic states and symbols already listed in the
 #'   DynMS model's `observables` are skipped. Every requested symbol must exist
@@ -18,7 +18,7 @@
 #' @return A compiled mrgsolve model object.
 #' @export
 build_mrgsolve <- function(
-  model, filepath = tempfile(fileext = ".mod"), observables = NULL, ...
+  model, filepath = NULL, observables = NULL, ...
 ) {
   check_mrgsolve_model(model, "build_mrgsolve")
   capture <- prepare_mrgsolve_observable_capture(model, observables)
@@ -41,7 +41,14 @@ build_mrgsolve <- function(
     )
   }
 
+  if (is.null(filepath)) {
+    filepath <- tempfile(fileext = ".mod")
+    on.exit(unlink(filepath), add = TRUE)
+  }
   path <- write_mrgsolve(model, filepath)
+  if (!"soloc" %in% names(dots)) {
+    dots$soloc <- tempdir()
+  }
   do.call(
     mrgsolve::mread,
     c(
