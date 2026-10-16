@@ -1,0 +1,87 @@
+name: Release package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  autotests:
+    name: Autotests
+    uses: ./.github/workflows/autotests.yml
+
+  cran-check:
+    name: CRAN check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+
+      - name: Setup R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Check package as CRAN
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--as-cran")'
+
+  build-and-upload:
+    name: Build and attach package source
+    needs: [autotests, cran-check]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+
+      - name: Verify release tag matches DESCRIPTION
+        shell: bash
+        run: |
+          version="$(Rscript -e 'cat(read.dcf("DESCRIPTION")[1, "Version"])')"
+          expected_tag="v${version}"
+          if [[ "${{ github.event.release.tag_name }}" != "$expected_tag" ]]; then
+            echo "Release tag must be $expected_tag for DESCRIPTION version $version."
+            exit 1
+          fi
+
+      - name: Build source package
+        shell: bash
+        run: |
+          R CMD build .
+          version="$(Rscript -e 'cat(read.dcf("DESCRIPTION")[1, "Version"])')"
+          tarball="DynMSR_${version}.tar.gz"
+          test -f "$tarball"
+          echo "TARBALL=$tarball" >> "$GITHUB_ENV"
+
+      - name: Attach source package to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "$TARBALL" --clobber
+
+      # Add a CRAN submission step here after its authentication and submission
+      # mechanism have been chosen. It must run only for a published release:
+      #
+      # - name: Submit package to CRAN
+      #   if: github.event.release.draft == false
+      #   env:
+      #     CRAN_USERNAME: ${{ secrets.CRAN_USERNAME }}
+      #     CRAN_PASSWORD: ${{ secrets.CRAN_PASSWORD }}
+      #   run: <submission command>
