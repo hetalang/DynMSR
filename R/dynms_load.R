@@ -1,7 +1,8 @@
 #' Load a DynMS platform
 #'
-#' Reads a DynMS JSON file, validates it against the bundled schema, runs
-#' backend-independent semantic validation, and returns a platform list.
+#' Reads a DynMS JSON file, validates it against the bundled schema for its
+#' `dynms` version, runs backend-independent semantic validation, and returns a
+#' platform list.
 #'
 #' Schema and semantic validation are both attempted before loading fails.
 #' Validation messages are reported with [message()], followed by one final

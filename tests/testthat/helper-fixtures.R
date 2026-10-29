@@ -13,7 +13,7 @@ minimal_raw_model <- function() {
 
 minimal_raw_platform <- function() {
   list(
-    dynms = "0.2.1",
+    dynms = "0.2.2",
     models = list(minimal_raw_model())
   )
 }

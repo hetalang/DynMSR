@@ -1,18 +1,21 @@
-.dynms_schema_path <- function() {
-  system.file(
-    "schema",
-    "dynms.schema.json",
-    package = "DynMSR",
-    mustWork = TRUE
-  )
+# return list of versions with options
+.dynms_schema_versions <- function() {
+  config_path <- system.file("config", "dynms.json", package = "DynMSR", mustWork = TRUE)
+  jsonlite::fromJSON(config_path, simplifyVector = FALSE)$versions
+}
+
+# return path to selected scheme
+.dynms_schema_path <- function(version, versions) {
+  target <- versions[[version]]$target
+  system.file("schema", basename(target), package = "DynMSR", mustWork = TRUE)
 }
 
 #' Validate a DynMS document against the JSON Schema
 #'
 #' Validates a DynMS document against a JSON Schema. The document can be passed
 #' as a file path or as the raw R list returned by [dynms_read()]. Validation
-#' always uses the schema bundled with DynMSR. It uses the `ajv` engine
-#' because the bundled schema uses modern JSON Schema features.
+#' selects a bundled local schema using the document's `dynms` version. It uses
+#' the `ajv` engine because the bundled schemas use modern JSON Schema features.
 #'
 #' @param x Path to a DynMS JSON file, or the raw R list returned by
 #'   [dynms_read()].
@@ -27,9 +30,23 @@
 #' validation$valid
 dynms_validate_schema <- function(x, error = FALSE) {
   json <- dynms_json_input(x)
+  document <- if (is.list(x)) x else dynms_read(json)
+  versions <- .dynms_schema_versions()
+  version <- if (is.list(document)) document$dynms else NULL
+
+  if (!is.character(version) || length(version) != 1L || is.na(version) ||
+      !nzchar(version) || !version %in% names(versions)) {
+    issue <- dynms_version_issue(version, names(versions))
+    result <- list(valid = FALSE, errors = list(issue), warnings = list())
+    if (isTRUE(error)) {
+      stop(format_schema_errors(result$errors), call. = FALSE)
+    }
+    return(result)
+  }
+
   validation <- jsonvalidate::json_validate(
     json = json,
-    schema = .dynms_schema_path(),
+    schema = .dynms_schema_path(version, versions),
     error = FALSE,
     verbose = TRUE,
     greedy = TRUE,
@@ -48,6 +65,22 @@ dynms_validate_schema <- function(x, error = FALSE) {
   }
 
   result
+}
+
+dynms_version_issue <- function(version, supported_versions) {
+  message <- if (!is.character(version) || length(version) != 1L ||
+                 is.na(version) || !nzchar(version)) {
+    "DynMS document must declare a non-empty string in `dynms`."
+  } else {
+    paste0("Unsupported DynMS version `", version, "`.")
+  }
+
+  list(
+    path = "$.dynms",
+    code = "version",
+    message = paste0(message, " Supported versions: ",
+                     paste(supported_versions, collapse = ", "), ".")
+  )
 }
 
 # jsonvalidate accepts JSON text or a file path. Passing a path through avoids

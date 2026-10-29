@@ -110,7 +110,7 @@ test_that("mrgsolve export captures static states and assignments", {
   expect_match(code, "V : -", fixed = TRUE)
   expect_match(code, "rate_value : -", fixed = TRUE)
   expect_false(grepl("A : -", code, fixed = TRUE))
-  expect_true(dynms_validate_semantic(list(dynms = "0.2.1", models = list(model)))$valid)
+  expect_true(dynms_validate_semantic(list(dynms = "0.2.2", models = list(model)))$valid)
 })
 
 test_that("mrgsolve export renames reserved identifiers and references", {

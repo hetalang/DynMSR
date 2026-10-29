@@ -12,6 +12,44 @@ test_that("dynms_validate_schema validates all indexed examples", {
   expect_true(all(valid))
 })
 
+test_that("dynms_validate_schema selects the bundled schema by DynMS version", {
+  for (version in c("0.2.1", "0.2.2")) {
+    raw <- minimal_raw_platform()
+    raw$dynms <- version
+    path <- write_test_json(raw)
+
+    expect_true(dynms_validate_schema(raw)$valid, info = version)
+    expect_true(dynms_validate_schema(path)$valid, info = version)
+    unlink(path)
+  }
+})
+
+test_that("DynMS 0.2.2 schema supports scenarios", {
+  raw <- minimal_raw_platform()
+  raw$scenarios <- list(list(
+    id = "baseline",
+    model = "model",
+    tspan = list(0, 10)
+  ))
+
+  expect_true(dynms_validate_schema(raw)$valid)
+
+  raw$dynms <- "0.2.1"
+  expect_false(dynms_validate_schema(raw)$valid)
+})
+
+test_that("dynms_validate_schema reports unsupported DynMS versions", {
+  raw <- minimal_raw_platform()
+  raw$dynms <- "0.2.999"
+
+  result <- dynms_validate_schema(raw)
+  expect_false(result$valid)
+  expect_identical(result$errors[[1]]$path, "$.dynms")
+  expect_match(result$errors[[1]]$message, "Unsupported DynMS version `0.2.999`", fixed = TRUE)
+  expect_match(result$errors[[1]]$message, "0.2.1, 0.2.2", fixed = TRUE)
+  expect_error(dynms_validate_schema(raw, error = TRUE), "Unsupported DynMS version")
+})
+
 test_that("dynms_validate_schema reports messages for all indexed invalid examples", {
   paths <- indexed_example_paths("schemaErrorsExamples")
 

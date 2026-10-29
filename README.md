@@ -199,10 +199,9 @@ DynMSR, simulated with mrgsolve, and compared with its reference time course.
 | sbmlteam/sbml-test-suite | SBML L2V5 → Heta → DynMSR/mrgsolve | [![SBML L2V5 DynMS simulation](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl2v5%2Fbadge.json)](https://hetalang.github.io/format-conversion-test-suite/report/?ref=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl2v5%2Freport.json) |
 | sbmlteam/sbml-test-suite | SBML L3V1 → Heta → DynMSR/mrgsolve | [![SBML L3V1 DynMS simulation](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl3v1%2Fbadge.json)](https://hetalang.github.io/format-conversion-test-suite/report/?ref=https%3A%2F%2Fraw.githubusercontent.com%2Fhetalang%2FDynMSR%2Freports%2Fdynmsr-simulation%2Fbranches%2Fmain%2Fl3v1%2Freport.json) |
 
-The machine-readable compatibility rule, test pin, and installation URL are stored in
-`inst/config/heta-compiler.json`. A future GitHub Actions Heta integration job
-must install that exact version; the standard package-check matrix must remain
-independent of Heta.
+The compiler compatibility rule and installation URL are stored in
+`inst/config/heta-compiler.json`. Heta integration tests run only in CI jobs
+that install the optional compiler.
 
 ## Development
 
@@ -225,22 +224,19 @@ Regenerate roxygen2 documentation, including `NAMESPACE` and `man/*.Rd`, with:
 Rscript -e "roxygen2::roxygenise()"
 ```
 
-The bundled DynMS JSON Schema is stored in `inst/schema/dynms.schema.json`.
-Its upstream source URL is recorded in `inst/config/dynms.schema.source.json`.
+Bundled DynMS JSON Schemas are stored in `inst/schema/`. Supported versions,
+schema paths, and upstream sources are listed in `inst/config/dynms.json`.
+Schema validation selects the local schema using the document's `dynms` version.
 
-To refresh the local schema copy during development:
+To refresh all configured local schemas during development:
 
 ```sh
 Rscript tools/update-dynms-schema.R
 ```
 
-If the upstream URL is not reachable from the current network, `source` can be
-temporarily changed to a local schema file path in
-`inst/config/dynms.schema.source.json`.
-
 Heta is an optional DynMS producer; it is not required to read or validate
-DynMS JSON files. The supported compiler range and integration-test version
-are defined in `inst/config/heta-compiler.json`.
+DynMS JSON files. The compiler compatibility rule is defined in
+`inst/config/heta-compiler.json`.
 
 This is a manual developer step. Package installation, examples, and tests use
 the bundled local schema and do not download files from the internet.

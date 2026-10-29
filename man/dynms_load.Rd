@@ -14,8 +14,9 @@ A platform list. Use \code{platform$models[[i]]} to select one model for
 backend-specific operations.
 }
 \description{
-Reads a DynMS JSON file, validates it against the bundled schema, runs
-backend-independent semantic validation, and returns a platform list.
+Reads a DynMS JSON file, validates it against the bundled schema for its
+\code{dynms} version, runs backend-independent semantic validation, and returns a
+platform list.
 }
 \details{
 Schema and semantic validation are both attempted before loading fails.

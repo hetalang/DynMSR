@@ -11,6 +11,55 @@ test_that("dynms_validate_semantic succeeds for all indexed valid examples", {
   expect_true(all(vapply(results, function(result) length(result$warnings) == 0L, logical(1))))
 })
 
+test_that("common semantic rules apply to both DynMS versions", {
+  for (version in c("0.2.1", "0.2.2")) {
+    raw <- minimal_raw_platform()
+    raw$dynms <- version
+    raw$models[[1]]$constants <- list(
+      list(id = "k", value = 1),
+      list(id = "k", value = 2)
+    )
+    raw$models[[1]]$dynamic <- list(list(
+      id = "A",
+      initial = 1,
+      derivative = list(expr = list(sym = "missing"), format = "math-json")
+    ))
+
+    result <- dynms_validate_semantic(raw)
+    codes <- vapply(result$errors, `[[`, character(1), "code")
+    expect_false(result$valid, info = version)
+    expect_equal(sort(codes), sort(c("duplicate_identifier", "unknown_symbol")), info = version)
+  }
+})
+
+test_that("DynMS 0.2.2 scenarios have unique ids and reference existing models", {
+  raw <- minimal_raw_platform()
+  raw$scenarios <- list(
+    list(id = "baseline", model = "model", tspan = list(0, 10)),
+    list(id = "baseline", model = "missing", tspan = list(0, 10))
+  )
+
+  expect_true(dynms_validate_schema(raw)$valid)
+  result <- dynms_validate_semantic(raw)
+
+  expect_false(result$valid)
+  expect_equal(
+    vapply(result$errors, `[[`, character(1), "code"),
+    c("duplicate_scenario_identifier", "unknown_scenario_model")
+  )
+  expect_equal(
+    vapply(result$errors, `[[`, character(1), "path"),
+    c("$.scenarios[2].id", "$.scenarios[2].model")
+  )
+
+  raw$scenarios[[2]]$id <- "alternative"
+  raw$scenarios[[2]]$model <- "model"
+  expect_true(dynms_validate_semantic(raw)$valid)
+
+  raw$dynms <- "0.2.1"
+  expect_true(dynms_validate_semantic(raw)$valid)
+})
+
 test_that("dynms_validate_semantic reports messages for all indexed semantic error examples", {
   paths <- indexed_example_paths("semanticErrorsExamples")
 
@@ -119,7 +168,7 @@ test_that("dynms_validate_semantic resolves canonical and compatible MathJSON sy
 
 test_that("dynms_validate_semantic rejects duplicate state ids across dynamic and static", {
   raw <- list(
-    dynms = "0.2.1",
+    dynms = "0.2.2",
     models = list(
       list(
         id = "model",
@@ -151,7 +200,7 @@ test_that("dynms_validate_semantic rejects duplicate state ids across dynamic an
 
 test_that("dynms_validate_semantic rejects duplicate event ids across timeEvents and events", {
   raw <- list(
-    dynms = "0.2.1",
+    dynms = "0.2.2",
     models = list(
       list(
         id = "model",

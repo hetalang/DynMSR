@@ -24,7 +24,7 @@ jobs:
           - { os: macos-latest, r: 'release' }
           - { os: ubuntu-latest, r: 'devel' }
           - { os: ubuntu-latest, r: 'release', heta_integration: true, heta_version: '0.12.2' }
-#          - { os: ubuntu-latest, r: 'release', heta_integration: true, heta_version: '0.12.3' }
+          - { os: ubuntu-latest, r: 'release', heta_integration: true, heta_version: '0.12.3' }
           - { os: ubuntu-latest, r: 'oldrel' }
 
     env:

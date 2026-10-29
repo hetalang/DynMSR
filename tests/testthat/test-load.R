@@ -9,6 +9,28 @@ test_that("dynms_load loads every indexed valid example into a platform", {
   )))
 })
 
+test_that("dynms_load accepts the older supported DynMS version", {
+  raw <- minimal_raw_platform()
+  raw$dynms <- "0.2.1"
+  path <- write_test_json(raw)
+  on.exit(unlink(path), add = TRUE)
+
+  expect_s3_class(dynms_load(path), "platform")
+})
+
+test_that("dynms_load reports unsupported DynMS versions", {
+  raw <- minimal_raw_platform()
+  raw$dynms <- "0.2.999"
+  path <- write_test_json(raw)
+  on.exit(unlink(path), add = TRUE)
+
+  expect_message(
+    expect_error(dynms_load(path), "DynMS load failed: validation found"),
+    "Unsupported DynMS version `0.2.999`",
+    fixed = TRUE
+  )
+})
+
 test_that("dynms_load rejects every indexed schema-invalid example", {
   paths <- indexed_example_paths("schemaErrorsExamples")
 
