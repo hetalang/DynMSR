@@ -1,0 +1,16 @@
+Running compilation in directory "/home/runner/work/DynMSR/DynMSR/fcts-run/node_modules/@hetalang/format-conversion-test-suite/results/dynmsr-simulation-l2v5/00243"...
+
+No declaration file, running with defaults...
+
+[info]	Heta compiler v0.12.3 is initialized for the platform "undefined"
+[info]	Reading module of type "heta" from file "input.heta"...
+[info]	Reading module of type "sbml" from file "../../../cases/semantic/00243/00243-sbml-l2v5.xml"...
+[info]	Platform hash: 92b9016c8d1fa067cb1da4a0e5c3bb44acb8104630e1521148c000f3ef660f2d
+[info]	Setting references in elements, total length 104
+[info]	Checking for circular references in Records.
+[warn]	Units checking skipped. To turn it on set "unitsCheck: true" in declaration.
+[info]	Checking unit's terms.
+[info]	Start exporting to files, total: 1.
+[info]	Exporting to "/home/runner/work/DynMSR/DynMSR/fcts-run/node_modules/@hetalang/format-conversion-test-suite/results/dynmsr-simulation-l2v5/00243/dist/dynms" of format "dynms"...
+Compilation OK!
+

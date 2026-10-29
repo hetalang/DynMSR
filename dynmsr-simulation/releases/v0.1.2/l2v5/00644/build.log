@@ -1,0 +1,17 @@
+Running compilation in directory "/home/runner/work/DynMSR/DynMSR/fcts-run/node_modules/@hetalang/format-conversion-test-suite/results/dynmsr-simulation-l2v5/00644"...
+
+No declaration file, running with defaults...
+
+[info]	Heta compiler v0.12.3 is initialized for the platform "undefined"
+[info]	Reading module of type "heta" from file "input.heta"...
+[info]	Reading module of type "sbml" from file "../../../cases/semantic/00644/00644-sbml-l2v5.xml"...
+[warn]	SBML <rateRule variable="S2"> targets concentration species "S2" in compartment "C". It is imported as Process "S2_proc"; exported simulations may differ from SBML semantics, especially when the compartment changes.
+[info]	Platform hash: fb1499747d2b453d49157b54b13444488593c678a12c3ee5b9a7abef46dcb313
+[info]	Setting references in elements, total length 107
+[info]	Checking for circular references in Records.
+[warn]	Units checking skipped. To turn it on set "unitsCheck: true" in declaration.
+[info]	Checking unit's terms.
+[info]	Start exporting to files, total: 1.
+[info]	Exporting to "/home/runner/work/DynMSR/DynMSR/fcts-run/node_modules/@hetalang/format-conversion-test-suite/results/dynmsr-simulation-l2v5/00644/dist/dynms" of format "dynms"...
+Compilation OK!
+
