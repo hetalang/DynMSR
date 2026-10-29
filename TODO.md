@@ -10,7 +10,7 @@ optional DynMS producer, not a core dependency.
 
 2. Handle mrgsolve state-event detection for models without dynamic states.
    The current trigger check runs in `$ODE`, which is not called for these
-   models, so conditional events such as `issues/01779` do not fire.
+   models, so conditional events such as `_issues/01779` do not fire.
    **Status: planned.**
 
 3. Check the DynMS version supported by heta-compiler before building a Heta

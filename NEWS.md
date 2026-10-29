@@ -1,3 +1,13 @@
+# DynMSR 0.1.2
+
+- Added support for DynMS 0.2.2 alongside the existing 0.2.1 support.
+  Heta integration is tested with heta-compiler 0.12.2 and 0.12.3.
+- Added validation of DynMS 0.2.2 `scenarios`. Scenario execution is not yet implemented.
+- Fixed event action ordering in `write_mrgsolve()`: all right-hand sides are
+  evaluated from the pre-event state before any assignments are applied.
+- Corrected one-argument MathJSON `Log` in mrgsolve code generation to use
+  base 10. Explicit-base logarithms continue to use change of base.
+
 # DynMSR 0.1.1
 
 - Added `dynms_lib()` and three bundled DynMS models: first-order decay,

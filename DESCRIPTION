@@ -1,6 +1,6 @@
 Package: DynMSR
 Title: Connect Systems Biology and Pharmacology Formats to Simulation Backends
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
     person(given = "Evgeny", family = "Metelkin", role = c("aut", "cre"),
            email = "evgeny.metelkin@gmail.com")

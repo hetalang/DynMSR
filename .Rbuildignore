@@ -9,6 +9,7 @@
 ^cran-comments\.md$
 ^tools$
 ^_drafts$
+^_issues$
 ^.*\.Rproj$
 ^\.positai$
 ^\.claude$
