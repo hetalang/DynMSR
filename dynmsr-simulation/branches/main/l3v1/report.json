@@ -6,8 +6,8 @@
     "packageVersion": "0.3.3"
   },
   "status": "completed-with-errors",
-  "startedAt": "2026-10-29T14:58:28.646Z",
-  "completedAt": "2026-10-29T15:28:18.186Z",
+  "startedAt": "2026-10-29T16:38:13.004Z",
+  "completedAt": "2026-10-29T17:09:02.249Z",
   "command": {
     "source": "cases/index.json",
     "target": "results/dynmsr-simulation-l3v1",
