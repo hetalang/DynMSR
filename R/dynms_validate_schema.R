@@ -68,18 +68,24 @@ dynms_validate_schema <- function(x, error = FALSE) {
 }
 
 dynms_version_issue <- function(version, supported_versions) {
-  message <- if (!is.character(version) || length(version) != 1L ||
-                 is.na(version) || !nzchar(version)) {
+  has_version <- is.character(version) && length(version) == 1L &&
+    !is.na(version) && nzchar(version)
+  message <- if (!has_version) {
     "DynMS document must declare a non-empty string in `dynms`."
   } else {
     paste0("Unsupported DynMS version `", version, "`.")
+  }
+  guidance <- if (has_version) {
+    " Update DynMSR or use a compatible version of the DynMS generator."
+  } else {
+    ""
   }
 
   list(
     path = "$.dynms",
     code = "version",
     message = paste0(message, " Supported versions: ",
-                     paste(supported_versions, collapse = ", "), ".")
+                     paste(supported_versions, collapse = ", "), ".", guidance)
   )
 }
 

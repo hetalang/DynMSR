@@ -12,3 +12,9 @@ optional DynMS producer, not a core dependency.
    The current trigger check runs in `$ODE`, which is not called for these
    models, so conditional events such as `issues/01779` do not fire.
    **Status: planned.**
+
+3. Check the DynMS version supported by heta-compiler before building a Heta
+   project, once a future compiler release exposes that version through its
+   CLI. Until then, check the version of the exported DynMS document during
+   loading; the compiler's DynMS version cannot be checked before the build.
+   **Status: waiting for heta-compiler support.**

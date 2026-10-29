@@ -47,6 +47,8 @@ test_that("dynms_validate_schema reports unsupported DynMS versions", {
   expect_identical(result$errors[[1]]$path, "$.dynms")
   expect_match(result$errors[[1]]$message, "Unsupported DynMS version `0.2.999`", fixed = TRUE)
   expect_match(result$errors[[1]]$message, "0.2.1, 0.2.2", fixed = TRUE)
+  expect_match(result$errors[[1]]$message, "Update DynMSR", fixed = TRUE)
+  expect_match(result$errors[[1]]$message, "heta-compiler", fixed = TRUE)
   expect_error(dynms_validate_schema(raw, error = TRUE), "Unsupported DynMS version")
 })
 
