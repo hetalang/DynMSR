@@ -392,6 +392,7 @@ prepare_mrgsolve_event_action <- function(
   action$static_ <- !dynamic
   action$cmt_ <- if (dynamic) unname(dynamic_index[[action$state]]) else ""
   action$event_var_ <- paste0("evt_", event_number, "_", action_number, "_")
+  action$next_var_ <- paste0("evt_", event_number, "_", action_number, "_next_")
   action
 }
 

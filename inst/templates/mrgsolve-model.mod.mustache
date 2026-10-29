@@ -110,15 +110,18 @@ $TABLE
 // {{&id}} // {{&title}}
 if ({{&id}}__active__ && EVID=={{&time_index_}}) {
 {{#actions}}
+  double {{&next_var_}} = {{&rhs_expr_}};
+{{/actions}}
+{{#actions}}
 {{#dynamic_}}
   mrg::evdata {{&event_var_}}(TIME, 8);
-  {{&event_var_}}.amt = {{&rhs_expr_}};
+  {{&event_var_}}.amt = {{&next_var_}};
   {{&event_var_}}.cmt = {{&cmt_}};
   {{&event_var_}}.now = true;
   self.mevector.push_back({{&event_var_}});
 {{/dynamic_}}
 {{#static_}}
-  {{&state}} = {{&rhs_expr_}};
+  {{&state}} = {{&next_var_}};
 {{/static_}}
 {{/actions}}
 {{#trigger.has_period_}}
@@ -141,15 +144,18 @@ if ({{&id}}__active__ && EVID=={{&time_index_}}) {
 // {{&id}} // {{&title}}
 for (int {{&id}}__i__ = 0; {{&id}}__i__ < {{&id}}__charge__; {{&id}}__i__++) {
 {{#actions}}
+  double {{&next_var_}} = {{&rhs_expr_}};
+{{/actions}}
+{{#actions}}
 {{#dynamic_}}
   mrg::evdata {{&event_var_}}(TIME, 8);
-  {{&event_var_}}.amt = {{&rhs_expr_}};
+  {{&event_var_}}.amt = {{&next_var_}};
   {{&event_var_}}.cmt = {{&cmt_}};
   {{&event_var_}}.now = true;
   self.mevector.push_back({{&event_var_}});
 {{/dynamic_}}
 {{#static_}}
-  {{&state}} = {{&rhs_expr_}};
+  {{&state}} = {{&next_var_}};
 {{/static_}}
 {{/actions}}
  } // end event loop

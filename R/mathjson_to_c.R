@@ -166,7 +166,7 @@ dynms_which_c <- function(args) {
 
 dynms_log_c <- function(args) {
   if (length(args) == 1L) {
-    return(dynms_call_c("log", args))
+    return(dynms_call_c("log10", args))
   }
   if (length(args) == 2L) {
     return(dynms_paren_c(paste0("log(", args[[1]], ") / log(", args[[2]], ")")))

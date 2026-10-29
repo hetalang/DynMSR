@@ -85,6 +85,68 @@ test_that("mrgsolve time events repeat only for positive periods", {
   expect_s4_class(build_mrgsolve(model, quiet = TRUE), "mrgmod")
 })
 
+test_that("mrgsolve time event actions read the pre-event state", {
+  testthat::skip_if_not_installed("mrgsolve")
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  model <- list(
+    id = "simultaneous-actions",
+    constants = list(),
+    dynamic = list(list(id = "A", initial = 0, derivative = expression(0))),
+    static = list(
+      list(id = "C1", initial = 0.5),
+      list(id = "S1_amt_", initial = 1)
+    ),
+    assignments = list(),
+    timeEvents = list(list(
+      id = "change",
+      trigger = list(type = "time", start = 0.5),
+      actions = list(
+        list(state = "C1", rhs = expression(0.2)),
+        list(state = "S1_amt_", rhs = expression(list("Multiply", 0.2, "C1")))
+      )
+    )),
+    events = list(),
+    observables = list()
+  )
+
+  compiled <- build_mrgsolve(model, observables = c("C1", "S1_amt_"), quiet = TRUE)
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 1, delta = 0.25)
+
+  expect_equal(tail(simulation$C1, 1), 0.2)
+  expect_equal(tail(simulation$S1_amt_, 1), 0.1)
+})
+
+test_that("mrgsolve state event actions read the pre-event state", {
+  testthat::skip_if_not_installed("mrgsolve")
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  model <- list(
+    id = "simultaneous-state-actions",
+    constants = list(),
+    dynamic = list(list(id = "A", initial = 0, derivative = expression(0))),
+    static = list(
+      list(id = "C1", initial = 0.5),
+      list(id = "S1_amt_", initial = 1)
+    ),
+    assignments = list(),
+    timeEvents = list(),
+    events = list(list(
+      id = "change",
+      trigger = list(type = "conditional", rhs = expression(list("GreaterEqual", "t", 0.5))),
+      actions = list(
+        list(state = "C1", rhs = expression(0.2)),
+        list(state = "S1_amt_", rhs = expression(list("Multiply", 0.2, "C1")))
+      )
+    )),
+    observables = list()
+  )
+
+  compiled <- build_mrgsolve(model, observables = c("C1", "S1_amt_"), quiet = TRUE)
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 1, delta = 0.25)
+
+  expect_equal(tail(simulation$C1, 1), 0.2)
+  expect_equal(tail(simulation$S1_amt_, 1), 0.1)
+})
+
 test_that("mrgsolve export captures static states and assignments", {
   expression <- function(expr) list(expr = expr, format = "math-json")
   model <- list(
@@ -280,6 +342,46 @@ test_that("mrgsolve export converts Pi and safely negates negative values", {
   expect_identical(dynms_mathjson_to_c("Pi"), "acos(-1.0)")
   expect_identical(dynms_mathjson_to_c(list(sym = "Pi")), "acos(-1.0)")
   expect_identical(dynms_mathjson_to_c(list("Negate", -2)), "(-(-2.0))")
+})
+
+test_that("mrgsolve export uses MathJSON logarithm bases and gamma factorial", {
+  expect_identical(dynms_mathjson_to_c(list("Log", 100)), "log10(100.0)")
+  expect_identical(
+    dynms_mathjson_to_c(list("Log", 8, 2)),
+    "(log(8.0) / log(2.0))"
+  )
+  expect_identical(dynms_mathjson_to_c(list("Ln", 100)), "log(100.0)")
+  expect_identical(dynms_mathjson_to_c(list("Factorial", 0.5)), "tgamma((0.5 + 1.0))")
+})
+
+test_that("mrgsolve evaluates decimal Log and fractional Factorial", {
+  testthat::skip_if_not_installed("mrgsolve")
+  expression <- function(expr) list(expr = expr, format = "math-json")
+  model <- list(
+    id = "math-functions",
+    constants = list(),
+    dynamic = list(list(id = "A", initial = 0, derivative = expression(0))),
+    static = list(),
+    assignments = list(
+      list(id = "decimal_log", rhs = expression(list("Log", 100))),
+      list(id = "binary_log", rhs = expression(list("Log", 8, 2))),
+      list(id = "fractional_factorial", rhs = expression(list("Factorial", 0.5)))
+    ),
+    timeEvents = list(),
+    events = list(),
+    observables = list()
+  )
+
+  compiled <- build_mrgsolve(
+    model,
+    observables = c("decimal_log", "binary_log", "fractional_factorial"),
+    quiet = TRUE
+  )
+  simulation <- mrgsolve::mrgsim_df(compiled, end = 0.1, delta = 0.1)
+
+  expect_equal(simulation$decimal_log[[2]], 2)
+  expect_equal(simulation$binary_log[[2]], 3)
+  expect_equal(simulation$fractional_factorial[[2]], gamma(1.5))
 })
 
 test_that("mrgsolve export renders numeric literals as doubles", {
