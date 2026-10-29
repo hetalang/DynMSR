@@ -2,10 +2,10 @@ Running compilation in directory "/home/runner/work/DynMSR/DynMSR/fcts-run/node_
 
 No declaration file, running with defaults...
 
-[info]	Heta compiler v0.12.2 is initialized for the platform "undefined"
+[info]	Heta compiler v0.12.3 is initialized for the platform "undefined"
 [info]	Reading module of type "heta" from file "input.heta"...
 [info]	Reading module of type "sbml" from file "../../../cases/semantic/01337/01337-sbml-l3v1.xml"...
-[info]	Platform hash: 9fe0cee8691870f467a018d172fdd54c3561a6f6a3313fb2a03abf8f0e24d3db
+[info]	Platform hash: 9a99f5b36a24a4fb8c27457e23279d14d75024d964e7729aaf14c4ea4113e2d2
 [info]	Setting references in elements, total length 94
 [info]	Checking for circular references in Records.
 [warn]	Units checking skipped. To turn it on set "unitsCheck: true" in declaration.

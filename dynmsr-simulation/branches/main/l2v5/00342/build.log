@@ -2,9 +2,10 @@ Running compilation in directory "/home/runner/work/DynMSR/DynMSR/fcts-run/node_
 
 No declaration file, running with defaults...
 
-[info]	Heta compiler v0.12.2 is initialized for the platform "undefined"
+[info]	Heta compiler v0.12.3 is initialized for the platform "undefined"
 [info]	Reading module of type "heta" from file "input.heta"...
 [info]	Reading module of type "sbml" from file "../../../cases/semantic/00342/00342-sbml-l2v5.xml"...
+[warn]	SBML <rateRule variable="S4"> targets concentration species "S4" in compartment "compartment". It is imported as Process "S4_proc"; exported simulations may differ from SBML semantics, especially when the compartment changes.
 [info]	Platform hash: 42a22764391eb5287ea78e44eaf3947e447af74337c8978eae6dd5c344c7be0b
 [info]	Setting references in elements, total length 105
 [info]	Checking for circular references in Records.
