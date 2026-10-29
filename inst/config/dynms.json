@@ -1,0 +1,12 @@
+{
+  "versions": {
+    "0.2.1": {
+      "source": "https://raw.githubusercontent.com/hetalang/heta-compiler/v0.12.2/src/dynms/dynms.schema.json",
+      "target": "inst/schema/dynms.schema-0.2.1.json"
+    },
+    "0.2.2": {
+      "source": "https://raw.githubusercontent.com/hetalang/heta-compiler/v0.12.3/src/dynms/dynms.schema.json",
+      "target": "inst/schema/dynms.schema-0.2.2.json"
+    }
+  }
+}

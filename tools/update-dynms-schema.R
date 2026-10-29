@@ -3,7 +3,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 dry_run <- "--dry-run" %in% args
 
-config_path <- file.path("inst", "config", "dynms.schema.source.json")
+config_path <- file.path("inst", "config", "dynms.json")
 json_schema_meta_url <- "https://json-schema.org/draft/2020-12/schema"
 
 download_file <- function(url, dest) {
@@ -71,7 +71,33 @@ if (!file.exists(config_path)) {
   stop("Schema source config was not found: ", config_path, call. = FALSE)
 }
 
-config <- jsonlite::fromJSON(config_path, simplifyVector = FALSE)
+versions <- jsonlite::fromJSON(config_path, simplifyVector = FALSE)$versions
+if (!is.list(versions) || length(versions) == 0L ||
+    is.null(names(versions)) || any(!nzchar(names(versions)))) {
+  stop("DynMS config must contain named `versions` entries.", call. = FALSE)
+}
+
+version_args <- sub("^--version=", "", args[grepl("^--version=", args)])
+if (length(version_args) > 1L || (length(version_args) == 1L && !nzchar(version_args))) {
+  stop("Specify one non-empty `--version=VERSION` argument.", call. = FALSE)
+}
+if (length(version_args) == 0L) {
+  if (length(versions) != 1L) {
+    stop("Specify `--version=VERSION`. Available versions: ",
+         paste(names(versions), collapse = ", "), call. = FALSE)
+  }
+  version <- names(versions)[[1]]
+} else {
+  version <- version_args[[1]]
+}
+
+config <- versions[[version]]
+if (is.null(config)) {
+  stop("Unsupported DynMS version: ", version, call. = FALSE)
+}
+if (!is.list(config)) {
+  stop("DynMS version entry must contain `source` and `target` strings.", call. = FALSE)
+}
 
 if (!is.character(config$source) || length(config$source) != 1L || !nzchar(config$source)) {
   stop("Schema source config must contain a non-empty `source` string.", call. = FALSE)
@@ -108,7 +134,7 @@ if (is_url) {
         "",
         "Check internet access, DNS, proxy, or GitHub availability.",
         "The existing local schema was not modified.",
-        "If needed, set `source` in inst/config/dynms.schema.source.json",
+        "If needed, set `source` for this version in inst/config/dynms.json",
         "to a local schema file path and run this command again.",
         sep = "\n"
       ),
@@ -137,6 +163,11 @@ schema <- tryCatch(
 
 if (!is.list(schema) || is.null(schema[["$schema"]]) || is.null(schema[["$id"]])) {
   stop("Downloaded file does not look like a JSON Schema document.", call. = FALSE)
+}
+
+if (!identical(schema$properties$dynms$const, version)) {
+  stop("DynMS schema version does not match config version ", version,
+       ". The existing local schema was not modified.", call. = FALSE)
 }
 
 validate_json_schema(tmp)

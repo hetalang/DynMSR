@@ -113,7 +113,7 @@ heta_parse_version <- function(output) {
 
 heta_compiler_config <- function() {
   config <- jsonlite::fromJSON(.heta_compiler_config_path())
-  required <- c("package", "supportedVersion", "testVersion", "installationUrl")
+  required <- c("package", "supportedVersion", "installationUrl")
 
   if (!is.list(config) || !all(required %in% names(config))) {
     stop("Bundled Heta compiler configuration is invalid.", call. = FALSE)

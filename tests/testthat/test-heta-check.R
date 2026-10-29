@@ -211,7 +211,7 @@ test_that("sbml_load passes the shared output directory to heta_load", {
   expect_identical(captured$output_dir, output_dir)
 })
 
-test_that("heta_check finds the configured integration-test compiler", {
+test_that("heta_check finds the integration-test compiler", {
   skip_if_heta_integration_disabled()
 
   config <- heta_compiler_config()
@@ -219,7 +219,10 @@ test_that("heta_check finds the configured integration-test compiler", {
 
   expect_true(check$available, info = check$message)
   expect_true(check$supported, info = check$message)
-  expect_identical(check$version, config$testVersion, info = check$message)
+  expected_version <- Sys.getenv("HETA_COMPILER_VERSION", unset = "")
+  if (nzchar(expected_version)) {
+    expect_identical(check$version, expected_version, info = check$message)
+  }
   expect_identical(check$supported_version, config$supportedVersion)
   expect_identical(check$installation_url, config$installationUrl)
 })

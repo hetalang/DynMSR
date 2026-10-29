@@ -9,6 +9,7 @@ An R toolkit for systems-biology and systems-pharmacology models in
 [![GitHub issues](https://img.shields.io/badge/issues-GitHub-blue.svg)](https://github.com/hetalang/DynMSR/issues/)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/hetalang/DynMSR/blob/master/LICENSE.md)
 [![Autotests](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml/badge.svg)](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml)
+[![Downloads](https://cranlogs.r-pkg.org/badges/DynMSR)](https://cran.r-project.org/package=DynMSR)
 
 **DynMSR** helps you take a Heta project, an SBML model, or a DynMS JSON file
 and run it from R. It provides one convenient interface between these model
@@ -34,7 +35,13 @@ DynMS JSON ───────────────────────
 
 ## Installation
 
-> Currently not available on CRAN. You can install the development version from GitHub:
+Install the released version from CRAN:
+
+```r
+install.packages("DynMSR")
+```
+
+To install the development version from GitHub:
 
 ```r
 # install.packages("devtools")
@@ -43,15 +50,13 @@ devtools::install_github("hetalang/DynMSR")
 
 ## Heta project quick start
 
-DynMSR can also build a Heta project and load its DynMS export. This workflow,
+DynMSR can also build a Heta project. This workflow,
 as well as `sbml_load()`, requires a compatible `heta-compiler` installation.
-DynMSR is currently tested with `heta-compiler` version **0.12.2**. The
-supported version range and integration-test version are recorded in
-`inst/config/heta-compiler.json`.
+DynMSR works with `heta-compiler` starting from version **0.12.2**.
 
 Install the compiler by following the [official Heta installation
-instructions](https://hetalang.github.io/hetacompiler/installation.html),
-selecting version 0.12.2. Then create an empty directory, such as
+instructions](https://hetalang.github.io/hetacompiler/installation.html). 
+Then create an empty directory, such as
 `heta-quick-start`, and save this file as `heta-quick-start/index.heta`:
 
 ```heta
@@ -156,7 +161,7 @@ res <- mrgsim(mrgsolve_model)
 
 ## Backends
 
-DynMSR treats **mrgsolve** and **deSolve** as backend targets in
+DynMSR treats **mrgsolve** and **deSolve** (planned) as backend targets in
 its architecture: the same loaded DynMS model is intended to support either
 backend without changing the core loader or validator. The mrgsolve backend is
 available now. The deSolve backend is planned, but is not yet implemented and
@@ -208,7 +213,7 @@ Rscript -e "pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
 ```
 
 Heta integration tests are disabled by default. They require
-`heta-compiler` version 0.12.2 and can be enabled with:
+`heta-compiler` and can be enabled with:
 
 ```sh
 Rscript -e "Sys.setenv(DYNMSR_RUN_HETA_INTEGRATION = 'true'); pkgload::load_all('.'); testthat::test_dir('tests/testthat')"

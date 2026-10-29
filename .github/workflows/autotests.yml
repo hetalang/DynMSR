@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   check:
-    name: R ${{ matrix.r }} - ${{ matrix.os }}${{ matrix.heta_integration && ' - Heta integration' || '' }}
+    name: R ${{ matrix.r }} - ${{ matrix.os }}${{ matrix.heta_integration && ' - Heta ' || '' }}${{ matrix.heta_version || '' }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -23,12 +23,14 @@ jobs:
           - { os: windows-latest, r: 'devel' }
           - { os: macos-latest, r: 'release' }
           - { os: ubuntu-latest, r: 'devel' }
-          - { os: ubuntu-latest, r: 'release', heta_integration: true }
+          - { os: ubuntu-latest, r: 'release', heta_integration: true, heta_version: '0.12.2' }
+#          - { os: ubuntu-latest, r: 'release', heta_integration: true, heta_version: '0.12.3' }
           - { os: ubuntu-latest, r: 'oldrel' }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       DYNMSR_RUN_HETA_INTEGRATION: ${{ matrix.heta_integration && 'true' || 'false' }}
+      HETA_COMPILER_VERSION: ${{ matrix.heta_version }}
 
     steps:
       - name: Checkout repository
@@ -39,12 +41,6 @@ jobs:
         with:
           r-version: ${{ matrix.r }}
           use-public-rspm: true
-
-      - name: Read configured Heta compiler version
-        if: matrix.heta_integration
-        shell: bash
-        run: |
-          echo "HETA_COMPILER_VERSION=$(jq -r '.testVersion' inst/config/heta-compiler.json)" >> "$GITHUB_ENV"
 
       - name: Install Heta compiler
         if: matrix.heta_integration

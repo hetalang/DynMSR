@@ -6,11 +6,27 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
-  autotests:
-    name: Autotests
-    uses: ./.github/workflows/autotests.yml
+  verify-autotests:
+    name: Verify Autotests passed for release commit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Find successful Autotests run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          run_url="$(gh api -X GET "repos/${GITHUB_REPOSITORY}/actions/workflows/autotests.yml/runs" \
+            -f head_sha="${GITHUB_SHA}" -f event=push -f status=success \
+            --jq '.workflow_runs[0].html_url // empty')"
+          if [[ -z "$run_url" ]]; then
+            echo "No successful Autotests push run found for release commit ${GITHUB_SHA}."
+            exit 1
+          fi
+          echo "Successful Autotests run: $run_url"
 
   cran-check:
     name: CRAN check
@@ -41,7 +57,7 @@ jobs:
 
   build-and-upload:
     name: Build and attach package source
-    needs: [autotests, cran-check]
+    needs: [verify-autotests, cran-check]
     runs-on: ubuntu-latest
 
     steps:

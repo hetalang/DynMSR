@@ -1,0 +1,595 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/hetalang/heta-compiler/v0.12.3/src/dynms/dynms.schema.json",
+  "title": "DynMS 0.2.2 document",
+  "description": "Dynamic Model Specification (DynMS) document schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dynms", "models"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "dynms": {
+      "type": "string",
+      "const": "0.2.2"
+    },
+    "generator": {
+      "$ref": "#/$defs/generator"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "platformId": {
+      "type": "string"
+    },
+    "platformVersion": {
+      "type": "string"
+    },
+    "platformNotes": {
+      "type": "string"
+    },
+    "license": {
+      "type": "string"
+    },
+    "models": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/model"
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scenario"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[_A-Za-z][_A-Za-z0-9]*$",
+      "not": {
+        "enum": ["t", "Pi", "ExponentialE", "NaN", "Infinity", "True", "False"]
+      }
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "constants", "dynamic", "static", "assignments", "timeEvents", "events", "observables"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "constants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/constant"
+          }
+        },
+        "dynamic": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dynamicState"
+          }
+        },
+        "static": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/staticState"
+          }
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assignment"
+          }
+        },
+        "timeEvents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/timeEvent"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          }
+        },
+        "observables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observable"
+          }
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "model", "tspan"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "model": {
+          "$ref": "#/$defs/identifier"
+        },
+        "tspan": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "parameters": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "saveat": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "observables": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "eventsActive": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "eventsSave": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "boolean" },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "constant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "value"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "value": {
+          "type": "number"
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "dynamicState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "initial", "derivative"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "initial": {
+          "$ref": "#/$defs/value"
+        },
+        "derivative": {
+          "$ref": "#/$defs/expression"
+        },
+        "algebraic": {
+          "type": "boolean",
+          "default": false
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "staticState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "initial"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "initial": {
+          "$ref": "#/$defs/value"
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rhs"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "rhs": {
+          "$ref": "#/$defs/expression"
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "timeEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "trigger", "actions"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "trigger": {
+          "$ref": "#/$defs/timeTrigger"
+        },
+        "priority": {
+          "type": "integer",
+          "default": 0
+        },
+        "active": {
+          "type": "boolean",
+          "default": true
+        },
+        "stopSimulation": {
+          "type": "boolean",
+          "default": false
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventAction"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "trigger", "actions"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "trigger": {
+          "$ref": "#/$defs/nonTimeEventTrigger"
+        },
+        "priority": {
+          "type": "integer",
+          "default": 0
+        },
+        "active": {
+          "type": "boolean",
+          "default": true
+        },
+        "stopSimulation": {
+          "type": "boolean",
+          "default": false
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventAction"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "nonTimeEventTrigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "rhs"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["crossing", "conditional"]
+        },
+        "rhs": {
+          "$ref": "#/$defs/expression"
+        },
+        "detection": {
+          "type": "string",
+          "enum": ["root", "step"]
+        },
+        "atStart": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "timeTrigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "start"],
+      "properties": {
+        "type": {
+          "const": "time"
+        },
+        "start": {
+          "$ref": "#/$defs/value",
+          "description": "Required first activation time."
+        },
+        "period": {
+          "$ref": "#/$defs/value",
+          "description": "Optional repeat interval. For compatibility, non-positive values are treated as one-shot behavior (same as omitted period)."
+        },
+        "stop": {
+          "$ref": "#/$defs/value",
+          "description": "Optional upper time bound used mainly for periodic triggers."
+        }
+      }
+    },
+    "eventAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "rhs"],
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/identifier"
+        },
+        "rhs": {
+          "$ref": "#/$defs/expression"
+        }
+      }
+    },
+    "observable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["symbol"],
+      "properties": {
+        "symbol": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "value": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "$ref": "#/$defs/expression"
+        }
+      ]
+    },
+    "expression": {
+      "oneOf": [
+        { "$ref": "#/$defs/mathjsonExpression" },
+        { "$ref": "#/$defs/lineExpression" }
+      ]
+    },
+    "lineExpression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expr", "format"],
+      "properties": {
+        "expr": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "string",
+          "enum": ["heta", "c", "mrgsolve", "julia"]
+        }
+      }
+    },
+    "mathjsonExpression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expr", "format"],
+      "properties": {
+        "expr": {
+          "$ref": "#/$defs/mathJsonNode"
+        },
+        "format": {
+          "type": "string",
+          "const": "math-json"
+        }
+      }
+    },
+    "mathJsonNode": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        {
+          "$ref": "#/$defs/mathJsonFunctionArray"
+        },
+        {
+          "$ref": "#/$defs/mathJsonNumberObject"
+        },
+        {
+          "$ref": "#/$defs/mathJsonSymbolObject"
+        },
+        {
+          "$ref": "#/$defs/mathJsonStringObject"
+        },
+        {
+          "$ref": "#/$defs/mathJsonFunctionObject"
+        }
+      ]
+    },
+    "mathJsonFunctionName": {
+      "type": "string",
+      "enum": [
+        "Abs",
+        "Add",
+        "And",
+        "Arccos",
+        "Arccot",
+        "Arccsc",
+        "Arcsec",
+        "Arcsin",
+        "Arctan",
+        "Ceil",
+        "Cos",
+        "Cot",
+        "Csc",
+        "Divide",
+        "Equal",
+        "Exp",
+        "Factorial",
+        "Floor",
+        "Greater",
+        "GreaterEqual",
+        "If",
+        "Lb",
+        "Less",
+        "LessEqual",
+        "Lg",
+        "Ln",
+        "Log",
+        "Max",
+        "Min",
+        "Multiply",
+        "Negate",
+        "Not",
+        "NotEqual",
+        "Or",
+        "Power",
+        "Root",
+        "Sec",
+        "Sign",
+        "Sin",
+        "Sqrt",
+        "Square",
+        "Tan",
+        "Which",
+        "Xor"
+      ]
+    },
+    "mathJsonFunctionArray": {
+      "type": "array",
+      "minItems": 1,
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/mathJsonFunctionName"
+        }
+      ],
+      "items": {
+        "$ref": "#/$defs/mathJsonNode"
+      }
+    },
+    "mathJsonNumberObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["num"],
+      "properties": {
+        "num": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "mathJsonSymbolObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sym"],
+      "properties": {
+        "sym": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        }
+      }
+    },
+    "mathJsonStringObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["str"],
+      "properties": {
+        "str": {
+          "type": "string"
+        }
+      }
+    },
+    "mathJsonFunctionObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fn"],
+      "properties": {
+        "fn": {
+          "$ref": "#/$defs/mathJsonFunctionArray"
+        }
+      }
+    }
+  }
+}
