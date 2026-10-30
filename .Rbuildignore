@@ -8,6 +8,7 @@
 ^TODO\.md$
 ^cran-comments\.md$
 ^tools$
+^docs$
 ^_drafts$
 ^_issues$
 ^.*\.Rproj$

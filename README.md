@@ -9,6 +9,7 @@ An R toolkit for systems-biology and systems-pharmacology models in
 [![GitHub issues](https://img.shields.io/badge/issues-GitHub-blue.svg)](https://github.com/hetalang/DynMSR/issues/)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/hetalang/DynMSR/blob/master/LICENSE.md)
 [![Autotests](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml/badge.svg)](https://github.com/hetalang/DynMSR/actions/workflows/autotests.yml)
+[![CRAN version](https://www.r-pkg.org/badges/version/DynMSR)](https://cran.r-project.org/package=DynMSR)
 [![Downloads](https://cranlogs.r-pkg.org/badges/DynMSR)](https://cran.r-project.org/package=DynMSR)
 
 **DynMSR** helps you take a Heta project, an SBML model, or a DynMS JSON file
