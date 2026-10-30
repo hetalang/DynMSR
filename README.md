@@ -219,10 +219,10 @@ Heta integration tests are disabled by default. They require
 Rscript -e "Sys.setenv(DYNMSR_RUN_HETA_INTEGRATION = 'true'); pkgload::load_all('.'); testthat::test_dir('tests/testthat')"
 ```
 
-Regenerate roxygen2 documentation, including `NAMESPACE` and `man/*.Rd`, with:
+Build the Markdown documentation in `docs/` (and refresh roxygen2 documentation):
 
 ```sh
-Rscript -e "roxygen2::roxygenise()"
+Rscript tools/build-reference-markdown.R
 ```
 
 Bundled DynMS JSON Schemas are stored in `inst/schema/`. Supported versions,

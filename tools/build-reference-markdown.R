@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
-# Build Markdown reference pages for the Heta documentation site.
-# Run from the DynMSR package root after installing roxygen2 and Rd2md.
+# Build Markdown reference and vignette pages for the Heta documentation site.
+# Run from the DynMSR package root after installing the development tools below.
 
 if (!requireNamespace("roxygen2", quietly = TRUE)) {
   stop("Install roxygen2 to generate man/*.Rd before building Markdown pages.")
@@ -11,11 +11,16 @@ if (!requireNamespace("Rd2md", quietly = TRUE)) {
   stop("Install Rd2md to convert Rd help pages to Markdown.")
 }
 
+if (!requireNamespace("knitr", quietly = TRUE) ||
+    !requireNamespace("pkgload", quietly = TRUE)) {
+  stop("Install knitr and pkgload to render the vignette from the current package source.")
+}
+
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 1L) {
   stop("Usage: Rscript tools/build-reference-markdown.R [output-directory]")
 }
-output_dir <- if (length(args)) args[[1L]] else "docs/dynmsr/reference"
+output_dir <- if (length(args)) args[[1L]] else "docs/reference"
 
 roxygen2::roxygenise()
 rd_files <- list.files("man", pattern = "\\.Rd$", full.names = TRUE)
@@ -56,3 +61,23 @@ index <- c(index, sprintf("- [%s](./%s.md)", topics, topics))
 writeLines(index, file.path(output_dir, "index.md"), useBytes = TRUE)
 
 message("Built ", length(rd_files), " reference pages in ", output_dir)
+
+vignette_source <- "vignettes/getting-started.Rmd"
+if (!file.exists(vignette_source)) stop("Vignette not found: ", vignette_source)
+
+pkgload::load_all(".", quiet = TRUE)
+knit_file <- tempfile(fileext = ".md")
+invisible(knitr::knit(vignette_source, output = knit_file, quiet = TRUE))
+lines <- readLines(knit_file, warn = FALSE, encoding = "UTF-8")
+frontmatter_end <- which(lines == "---")
+if (length(frontmatter_end) < 2L || frontmatter_end[[1L]] != 1L) {
+  stop("Expected YAML frontmatter in ", vignette_source)
+}
+lines <- lines[-seq_len(frontmatter_end[[2L]])]
+lines <- lines[c(TRUE, !(lines[-1L] == "" & lines[-length(lines)] == ""))]
+lines <- sub("^``` r$", "```r", lines)
+lines <- c("# Getting started with DynMSR", lines)
+vignette_target <- file.path(dirname(output_dir), "getting-started.md")
+writeLines(lines, vignette_target, useBytes = TRUE)
+unlink(knit_file)
+message("Built vignette page in ", vignette_target)

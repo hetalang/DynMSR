@@ -24,9 +24,12 @@ Imports:
     jsonvalidate,
     whisker
 Suggests:
+    knitr,
     mrgsolve,
+    rmarkdown,
     testthat (>= 3.0.0),
     withr
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/hetalang/DynMSR
 BugReports: https://github.com/hetalang/DynMSR/issues

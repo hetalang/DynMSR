@@ -1,0 +1,43 @@
+[
+  {
+    "text": "DynMSR",
+    "items": [
+      { "text": "Getting started", "link": "/dynmsr-docs/getting-started" },
+      { "text": "Function reference", "link": "/dynmsr-docs/reference/" },
+      {
+        "text": "DynMS models",
+        "items": [
+          { "text": "dynms_read", "link": "/dynmsr-docs/reference/dynms_read" },
+          { "text": "dynms_load", "link": "/dynmsr-docs/reference/dynms_load" },
+          { "text": "dynms_validate_schema", "link": "/dynmsr-docs/reference/dynms_validate_schema" },
+          { "text": "dynms_validate_semantic", "link": "/dynmsr-docs/reference/dynms_validate_semantic" },
+          { "text": "get_model", "link": "/dynmsr-docs/reference/get_model" },
+          { "text": "dynms_lib", "link": "/dynmsr-docs/reference/dynms_lib" }
+        ]
+      },
+      {
+        "text": "mrgsolve backend",
+        "items": [
+          { "text": "write_mrgsolve", "link": "/dynmsr-docs/reference/write_mrgsolve" },
+          { "text": "build_mrgsolve", "link": "/dynmsr-docs/reference/build_mrgsolve" }
+        ]
+      },
+      {
+        "text": "Optional Heta and SBML inputs",
+        "items": [
+          { "text": "heta_check", "link": "/dynmsr-docs/reference/heta_check" },
+          { "text": "heta_build", "link": "/dynmsr-docs/reference/heta_build" },
+          { "text": "heta_load", "link": "/dynmsr-docs/reference/heta_load" },
+          { "text": "sbml_load", "link": "/dynmsr-docs/reference/sbml_load" }
+        ]
+      },
+      {
+        "text": "Printing",
+        "items": [
+          { "text": "print.platform", "link": "/dynmsr-docs/reference/print.platform" },
+          { "text": "print.model", "link": "/dynmsr-docs/reference/print.model" }
+        ]
+      }
+    ]
+  }
+]
